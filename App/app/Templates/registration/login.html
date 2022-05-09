@@ -1,0 +1,34 @@
+<!-- templates/registration/login.html -->
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+  .loginform  *{ 
+    text-align: center !important;
+  }
+
+  .btn-primary{
+    background-color: #1F1D4F;
+    border-color: #1F1D4F;
+  }
+
+</style>
+<div style="background-color:#1F1D4F; height: 100vh">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center fondoFlores py-5"> 
+      <div class="col-md-8 col-lg-6 col-xl-4 shadow-lg p-5 my-5 bg-white rounded ">
+        <div class="loginform">
+          <h2 class="pb-3">Iniciar Sesión</h2>
+          <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary mt-2" type="submit">Log In</button>
+          </form>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+{% endblock %}

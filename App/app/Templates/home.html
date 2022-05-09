@@ -1,0 +1,20 @@
+<!-- templates/home.html-->
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+{% block head %}
+    {{ super }}
+    <link rel="stylesheet" href="./css/botton.css" />
+    {% endblock %}
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  <h5>¿Desea ir a sus proyectos?</h5>
+  <p><a class="btn btn-primary" href="{% url 'proyectos' %}">Proyectos</a></p>
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+{% endblock %}

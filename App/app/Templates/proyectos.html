@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Proyectos{% endblock %}
+{% block head %}
+    {{ super }}
+    <link rel="stylesheet" href="./css/botton.css" />
+    {% endblock %}
+{% block content %}
+{% if user.is_authenticated %}
+  Hi {{ user.username }}!
+  {% if ok %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Proyect Name</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in proyectos %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{p.titulo}}</td>
+        <td>TodoList</td>
+      </tr>
+      {% endfor %}
+      
+    </tbody>
+  </table>
+
+  {% else %}
+  <h3>No tienes proyectos</h3>
+  {% endif %}
+  <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Crear Proyecto</a></p>
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+{% endblock %}
