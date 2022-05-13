@@ -9,6 +9,7 @@ from suite.forms import *
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
 def proyectos(request):
+    #obtengo todos los proyectos y filtro por los que son mios
     proyectos=Proyecto.objects.all()
     mio=[]
     ok=False
@@ -17,21 +18,22 @@ def proyectos(request):
         if p.owner==usuario:
             mio.append(p)
             ok=True
-    print(mio)
     return render(request,'proyectos.html',{"ok":ok,"proyectos":mio})
 
 def crearProyecto(request):
+    #creo el formulario proyecto y lo mando al template
+    #si el form tiene datos invalidos creo el objeto y guardo en bd
     if request.method == "POST":
         formulario = ProyectoForm(request.POST)
         if formulario.is_valid():
             print(formulario)
-        #formulario.cleaned_data['owner']=request.user
             formulario.save()   
             return redirect(reverse('proyectos')) 
     else: 
         formulario = ProyectoForm(instance=request.user)
     return render(request, "proyecto-crear.html", {"form" : formulario})
 def eliminarProyecto(request,id):
+    #obtengo el proyecto a eliminar por id y lo elimino
     proyecto=Proyecto.objects.get(id=id)
     try:
         proyecto.delete()
@@ -40,6 +42,9 @@ def eliminarProyecto(request,id):
     return redirect(reverse('proyectos'))
 
 def modificarProyecto(request,id):
+    #obtengo los datos del proyecto por id
+    #mando los datos del proyecto con el form
+    #solamente modifica el nombre
     proyecto=Proyecto.objects.get(id=id)
     if request.method == "POST":
         formulario = ProyectoForm(request.POST)
@@ -52,3 +57,15 @@ def modificarProyecto(request,id):
         datosAModificar={'titulo': proyecto.titulo,'owner':proyecto.owner}
         formulario = ProyectoForm(datosAModificar,instance=request.user,initial=datosAModificar)
     return render(request, "proyecto-crear.html", {"form" : formulario})
+
+
+############################### Escenarios ##########################################
+# En este lugar estaran todos los codigos del modulo de Escenarios
+####################################################################################
+def artefactos(request,id):
+    proyecto=Proyecto.objects.get(id=id)
+    escen= proyecto.artefactos.all()
+    ok=False
+    if escen:
+        ok=True
+    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok})

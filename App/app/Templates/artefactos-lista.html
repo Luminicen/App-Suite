@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Proyectos{% endblock %}
+{% block title %}Artefactos del proyecto{% endblock %}
 {% block head %}
     {{ super }}
     <link rel="stylesheet" href="./css/botton.css" />
@@ -13,16 +13,16 @@
     <thead>
       <tr>
         <th scope="col">#</th>
-        <th scope="col">Proyect Name</th>
+        <th scope="col">Artifact Name</th>
         <th scope="col">Actions</th>
       </tr>
     </thead>
     <tbody>
-      {% for p in proyectos %}
+      {% for p in artifacts %}
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.titulo}}</td>
-        <td><a href="{% url 'destruirProyecto' p.id%}">Eliminar</a> | <a href="{% url 'modificarProyecto' p.id%}">Modificar</a> | <a href="{% url 'artefactos' p.id%}">Artefactos</a></td>
+        <td>TO DO LIST</td>
       </tr>
       {% endfor %}
       
@@ -30,9 +30,9 @@
   </table>
 
   {% else %}
-  <h3>No tienes proyectos</h3>
+  <h3>No tienes Artefactos</h3>
   {% endif %}
-  <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Crear Proyecto</a></p>
+  <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Crear Artefacto</a></p>
   <p><a href="{% url 'logout' %}">Log Out</a></p>
 {% else %}
   <p>You are not logged in</p>

@@ -18,8 +18,9 @@ class Proyecto(models.Model):
 class Artefacto(models.Model):
     #artefactos (texto owner, tipoDeArtefacto)
     #los textos de cualquier tipo :P
+    nombre = models.CharField(max_length=255,blank=False)
     texto = models.TextField()
     owner= models.ForeignKey(User, on_delete=models.CASCADE)
     tipoDeArtefacto= models.ForeignKey('tipoDeArtefacto', on_delete=models.CASCADE)
     def __str__(self):
-        return f"Texto de tipo {self.tipoDeArtefacto.titulo} de {self.owner.username}"
+        return f"Texto de tipo {self.tipoDeArtefacto.titulo} de {self.owner.username} llamado {self.nombre}"
