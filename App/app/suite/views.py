@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from suite.models import *
 from suite.forms import *
 # Create your views here.
@@ -23,7 +24,8 @@ def crearProyecto(request):
         if formulario.is_valid():
             print(formulario)
         #formulario.cleaned_data['owner']=request.user
-            formulario.save()    
+            formulario.save()   
+            return redirect(reverse('proyectos')) 
     else: 
         formulario = ProyectoForm(instance=request.user)
     return render(request, "proyecto-crear.html", {"form" : formulario})
