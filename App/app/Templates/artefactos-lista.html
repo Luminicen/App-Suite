@@ -32,7 +32,10 @@
   {% else %}
   <h3>No tienes Artefactos</h3>
   {% endif %}
-  <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Crear Artefacto</a></p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+  <button class="btn btn-primary mt-2" type="submit">Submit</button>
   <p><a href="{% url 'logout' %}">Log Out</a></p>
 {% else %}
   <p>You are not logged in</p>

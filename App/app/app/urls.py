@@ -26,4 +26,5 @@ urlpatterns = [
     path('proyectos/eliminar/<str:id>',eliminarProyecto,name="destruirProyecto"),
     path('proyectos/modificar/<str:id>',modificarProyecto,name="modificarProyecto"),
     path('proyectos/artefactos/<str:id>',artefactos,name="artefactos"),
+    path('proyectos/artefactos/crear/<str:idP>/<str:idT>',crearArtefactos,name="crearArtefactos"),
 ]

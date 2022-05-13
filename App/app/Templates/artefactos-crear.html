@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Artefacto{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+    <button class="btn btn-primary mt-2" type="submit">Submit</button>
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+{% else %}
+  <p>You are not logged in</p>
+  <a href="{% url 'login' %}">Log In</a>
+{% endif %}
+{% endblock %}

@@ -23,4 +23,4 @@ class Artefacto(models.Model):
     owner= models.ForeignKey(User, on_delete=models.CASCADE)
     tipoDeArtefacto= models.ForeignKey('tipoDeArtefacto', on_delete=models.CASCADE)
     def __str__(self):
-        return f"Texto de tipo {self.tipoDeArtefacto.titulo} de {self.owner.username} llamado {self.nombre}"
+        return f"Texto de tipo {self.tipoDeArtefacto.tipo} de {self.owner.username} llamado {self.nombre}"

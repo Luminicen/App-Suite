@@ -4,6 +4,7 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from suite.models import *
 from suite.forms import *
+import json
 # Create your views here.
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
@@ -68,4 +69,64 @@ def artefactos(request,id):
     ok=False
     if escen:
         ok=True
-    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok})
+    if request.method == "POST":
+        formulario = ElejirArtefactoAcrear(request.POST)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            idT=TipoDeArtefacto.objects.get(id=infForma['eleccion']).id
+            idP=proyecto.id
+            return redirect(reverse('crearArtefactos',kwargs={'idP':idP,'idT':idT})) 
+    form=ElejirArtefactoAcrear()
+    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form})
+def tipoForm(tipo,val):
+    #elegirTipo
+    #debe estar tal cual esta cargado en la BD
+    formulario=None
+    if tipo.tipo=="textoplano":
+        if val!=None:
+            formulario = textoPlano(val)
+        else:
+            formulario = textoPlano()
+    elif tipo.tipo=="Scenario":
+        if val!=None:
+            formulario = Scenarios(val)
+        else:
+            formulario = Scenarios()
+    else:
+        if val!=None:
+            formulario = textoPlano(val)
+        else:
+            formulario = textoPlano()
+    return formulario
+def convertidorDeForms(tipo,form,usr):
+    #lugar= Lugares(nombre=infForm['nombre'],provincia=infForm['provincia'],cod_postal=infForm['codigo_postal'])
+    #lugar.save()
+    texto=None
+    if tipo.tipo=="textoplano":
+       texto=Artefacto(nombre=form['nombre'],texto=form['texto'],owner=usr,tipoDeArtefacto=tipo)
+    elif tipo.tipo=="Scenario":
+        aux=json.dumps(form,indent=4)
+        texto=Artefacto(nombre=form['ScenarioName'],texto=aux,owner=usr,tipoDeArtefacto=tipo)
+    else:
+        texto=Artefacto(nombre=form['nombre'],texto=form['texto'],owner=usr,tipoDeArtefacto=tipo)
+    if texto!=None:
+        texto.save()
+    else:
+        raise("Te olvidaste de agregar el tipo al if GIL?")
+def crearArtefactos(request,idP,idT):
+    #idP = id del Proyecto
+    #idT = id del Tipo
+    proyecto=Proyecto.objects.get(id=idP)
+    tipo=TipoDeArtefacto.objects.get(id=idT)
+    if request.method == "POST":
+        formulario = form=tipoForm(tipo,request.POST)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            convertidorDeForms(tipo,infForma,request.user)
+            #proyecto.titulo=infForma['titulo']
+            #proyecto.save()   
+            #return redirect(reverse('proyectos')) 
+    else:
+        form=tipoForm(tipo,None)
+
+    return render(request, "proyecto-crear.html", {"form" : form})
