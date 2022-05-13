@@ -132,3 +132,10 @@ def crearArtefactos(request,idP,idT):
         form=tipoForm(tipo,None)
 
     return render(request, "proyecto-crear.html", {"form" : form})
+
+def modificarArtefacto(request,id):
+    artefacto= Artefacto.objects.get(id=id)
+    texto=json.loads(artefacto.texto)
+    print(texto)
+    #queda llenar el form y mandarlo como siempre
+    pass
