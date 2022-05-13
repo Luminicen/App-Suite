@@ -14,6 +14,7 @@
       <tr>
         <th scope="col">#</th>
         <th scope="col">Artifact Name</th>
+        <th scope="col">Type</th>
         <th scope="col">Actions</th>
       </tr>
     </thead>
@@ -21,7 +22,8 @@
       {% for p in artifacts %}
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
-        <td>{{p.titulo}}</td>
+        <td>{{p.nombre}}</td>
+        <td>{{p.tipoDeArtefacto}}</td>
         <td>TO DO LIST</td>
       </tr>
       {% endfor %}

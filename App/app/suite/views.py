@@ -66,6 +66,7 @@ def modificarProyecto(request,id):
 def artefactos(request,id):
     proyecto=Proyecto.objects.get(id=id)
     escen= proyecto.artefactos.all()
+    print(escen)
     ok=False
     if escen:
         ok=True
@@ -99,8 +100,6 @@ def tipoForm(tipo,val):
             formulario = textoPlano()
     return formulario
 def convertidorDeForms(tipo,form,usr):
-    #lugar= Lugares(nombre=infForm['nombre'],provincia=infForm['provincia'],cod_postal=infForm['codigo_postal'])
-    #lugar.save()
     texto=None
     if tipo.tipo=="textoplano":
        texto=Artefacto(nombre=form['nombre'],texto=form['texto'],owner=usr,tipoDeArtefacto=tipo)
@@ -113,6 +112,7 @@ def convertidorDeForms(tipo,form,usr):
         texto.save()
     else:
         raise("Te olvidaste de agregar el tipo al if GIL?")
+    return texto
 def crearArtefactos(request,idP,idT):
     #idP = id del Proyecto
     #idT = id del Tipo
@@ -122,11 +122,12 @@ def crearArtefactos(request,idP,idT):
         formulario = form=tipoForm(tipo,request.POST)
         if formulario.is_valid():
             infForma=formulario.cleaned_data
-            convertidorDeForms(tipo,infForma,request.user)
-            #proyecto.titulo=infForma['titulo']
-            #proyecto.save()   
-            #return redirect(reverse('proyectos')) 
+            texto=convertidorDeForms(tipo,infForma,request.user)  
+            proyecto.artefactos.add(texto)
+            proyecto.save()
+            return redirect(reverse('artefactos',kwargs={'id':idP}))
     else:
+        #uso None para inicializar un form vacio
         form=tipoForm(tipo,None)
 
     return render(request, "proyecto-crear.html", {"form" : form})
