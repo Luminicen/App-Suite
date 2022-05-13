@@ -1,3 +1,5 @@
+from MySQLdb import IntegrityError
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from suite.models import *
@@ -29,3 +31,14 @@ def crearProyecto(request):
     else: 
         formulario = ProyectoForm(instance=request.user)
     return render(request, "proyecto-crear.html", {"form" : formulario})
+def eliminarProyecto(request,id):
+    proyecto=Proyecto.objects.get(id=id)
+    try:
+        proyecto.delete()
+    except IntegrityError as e:
+        return HttpResponse("ha ocurrido un error")
+    return redirect(reverse('proyectos'))
+
+def modificarProyecto(request,id):
+    proyecto=Proyecto.objects.get(id=id)
+    pass

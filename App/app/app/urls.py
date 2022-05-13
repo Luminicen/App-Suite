@@ -23,4 +23,5 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('proyectos/',proyectos,name="proyectos"),
     path('proyectos/crear/',crearProyecto,name='crearProyecto'),
+    path('proyectos/eliminar/<str:id>',eliminarProyecto,name="destruirProyecto")
 ]
