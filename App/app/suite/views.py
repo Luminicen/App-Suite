@@ -100,6 +100,7 @@ def tipoForm(tipo,val):
             formulario = textoPlano()
     return formulario
 def convertidorDeForms(tipo,form,usr):
+    #transformo los fomularios a un texto X
     texto=None
     if tipo.tipo=="textoplano":
        texto=Artefacto(nombre=form['nombre'],texto=form['texto'],owner=usr,tipoDeArtefacto=tipo)
