@@ -41,4 +41,14 @@ def eliminarProyecto(request,id):
 
 def modificarProyecto(request,id):
     proyecto=Proyecto.objects.get(id=id)
-    pass
+    if request.method == "POST":
+        formulario = ProyectoForm(request.POST)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            proyecto.titulo=infForma['titulo']
+            proyecto.save()   
+            return redirect(reverse('proyectos')) 
+    else:
+        datosAModificar={'titulo': proyecto.titulo,'owner':proyecto.owner}
+        formulario = ProyectoForm(datosAModificar,instance=request.user,initial=datosAModificar)
+    return render(request, "proyecto-crear.html", {"form" : formulario})

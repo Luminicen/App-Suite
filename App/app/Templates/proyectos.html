@@ -22,7 +22,7 @@
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.titulo}}</td>
-        <td><a href="{% url 'destruirProyecto' p.id%}">Eliminar</a></td>
+        <td><a href="{% url 'destruirProyecto' p.id%}">Eliminar</a> | <a href="{% url 'modificarProyecto' p.id%}">Modificar</a></td>
       </tr>
       {% endfor %}
       
