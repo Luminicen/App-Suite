@@ -98,6 +98,8 @@ def tipoForm(tipo,val):
             formulario = textoPlano(val)
         else:
             formulario = textoPlano()
+    if formulario==None:
+        raise("TE OLVIDASTE DE CONFIGURAR LA FUNCION TIPO FORM GIL")
     return formulario
 def convertidorDeForms(tipo,form,usr):
     #transformo los fomularios a un texto X
@@ -142,3 +144,10 @@ def modificarArtefacto(request,id,idP):
         form=tipoForm(artefacto.tipoDeArtefacto,texto)
     #queda llenar el form y mandarlo como siempre
     return render(request, "proyecto-crear.html", {"form" : form})
+
+def destruirArtefacto(request,id,idP):
+    artefacto= Artefacto.objects.get(id=id)
+    proyecto= Proyecto.objects.get(id=idP)
+    proyecto.artefactos.remove(artefacto)
+    artefacto.delete()
+    return redirect(reverse('artefactos',kwargs={'id':idP}))
