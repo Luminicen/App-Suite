@@ -7,7 +7,6 @@
     {% endblock %}
 {% block content %}
 {% if user.is_authenticated %}
-  Hi {{ user.username }}!
   {% if ok %}
   <table class="table">
     <thead>

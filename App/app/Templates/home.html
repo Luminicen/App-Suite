@@ -8,7 +8,6 @@
     {% endblock %}
 {% block content %}
 {% if user.is_authenticated %}
-  Hi {{ user.username }}!
   <h5>¿Desea ir a sus proyectos?</h5>
   <p><a class="btn btn-primary" href="{% url 'proyectos' %}">Proyectos</a></p>
   <p><a href="{% url 'logout' %}">Log Out</a></p>

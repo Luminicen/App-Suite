@@ -1,14 +1,16 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block title %}Proyectos{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
     <form method="post">
+      <div class="form-control">
         {% csrf_token %}
-        {{ form.as_p }}
+        {{ form | crispy }}
+      </div>
     <button class="btn btn-primary mt-2" type="submit">Submit</button>
-  <p><a href="{% url 'logout' %}">Log Out</a></p>
+    </form>
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log In</a>
