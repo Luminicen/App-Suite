@@ -84,30 +84,15 @@ def artefactos(request,id):
         for i in sel:
             if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
                 esce.append(i)
-        formatoToKG(esce)
-        print(sel)
-        print(esce)
+        if esce:
+            formatoToKG(esce)
     form=ElejirArtefactoAcrear()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"idP":id})
 def tipoForm(tipo,val):
     #elegirTipo
     #debe estar tal cual esta cargado en la BD
     formulario=None
-    if tipo.tipo=="textoplano":
-        if val!=None:
-            formulario = textoPlano(val)
-        else:
-            formulario = textoPlano()
-    elif tipo.tipo=="Scenario":
-        if val!=None:
-            formulario = Scenarios(val)
-        else:
-            formulario = Scenarios()
-    else:
-        if val!=None:
-            formulario = textoPlano(val)
-        else:
-            formulario = textoPlano()
+    formulario=globals()[tipo.tipo]().formulario(val)
     if formulario==None:
         raise("TE OLVIDASTE DE CONFIGURAR LA FUNCION TIPO FORM GIL")
     return formulario
@@ -220,3 +205,22 @@ def consumirApi(texto):
     dec=json.loads(rta.text)
     print(dec)
     pass
+###########################################################################################
+#CLASES
+#
+##########################################################################################
+class textoplano:
+
+    def formulario(self,val):
+        if val!=None:
+            formulario = textoPlano(val)
+        else:
+            formulario = textoPlano()
+        return formulario
+class Scenario:
+    def formulario(self,val):
+        if val!=None:
+            formulario = Scenarios(val)
+        else:
+            formulario = Scenarios()
+        return formulario
