@@ -8,6 +8,7 @@
 {% block content %}
 {% if user.is_authenticated %}
   {% if ok %}
+  <form method="get">
   <table class="table">
     <thead>
       <tr>
@@ -15,6 +16,7 @@
         <th scope="col">Artifact Name</th>
         <th scope="col">Type</th>
         <th scope="col">Actions</th>
+        <th scope="col">Seleccionado</th>
       </tr>
     </thead>
     <tbody>
@@ -24,12 +26,14 @@
         <td>{{p.nombre}}</td>
         <td>{{p.tipoDeArtefacto}}</td>
         <td><a href="{% url 'modificarArtefactos' p.id idP%}">Modificar</a> | <a href="{% url 'destruirArtefactos' p.id idP%}">Eliminar</a></td>
+        <td><input type="checkbox" id="{{p.id}}" value="{{p.id}}" name="seleccionados"></td>
       </tr>
       {% endfor %}
       
     </tbody>
   </table>
-
+  <button class="btn btn-primary mt-2" type="submit">TO KNOWLEDGE GRAPH</button>
+</form>
   {% else %}
   <h3>No tienes Artefactos</h3>
   {% endif %}

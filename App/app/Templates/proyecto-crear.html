@@ -5,7 +5,7 @@
 {% block content %}
 {% if user.is_authenticated %}
     <form method="post">
-      <div class="form-control">
+      <div>
         {% csrf_token %}
         {{ form | crispy }}
       </div>
@@ -16,5 +16,6 @@
   <a href="{% url 'login' %}">Log In</a>
 {% endif %}
 {% load static %}
-<script src="{% static 'scripts/textareaconverter.js' %}"></script>
+
+<script src="{% static 'scripts/reglas.js' %}"></script>
 {% endblock %}

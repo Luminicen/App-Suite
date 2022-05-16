@@ -1,9 +1,11 @@
+from cgitb import text
 from MySQLdb import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from suite.models import *
 from suite.forms import *
+import requests as req
 import json
 # Create your views here.
 ############################### Proyectos ##########################################
@@ -66,7 +68,6 @@ def modificarProyecto(request,id):
 def artefactos(request,id):
     proyecto=Proyecto.objects.get(id=id)
     escen= proyecto.artefactos.all()
-    print(escen)
     ok=False
     if escen:
         ok=True
@@ -76,7 +77,16 @@ def artefactos(request,id):
             infForma=formulario.cleaned_data
             idT=TipoDeArtefacto.objects.get(id=infForma['eleccion']).id
             idP=proyecto.id
-            return redirect(reverse('crearArtefactos',kwargs={'idP':idP,'idT':idT})) 
+            return redirect(reverse('crearArtefactos',kwargs={'idP':idP,'idT':idT}))
+    elif request.method == "GET":
+        sel = request.GET.getlist('seleccionados')
+        esce=[]
+        for i in sel:
+            if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
+                esce.append(i)
+        formatoToKG(esce)
+        print(sel)
+        print(esce)
     form=ElejirArtefactoAcrear()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"idP":id})
 def tipoForm(tipo,val):
@@ -151,3 +161,62 @@ def destruirArtefacto(request,id,idP):
     proyecto.artefactos.remove(artefacto)
     artefacto.delete()
     return redirect(reverse('artefactos',kwargs={'id':idP}))
+################################FUNCIONES####################################################
+#Aca se dejaran funciones utilizadas para llamar a otras herramientas
+#Ej ->TO KNOWLEDGE GRAPH
+#########################################################################################
+def formatoToKG(esce):
+    """
+    The input file must be a list of JSON objects with the following
+    structure:
+        {
+            "scenario": <str>,
+            "goal": <str>,
+            "context": <str>,
+            "actors": <list[str]>,
+            "resources": <list[str]>,
+            "episodes": <list[str]>
+        }
+    """
+    textF="["
+    for i in esce:
+        art=Artefacto.objects.get(id=i)
+        textF=textF+"{"
+        textF=textF+'"scenario":'+'"'+art.nombre+'"'+","
+        cont=json.loads(art.texto)
+        textF=textF+'"goal":'+'"'+cont["Goal"]+'"'+","
+        textF=textF+'"context":'+'"'+cont["Context"]+'"'+","
+        textF=textF+'"actors":'+json.dumps(separarPorComa(cont["Actors"]))+","
+        textF=textF+'"resources":'+json.dumps(separarPorComa(cont["Resources"]))+","
+        textF=textF+'"episodes":'+json.dumps(separarPorPunto(cont["Episodes"]))
+        textF=textF+"},"
+    textF=textF.rstrip(textF[-1])
+    textF=textF+"]"
+    print(json.loads(textF))
+def separarPorComa(actoresStr):
+    lista=[]
+    lista.extend(actoresStr.split(","))
+    return lista
+def separarPorPunto(actoresStr):
+    lista=[]
+    lista.extend(actoresStr.split("."))
+    return lista
+    
+
+############################### TESTE ##########################################
+# TEST API
+####################################################################################
+def reglaSimpleParaTextoPlano(text):
+    # El granjero podria regar tomates.
+    text={
+        "Razon":"Expresion Debil",
+        "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",13,-1],
+        "OP2":["Reemplazar por:","riega tomates",13,-1],
+        "palabraAMarcar":"podria"
+        }
+    return text
+def consumirApi(texto):
+    rta=req.post("http://127.0.0.1:5000/passive_voice",texto)
+    dec=json.loads(rta.text)
+    print(dec)
+    pass

@@ -1,0 +1,34 @@
+   
+			.hwt-container {
+				background-color: #f8f9fa;
+			}
+
+			.hwt-content {
+				width: 760px;
+				height: 100px;
+				padding: 20px;
+				border: 1px solid #adb5bd;
+				color: inherit;
+				font: 18px/25px 'Droid Sans Mono', sans-serif;
+			}
+
+			.hwt-input:focus {
+				outline-color: #495057;
+			}
+
+			.hwt-content mark {
+				border-radius: 3px;
+				background-color: #d0bfff;
+			}
+
+			.hwt-content mark.red {
+				background-color: #ffc9c9;
+			}
+
+			.hwt-content mark.blue {
+				background-color: #a3daff;
+			}
+
+			.hwt-content mark.yellow {
+				background-color: #ffec99;
+			}
