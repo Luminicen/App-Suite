@@ -27,13 +27,13 @@ class ElejirArtefactoAcrear(forms.Form):
 #desde el DJANGO ADMIN (sujeto a cambios)
 #Para usar el Django Forms: https://docs.djangoproject.com/en/4.0/ref/forms/api/
 #Registrar la opcion en el if de views.py(sujeto a cambios)
-#
+#LA IDENTIFICACION TIENE QUE LLAMARSE NOMBRE!
 #############################################################################
 class textoPlano(forms.Form):
     nombre=forms.CharField(max_length=255)
     texto=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
 class Scenarios(forms.Form):
-    ScenarioName=forms.CharField(max_length=255)
+    nombre=forms.CharField(max_length=255,label="ScenarioName")
     Goal=forms.CharField(max_length=255)
     Context=forms.CharField(max_length=255)
     Resources=forms.CharField(max_length=255)

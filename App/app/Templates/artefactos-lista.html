@@ -24,7 +24,7 @@
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.nombre}}</td>
         <td>{{p.tipoDeArtefacto}}</td>
-        <td><a href="{% url 'modificarArtefactos' p.id%}">Modificar</a></td>
+        <td><a href="{% url 'modificarArtefactos' p.id idP%}">Modificar</a></td>
       </tr>
       {% endfor %}
       

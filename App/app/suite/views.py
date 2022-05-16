@@ -78,7 +78,7 @@ def artefactos(request,id):
             idP=proyecto.id
             return redirect(reverse('crearArtefactos',kwargs={'idP':idP,'idT':idT})) 
     form=ElejirArtefactoAcrear()
-    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form})
+    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"idP":id})
 def tipoForm(tipo,val):
     #elegirTipo
     #debe estar tal cual esta cargado en la BD
@@ -102,17 +102,8 @@ def tipoForm(tipo,val):
 def convertidorDeForms(tipo,form,usr):
     #transformo los fomularios a un texto X
     texto=None
-    if tipo.tipo=="textoplano":
-       texto=Artefacto(nombre=form['nombre'],texto=form['texto'],owner=usr,tipoDeArtefacto=tipo)
-    elif tipo.tipo=="Scenario":
-        aux=json.dumps(form,indent=4)
-        texto=Artefacto(nombre=form['ScenarioName'],texto=aux,owner=usr,tipoDeArtefacto=tipo)
-    else:
-        texto=Artefacto(nombre=form['nombre'],texto=form['texto'],owner=usr,tipoDeArtefacto=tipo)
-    if texto!=None:
-        texto.save()
-    else:
-        raise("Te olvidaste de agregar el tipo al if GIL?")
+    aux=json.dumps(form,indent=4)
+    texto=Artefacto(nombre=form['nombre'],texto=aux,owner=usr,tipoDeArtefacto=tipo)
     return texto
 def crearArtefactos(request,idP,idT):
     #idP = id del Proyecto
@@ -124,6 +115,7 @@ def crearArtefactos(request,idP,idT):
         if formulario.is_valid():
             infForma=formulario.cleaned_data
             texto=convertidorDeForms(tipo,infForma,request.user)  
+            texto.save()
             proyecto.artefactos.add(texto)
             proyecto.save()
             return redirect(reverse('artefactos',kwargs={'id':idP}))
@@ -133,9 +125,20 @@ def crearArtefactos(request,idP,idT):
 
     return render(request, "proyecto-crear.html", {"form" : form})
 
-def modificarArtefacto(request,id):
+def modificarArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
     texto=json.loads(artefacto.texto)
-    print(texto)
+    if request.method == "POST":
+        formulario = form=tipoForm(artefacto.tipoDeArtefacto,request.POST)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            aux=json.dumps(infForma,indent=4)
+            artefacto.nombre=infForma['nombre']
+            artefacto.texto=aux
+            artefacto.save()
+            return redirect(reverse('artefactos',kwargs={'id':idP}))
+    else:
+        #uso None para inicializar un form vacio
+        form=tipoForm(artefacto.tipoDeArtefacto,texto)
     #queda llenar el form y mandarlo como siempre
-    pass
+    return render(request, "proyecto-crear.html", {"form" : form})
