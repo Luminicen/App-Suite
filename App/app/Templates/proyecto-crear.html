@@ -15,4 +15,6 @@
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log In</a>
 {% endif %}
+{% load static %}
+<script src="{% static 'scripts/textareaconverter.js' %}"></script>
 {% endblock %}
