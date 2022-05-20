@@ -1,6 +1,6 @@
 from cgitb import text
 from MySQLdb import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from suite.models import *
@@ -147,15 +147,16 @@ def destruirArtefacto(request,id,idP):
     
 
 ############################### TESTE ##########################################
-# TEST API
+# TEST API# os.system("java -jar plantuml.jar test.txt")
 ####################################################################################
+def api(request):
+    return JsonResponse(reglaSimpleParaTextoPlano("text"))
 def reglaSimpleParaTextoPlano(text):
     # El granjero podria regar tomates.
     text={
         "Razon":"Expresion Debil",
         "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",13,-1],
         "OP2":["Reemplazar por:","riega tomates",13,-1],
-        "palabraAMarcar":"podria"
         }
     return text
 def consumirApi(texto):
@@ -207,6 +208,7 @@ def listaBotones():
     return botones
 def funcionalidadesRegitradas(request,entidadesSeleccionadas):
     #REGISTRE ACA SU FUNCIONALIDAD
+    #paradigma por broadcast event based
     KG.knowledgeGraph(entidadesSeleccionadas,request)
     dumy.funcionalidad(entidadesSeleccionadas,request)
 

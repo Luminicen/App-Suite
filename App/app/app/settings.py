@@ -17,6 +17,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_ROOT=os.path.join(os.path.dirname(BASE_DIR), 'static')
 STATICFILES_DIRS = (os.path.join(
     BASE_DIR, "app", "static"),)
+MEDIA_URL='/herramientas/'
+MEDIA_ROOT=os.path.join(BASE_DIR,'herramientas')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
