@@ -65,24 +65,6 @@ def modificarProyecto(request,id):
 ############################### Escenarios ##########################################
 # En este lugar estaran todos los codigos del modulo de Escenarios
 ####################################################################################
-def listaBotones():
-    #se va a llamar en la view artefactos para generar los botones
-    #aca se especifican las funcionalidades personalizadas
-    #esto se hace para hacerlo mas dinamico
-    #Tener en cuenta! es muy importante generar una clave,
-    #al momento donde el usuario elije el boton de la funcionalidad N
-    #se llamaran a todas las funcionalidades y la que tenga la clave correcta(o boton)
-    #es la que se ejecutara
-    #MUY IMPORTANTE CHEQUEAR POR LA CLAVE EN EL OBJETO DE LA FUNCIONALIDAD!
-    botones=[]
-    botones.append(Boton("TO KNOWLEDGE GRAPH","kg"))
-    botones.append(Boton("DUMMY","dm"))
-    return botones
-def funcionalidadesRegitradas(request,entidadesSeleccionadas):
-    #REGISTRE ACA SU FUNCIONALIDAD
-    KG.knowledgeGraph(entidadesSeleccionadas,request)
-    dumy.funcionalidad(entidadesSeleccionadas,request)
-
 def artefactos(request,id):
     proyecto=Proyecto.objects.get(id=id)
     escen= proyecto.artefactos.all()
@@ -210,6 +192,24 @@ class Boton():
 #SE REQUIERE DE HACER LA CLASE PARA LA FUNCIONALIDAD Y AGREGAR EL BOTON EN 
 #LA FUNCION listaBotones
 #############################################################################################
+def listaBotones():
+    #se va a llamar en la view artefactos para generar los botones
+    #aca se especifican las funcionalidades personalizadas
+    #esto se hace para hacerlo mas dinamico
+    #Tener en cuenta! es muy importante generar una clave,
+    #al momento donde el usuario elije el boton de la funcionalidad N
+    #se llamaran a todas las funcionalidades y la que tenga la clave correcta(o boton)
+    #es la que se ejecutara
+    #MUY IMPORTANTE CHEQUEAR POR LA CLAVE EN EL OBJETO DE LA FUNCIONALIDAD!
+    botones=[]
+    botones.append(Boton("TO KNOWLEDGE GRAPH","kg"))
+    botones.append(Boton("DUMMY","dm"))
+    return botones
+def funcionalidadesRegitradas(request,entidadesSeleccionadas):
+    #REGISTRE ACA SU FUNCIONALIDAD
+    KG.knowledgeGraph(entidadesSeleccionadas,request)
+    dumy.funcionalidad(entidadesSeleccionadas,request)
+
 class KG():
     def knowledgeGraph(sel,request):
         if 'kg' in request.GET:
