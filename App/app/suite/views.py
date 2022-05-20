@@ -65,6 +65,24 @@ def modificarProyecto(request,id):
 ############################### Escenarios ##########################################
 # En este lugar estaran todos los codigos del modulo de Escenarios
 ####################################################################################
+def listaBotones():
+    #se va a llamar en la view artefactos para generar los botones
+    #aca se especifican las funcionalidades personalizadas
+    #esto se hace para hacerlo mas dinamico
+    #Tener en cuenta! es muy importante generar una clave,
+    #al momento donde el usuario elije el boton de la funcionalidad N
+    #se llamaran a todas las funcionalidades y la que tenga la clave correcta(o boton)
+    #es la que se ejecutara
+    #MUY IMPORTANTE CHEQUEAR POR LA CLAVE EN EL OBJETO DE LA FUNCIONALIDAD!
+    botones=[]
+    botones.append(Boton("TO KNOWLEDGE GRAPH","kg"))
+    botones.append(Boton("DUMMY","dm"))
+    return botones
+def funcionalidadesRegitradas(request,entidadesSeleccionadas):
+    #REGISTRE ACA SU FUNCIONALIDAD
+    KG.knowledgeGraph(entidadesSeleccionadas,request)
+    dumy.funcionalidad(entidadesSeleccionadas,request)
+
 def artefactos(request,id):
     proyecto=Proyecto.objects.get(id=id)
     escen= proyecto.artefactos.all()
@@ -80,14 +98,10 @@ def artefactos(request,id):
             return redirect(reverse('crearArtefactos',kwargs={'idP':idP,'idT':idT}))
     elif request.method == "GET":
         sel = request.GET.getlist('seleccionados')
-        esce=[]
-        for i in sel:
-            if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
-                esce.append(i)
-        if esce:
-            formatoToKG(esce)
+        funcionalidadesRegitradas(request,sel)
+    botones=listaBotones()
     form=ElejirArtefactoAcrear()
-    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"idP":id})
+    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"idP":id,"botones":botones})
 def tipoForm(tipo,val):
     #elegirTipo
     #debe estar tal cual esta cargado en la BD
@@ -146,10 +160,66 @@ def destruirArtefacto(request,id,idP):
     proyecto.artefactos.remove(artefacto)
     artefacto.delete()
     return redirect(reverse('artefactos',kwargs={'id':idP}))
-################################FUNCIONES####################################################
-#Aca se dejaran funciones utilizadas para llamar a otras herramientas
-#Ej ->TO KNOWLEDGE GRAPH
-#########################################################################################
+
+
+    
+
+############################### TESTE ##########################################
+# TEST API
+####################################################################################
+def reglaSimpleParaTextoPlano(text):
+    # El granjero podria regar tomates.
+    text={
+        "Razon":"Expresion Debil",
+        "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",13,-1],
+        "OP2":["Reemplazar por:","riega tomates",13,-1],
+        "palabraAMarcar":"podria"
+        }
+    return text
+def consumirApi(texto):
+    rta=req.post("http://127.0.0.1:5000/passive_voice",texto)
+    dec=json.loads(rta.text)
+    print(dec)
+    pass
+###########################################################################################
+#CLASES
+#PARA APROBECHAR POLIMORFISMO
+#DEFINIR LOS FORMULARIOS VACIOS Y CON VALORES PLS
+##########################################################################################
+class textoplano:
+
+    def formulario(self,val):
+        if val!=None:
+            formulario = textoPlano(val)
+        else:
+            formulario = textoPlano()
+        return formulario
+class Scenario:
+    def formulario(self,val):
+        if val!=None:
+            formulario = Scenarios(val)
+        else:
+            formulario = Scenarios()
+        return formulario
+class Boton():
+    def __init__(self,nom,clave):
+        self.nombre=nom
+        self.cod=clave
+
+##################################EXTENCIONES DE HERRAMIENTRAS ###############################
+#SE REQUIERE DE HACER LA CLASE PARA LA FUNCIONALIDAD Y AGREGAR EL BOTON EN 
+#LA FUNCION listaBotones
+#############################################################################################
+class KG():
+    def knowledgeGraph(sel,request):
+        if 'kg' in request.GET:
+            esce=[]
+            for i in sel:
+                if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
+                    esce.append(i)
+            print(esce)
+            if esce:
+                formatoToKG(esce)
 def formatoToKG(esce):
     """
     The input file must be a list of JSON objects with the following
@@ -186,41 +256,7 @@ def separarPorPunto(actoresStr):
     lista=[]
     lista.extend(actoresStr.split("."))
     return lista
-    
-
-############################### TESTE ##########################################
-# TEST API
-####################################################################################
-def reglaSimpleParaTextoPlano(text):
-    # El granjero podria regar tomates.
-    text={
-        "Razon":"Expresion Debil",
-        "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",13,-1],
-        "OP2":["Reemplazar por:","riega tomates",13,-1],
-        "palabraAMarcar":"podria"
-        }
-    return text
-def consumirApi(texto):
-    rta=req.post("http://127.0.0.1:5000/passive_voice",texto)
-    dec=json.loads(rta.text)
-    print(dec)
-    pass
-###########################################################################################
-#CLASES
-#
-##########################################################################################
-class textoplano:
-
-    def formulario(self,val):
-        if val!=None:
-            formulario = textoPlano(val)
-        else:
-            formulario = textoPlano()
-        return formulario
-class Scenario:
-    def formulario(self,val):
-        if val!=None:
-            formulario = Scenarios(val)
-        else:
-            formulario = Scenarios()
-        return formulario
+class dumy:
+    def funcionalidad(ent,request):
+         if 'dm' in request.GET:
+            print("SOY DUMMY")

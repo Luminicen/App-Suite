@@ -32,8 +32,11 @@
       
     </tbody>
   </table>
-  <button class="btn btn-primary mt-2" type="submit">TO KNOWLEDGE GRAPH</button>
-</form>
+  {% for b in botones %}
+  <button class="btn btn-primary mt-2" name="{{b.cod}}" href="{% url 'artefactos' id=idP%}" type="submit">{{b.nombre}}</button>
+  {% endfor %}
+ </form>
+
   {% else %}
   <h3>No tienes Artefactos</h3>
   {% endif %}
@@ -41,6 +44,7 @@
     {% csrf_token %}
     {{ form.as_p }}
   <button class="btn btn-primary mt-2" type="submit">Submit</button>
+</form>
   <p><a href="{% url 'logout' %}">Log Out</a></p>
 {% else %}
   <p>You are not logged in</p>
