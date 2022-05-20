@@ -30,9 +30,14 @@ class ElejirArtefactoAcrear(forms.Form):
 #LA IDENTIFICACION TIENE QUE LLAMARSE NOMBRE!
 #############################################################################
 class textoPlano(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(textoPlano, self).__init__(*args, **kwargs)
+        self.fields['texto'].widget.attrs['class'] = 'texto' # para el lighter
     nombre=forms.CharField(max_length=255)#<---
     texto=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
 class Scenarios(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(Scenarios, self).__init__(*args, **kwargs)
     nombre=forms.CharField(max_length=255,label="ScenarioName")#<---
     Goal=forms.CharField(max_length=255)
     Context=forms.CharField(max_length=255)
