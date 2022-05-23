@@ -42,11 +42,12 @@ axios({
       $('#id_texto').highlightWithinTextarea({
         highlight: arr
     });
-    
+    console.log("HOLA 3")
+    console.log(response.data[2]["Razon"])
     //MENU CONTEXTUAL
     
     let largo = 0
-    while (largo < 2) {
+    while (largo < (long+1)) {
     contextMenu = CtxMenu(document.querySelectorAll('.regla'+largo)[0]);
     //console.log(document.querySelectorAll('.regla'+largo)[0])
     contextMenu.addItem(response.data[largo]["Razon"])
@@ -67,7 +68,7 @@ axios({
     document.getElementById('id_texto').addEventListener('contextmenu', function(e) {
       e.preventDefault()
       i=0
-      while (i<2){ if (localizar(e,arrbonds,i)) {break} ;i=i+1}
+      while (i<(long+1)){ if (localizar(e,arrbonds,i)) {break} ;i=i+1}
       
     });
     largo = largo + 1
