@@ -40,9 +40,11 @@
 .hwt-content {
 	border: 1px solid;
 	background: none transparent !important;
+	z-index: 80;
 }
 
 .hwt-content mark {
 	padding: 0 !important;
 	color: inherit;
+	z-index: 80;
 }
