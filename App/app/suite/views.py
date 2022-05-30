@@ -116,6 +116,11 @@ def crearArtefactos(request,idP,idT):
         #uso None para inicializar un form vacio
         form=tipoForm(tipo,None)
 
+    all_fields = form.declared_fields.keys()
+    fields=[]
+    for i in all_fields:
+        if i != 'nombre':
+            fields.append('id_'+i)
     return render(request, "proyecto-crear.html", {"form" : form})
 
 def modificarArtefacto(request,id,idP):
@@ -134,7 +139,13 @@ def modificarArtefacto(request,id,idP):
         #uso None para inicializar un form vacio
         form=tipoForm(artefacto.tipoDeArtefacto,texto)
     #queda llenar el form y mandarlo como siempre
-    return render(request, "proyecto-crear.html", {"form" : form})
+    ##print(type(get_all_fields_from_form(form)))
+    all_fields = form.declared_fields.keys()
+    fields=[]
+    for i in all_fields:
+        if i != 'nombre':
+            fields.append('id_'+i)
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields})
 
 def destruirArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
@@ -143,7 +154,21 @@ def destruirArtefacto(request,id,idP):
     artefacto.delete()
     return redirect(reverse('artefactos',kwargs={'id':idP}))
 
+def get_all_fields_from_form(instance):
+    """"
+    Return names of all available fields from given Form instance.
 
+    :arg instance: Form instance
+    :returns list of field names
+    :rtype: list
+    """
+
+    fields = list(instance().base_fields)
+
+    for field in list(instance().declared_fields):
+        if field not in fields:
+            fields.append(field)
+    return fields
     
 
 ############################### TESTE ##########################################

@@ -39,8 +39,8 @@ class Scenarios(forms.Form):
     def __init__(self, *args, **kwargs):
         super(Scenarios, self).__init__(*args, **kwargs)
     nombre=forms.CharField(max_length=255,label="ScenarioName")#<---
-    Goal=forms.CharField(max_length=255)
-    Context=forms.CharField(max_length=255)
-    Resources=forms.CharField(max_length=255)
-    Actors=forms.CharField(max_length=255)
+    Goal=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 10, 'cols': 10}))
+    Context=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 10, 'cols': 10}))
+    Resources=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 10, 'cols': 10}))
+    Actors=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 10, 'cols': 10}))
     Episodes=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))

@@ -48,6 +48,7 @@ teVasAEnterarX3(reemplazo,response){
         var aux=""
         aux=Campo.reemplazarTexto(this.arrbonds,response,reemplazo,document.getElementById(this.campo).value,this.clickActual)
         document.getElementById(this.campo).value=aux
+        this.pedirDatos()
         }
 }
 
