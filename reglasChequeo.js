@@ -8,13 +8,14 @@ var arr=[]
 var arrContext=[]
 var arrbonds=[]
 var arrOP=[] // voy a tener siempre una razon, lo que me varian son las opciones
+var arrInicio=[]
+var arrFin=[]
+var arrReemplazo=[]
 var largo = 0
 var clickActual
-
 window.onload = ()=>{
-refrescar()
-function refrescar(){
-console.log("EJECUCION")
+
+
 axios({
     method: 'post',
     url: 'http://localhost:5000/passive_voice',
@@ -56,19 +57,23 @@ axios({
     
     while (largo < (long+1)) {
     contextMenu = CtxMenu(document.querySelectorAll('.regla'+largo)[0]);
+    //console.log(document.querySelectorAll('.regla'+largo)[0])
     contextMenu.addItem(response.data[largo]["Razon"])
     contextMenu.addSeparator(index = 1)
     p=1
     while(response.data[largo]["OP"+p]!= undefined){
+      //console.log(response.data[largo]["OP"+p])
       let reemplazo=response.data[largo]["OP"+p][1]
       contextMenu.addItem( response.data[largo]["OP"+p][0]+" "+response.data[largo]["OP"+p][1],function(){reemplazarTexto(arrbonds,response,reemplazo) })
       p=p+1
     }
-
+    //contextMenu.addItem( response.data[0]["OP1"][0]+" "+response.data[0]["OP1"][1], function(){console.log("HOLA")})
+    //contextMenu.addItem( response.data[0]["OP2"][0]+" "+response.data[0]["OP2"][1], function(){console.log("HOLA")})
+    
     arrContext.push(contextMenu)
     Boundaries = document.querySelectorAll('.regla'+largo)[0].getBoundingClientRect();
     arrbonds.push(Boundaries)
-
+    //console.log(arrbonds)
     document.getElementById(''+id).addEventListener('contextmenu', function(e) {
       e.preventDefault()
       i=0
@@ -79,24 +84,22 @@ axios({
     }
 
   });
-  
+    //contextMenu = CtxMenu(document.querySelectorAll('.regla')[0]);
+    //console.log(document.querySelectorAll('.regla0')[0])
+    //contextMenu.addItem(response.data[0]["Razon"])
+    //contextMenu.addSeparator(index = 1)
+    //contextMenu.addItem( response.data[0]["OP1"][0]+" "+response.data[0]["OP1"][1], function(){console.log("HOLA")})
+    //contextMenu.addItem( response.data[0]["OP2"][0]+" "+response.data[0]["OP2"][1], function(){console.log("HOLA")})
+
+    
     document.getElementById(''+id).addEventListener('click', function(e){e.preventDefault();
       q=0 
       while(q<=long){arrContext[q].closeMenu();q= q + 1}
       
       });
-  esperar()
-  function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-  async function esperar() {
-        for (let i = 0; i < 10; i++) {
-            console.log(`Waiting ${i} seconds...`);
-            await sleep(i * 1000);
-        }
-        console.log('Done');
-        refrescar()
-    }
+  
+
+
 
   function localizar(e,arrbonds,largo){
         var x = e.clientX;
@@ -116,7 +119,7 @@ axios({
         }
           
     }
-}}
+}
 function reemplazarTexto(arrbonds,response,text){
  act=0
  target=document.getElementById(id).value
@@ -137,8 +140,4 @@ var lastPart = target.substr(fin);
 target=firstPart+text+lastPart
 console.log(target)
 document.getElementById(id).value=target
-arr=[]
-arrContext=[]
-arrbonds=[]
-arrOP=[]
 }
