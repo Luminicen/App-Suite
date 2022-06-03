@@ -7,20 +7,25 @@ document.addEventListener('DOMContentLoaded', function () {
     var delta=0
     let i = 0
     while(i<fields.length){
-        console.log(delta)
+        //console.log(delta)
         cam.push(new Campo(fields[i],delta))
         delta= delta + 100
         cam[i].pedirDatos()
+        //setInterval(cam[i].pedirDatos(),10000)
         i = i+1
     }
-    console.log("CAM:")
-    console.log(cam)
-    //cam.push(new Campo(fields[0],delta))
-    //delta = delta + 100
-    //cam.push(new Campo(fields[4],delta))
-    //cam[0].pedirDatos()
-    //cam[1].pedirDatos()
-    //console.log(cam)
-    //var campo = new Campo('id_texto')
-    //campo.pedirDatos()
+    //console.log("HOLA")
+    //console.log(fields.length)
+    //actualizar(cam,fields.length)
+    setInterval(function() {actualizar(cam,fields.length)},20000)
   })
+  function actualizar(cam,len){
+    let i=0
+    while(i<len){
+        cam[i].pedirDatosActualizar()
+        i= i+1
+        //console.log(i)
+    }
+    console.log("ACTUALIZAR")
+    //setTimeout(actualizar(cam,len), 10000);
+}

@@ -13,7 +13,12 @@ export default class Campo {
         this.clickActual=[]
         this.data={}
     }
-
+pedirDatosActualizar(){
+   this.arr=[]
+   this.arrContext=[]
+   this.arrbonds=[]
+   return this.pedirDatos()
+}
 pedirDatos(){
     axios.post('http://localhost:5000/passive_voice',{texto:document.getElementById(this.campo).value}).then(
         res=>{console.log(res);
@@ -52,6 +57,10 @@ teVasAEnterarX3(reemplazo,response){
         var aux=""
         aux=Campo.reemplazarTexto(this.arrbonds,response,reemplazo,document.getElementById(this.campo).value,this.clickActual)
         document.getElementById(this.campo).value=aux
+        $('#'+this.campo).highlightWithinTextarea('destroy');
+        this.arr=[]
+        this.arrContext=[]
+        this.arrbonds=[]
         this.pedirDatos()
         }
 }
@@ -66,6 +75,7 @@ highlighterConfigurar(response){
       $('#'+this.campo).highlightWithinTextarea({
         highlight: this.arr
       });
+      
 }
 menuConfigurar(response){
     let largo=0
