@@ -1,8 +1,9 @@
 export default class Campo {
-    constructor(id,sep){
+    constructor(id,sep,tipo){
         //console.log(sep)
         this.campo = id
         this.delta= sep
+        this.tip=tipo
         this.Boundaries
         this.contextMenu
         this.long=0
@@ -12,6 +13,7 @@ export default class Campo {
         this.largo = 0
         this.clickActual=[]
         this.data={}
+        this.datosFiltro=[]
     }
 pedirDatosActualizar(){
    this.arr=[]
@@ -21,10 +23,21 @@ pedirDatosActualizar(){
 }
 pedirDatos(){
     axios.post('http://localhost:5000/passive_voice',{texto:document.getElementById(this.campo).value}).then(
-        res=>{console.log(res);
+        res=>{//console.log(res);
         this.data=res.data;
         this.long=res.data.length - 1
-        this.highlighterConfigurar(res)
+        let i = 0
+        this.datosFiltro=[]
+        while (i<this.long + 1){
+            if (res.data[i]["tipo"]=="general" || res.data[i]["tipo"]==this.tip){
+                this.datosFiltro.push(res.data[i])
+            }
+            i = i+1
+        }
+        console.log(this.datosFiltro)
+        console.log(this.datosFiltro[0])
+        this.long= this.datosFiltro.length - 1
+        this.highlighterConfigurar(this.datosFiltro)
         this.menuConfigurar(res)
         //console.log(this.delta)
         }
@@ -66,10 +79,16 @@ teVasAEnterarX3(reemplazo,response){
 }
 
 highlighterConfigurar(response){
+    console.log("CONSOLA")
+    console.log(response[0]["OP1"])
     let largoD= 0
     while (largoD < (this.long+1)){
-        this.arr.push({highlight: [response.data[largoD]["OP1"][2], response.data[largoD]["OP1"][3]],
-        className: 'regla'+(largoD+this.delta)})      
+        console.log(response[largoD])
+        if (response[largoD]["tipo"]=="general" || response[largoD]["tipo"]==this.tip){
+            this.arr.push({highlight: [response[largoD]["OP1"][2], response[largoD]["OP1"][3]],
+            className: 'regla'+(largoD+this.delta)})  
+        }
+            
         largoD = largoD + 1
       }
       $('#'+this.campo).highlightWithinTextarea({

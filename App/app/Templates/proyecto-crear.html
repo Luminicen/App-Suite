@@ -4,6 +4,7 @@
 
 {% block content %}
 {% if user.is_authenticated %}
+{{ tipo | json_script:"tipo" }}
 {{ campos | json_script:"fields" }}
     <form method="post">
       <div>

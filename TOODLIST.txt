@@ -1,0 +1,4 @@
+-deje pasar letrasw numeros y un conjuunto reducido de simbolos normales , . _-?! / 
+no deje  + - |
+- reglas definidas para un artefacto especifico (cierto atributo de cierto artefacto)
+episodeos: regla que verifique si los actores y los recursos estan siendo utilizados en los episodeos. y el complemento

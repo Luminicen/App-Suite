@@ -8,12 +8,38 @@
     {% endblock %}
 {% block content %}
 {% if user.is_authenticated %}
-  <h5>¿Desea ir a sus proyectos?</h5>
-  <p><a class="btn btn-primary" href="{% url 'proyectos' %}">Proyectos</a></p>
-  <p><a href="{% url 'logout' %}">Log Out</a></p>
+<div class="container-fluid h-custom">
+  <div class="row d-flex justify-content-center align-items-center fondoFlores py-5">
+<div class="card" style="width: 25rem;">
+  <img src="https://productfolio.com/wp-content/uploads/product-requirements.jpg" class="card-img-top" alt="...">
+  <div class="card-body">
+    <h5 class="card-title">Instrucciones</h5>
+    <p class="card-text">Ir a proyectos para manejar cada tipo de proyecto por separado. Si desea crear un nuevo tipo de artefacto
+      ir al codigo y crear un formulario con los campos qeu se quieren utilizar. Registrar la clase en viewes.py seccion clases. Y si desea
+      agregar alguna nueva funcionalidad ir a la seccion de EXTENCIONES DE HERRAMIENTRAS Gracias!
+      ¿Desea ir a sus proyectos?
+    </p>
+    <p><a class="btn btn-primary" href="{% url 'proyectos' %}">Proyectos</a></p>
+  </div>
+</div>  
+{% if request.user.is_staff %}
+<div class="card" style="width: 35rem;">
+  <img src="https://st.depositphotos.com/1002881/1285/i/950/depositphotos_12859789-stock-photo-admin-tag.jpg" class="card-img-top" alt="...">
+  <div class="card-body">
+<h5 class="card-title">Instrucciones</h5>
+    <p class="card-text">Pagina de admin para hacer cosas de admin xd
+    </p>
+    <p><a class="btn btn-primary" href="{% url 'admin:index' %}">Ir a Administrador</a></p>
+  </div>
+</div>  
+{% endif %}
+</div>
+</div>
+
 
 {% else %}
   <p>You are not logged in</p>
   <a href="{% url 'login' %}">Log In</a>
+  
 {% endif %}
 {% endblock %}
