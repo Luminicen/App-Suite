@@ -121,7 +121,7 @@ def crearArtefactos(request,idP,idT):
     for i in all_fields:
         if i != 'nombre':
             fields.append('id_'+i)
-    return render(request, "proyecto-crear.html", {"form" : form})
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
 
 def modificarArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
