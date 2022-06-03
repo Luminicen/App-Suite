@@ -1,6 +1,8 @@
 export default class Campo {
-    constructor(id){
+    constructor(id,sep){
+        //console.log(sep)
         this.campo = id
+        this.delta= sep
         this.Boundaries
         this.contextMenu
         this.long=0
@@ -19,6 +21,7 @@ pedirDatos(){
         this.long=res.data.length - 1
         this.highlighterConfigurar(res)
         this.menuConfigurar(res)
+        //console.log(this.delta)
         }
     )
 }
@@ -43,6 +46,7 @@ teVasAEnterarX2(long){
         while(q<=this.long){this.arrContext[q].closeMenu();q= q + 1}
         }
 }
+//SALVO ESTE QUE SIRVE PARA AYUDAR AL REEMPLAZAR
 teVasAEnterarX3(reemplazo,response){
     return (e)=>{
         var aux=""
@@ -56,7 +60,7 @@ highlighterConfigurar(response){
     let largoD= 0
     while (largoD < (this.long+1)){
         this.arr.push({highlight: [response.data[largoD]["OP1"][2], response.data[largoD]["OP1"][3]],
-        className: 'regla'+largoD})      
+        className: 'regla'+(largoD+this.delta)})      
         largoD = largoD + 1
       }
       $('#'+this.campo).highlightWithinTextarea({
@@ -66,7 +70,11 @@ highlighterConfigurar(response){
 menuConfigurar(response){
     let largo=0
     while (largo < (this.long+1)) {
-        this.contextMenu = CtxMenu(document.querySelectorAll('.regla'+largo)[0]);
+        //console.log(this.delta)
+        //console.log(largo+this.delta)
+        //console.log('.regla'+(largo+this.delta))
+        //console.log(largo)
+        this.contextMenu = CtxMenu(document.querySelectorAll('.regla'+(largo+this.delta))[0]);
         this.contextMenu.addItem(response.data[largo]["Razon"])
         let index = 1
         this.contextMenu.addSeparator(index = 1)
@@ -78,7 +86,7 @@ menuConfigurar(response){
         }
     
         this.arrContext.push(this.contextMenu)
-        this.Boundaries = document.querySelectorAll('.regla'+largo)[0].getBoundingClientRect();
+        this.Boundaries = document.querySelectorAll('.regla'+(largo+this.delta))[0].getBoundingClientRect();
         this.arrbonds.push(this.Boundaries)
         largo = largo + 1
         }
@@ -87,8 +95,13 @@ menuConfigurar(response){
         document.getElementById(''+this.campo).addEventListener('click', this.teVasAEnterarX2(this.long));
 }
 localizar(e,arrbonds,largo){
-    var x = e.clientX;
-    var y = e.clientY;
+    var x = e.clientX + window.scrollX;
+    var y = e.clientY + window.scrollY;
+    console.log(y)
+    console.log(x)
+    console.log("CHEQUEO")
+    console.log("coord X: "+ arrbonds[largo].left + "<X:"+x+"<"+arrbonds[largo].right)
+    console.log("coord Y: "+ arrbonds[largo].top + "<y:"+y+"<"+arrbonds[largo].bottom)
     var insideX = x >= arrbonds[largo].left && x <= arrbonds[largo].right;
     var insideY = y >= arrbonds[largo].top && y <= arrbonds[largo].bottom;
     if(insideX && insideY){
@@ -120,7 +133,7 @@ static reemplazarTexto(arrbonds,response,text,target,clickActual){
    var firstPart = target.toString().substr(0,ini); 
    var lastPart = target.toString().substr(fin);
    target=firstPart+text+lastPart
-   console.log(target)
+   //console.log(target)
    this.arr=[]
    this.arrContext=[]
    this.arrbonds=[]
