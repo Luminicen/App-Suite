@@ -1,7 +1,8 @@
 export default class Campo {
-    constructor(id,sep,tipo){
+    constructor(id,sep,tipo,fieldsCorrelativas){
         //console.log(sep)
         this.campo = id
+        this.fieldHerrmanas=fieldsCorrelativas
         this.delta= sep
         this.tip=tipo
         this.Boundaries
@@ -21,8 +22,29 @@ pedirDatosActualizar(){
    this.arrbonds=[]
    return this.pedirDatos()
 }
+datosEspecificos(){
+    if (this.tip == "Scenario"){
+        let i=0
+        let fieldsHer={}
+        while (i< this.fieldHerrmanas.length){
+            fieldsHer[this.fieldHerrmanas[i]]=(document.getElementById(this.fieldHerrmanas[i]).value)
+            i = i+1
+        }
+        return fieldsHer
+    }
+}
 pedirDatos(){
-    axios.post('http://localhost:5000/passive_voice',{texto:document.getElementById(this.campo).value}).then(
+    let datosAdicionales=this.datosEspecificos()
+    console.log(JSON.stringify(datosAdicionales))
+    //'http://localhost:5000/passive_voice'
+    axios.post('http://localhost:5000/reglas', 
+    {
+        texto:document.getElementById(this.campo).value,
+        tipo:this.tip,
+        adicional:JSON.stringify(datosAdicionales),
+        yoSoy:this.campo,
+    }
+).then(
         res=>{//console.log(res);
         this.data=res.data;
         this.long=res.data.length - 1
@@ -34,8 +56,8 @@ pedirDatos(){
             }
             i = i+1
         }
-        console.log(this.datosFiltro)
-        console.log(this.datosFiltro[0])
+        //console.log(this.datosFiltro)
+        //console.log(this.datosFiltro[0])
         this.long= this.datosFiltro.length - 1
         this.highlighterConfigurar(this.datosFiltro)
         this.menuConfigurar(res)
@@ -79,11 +101,11 @@ teVasAEnterarX3(reemplazo,response){
 }
 
 highlighterConfigurar(response){
-    console.log("CONSOLA")
-    console.log(response[0]["OP1"])
+    //console.log("CONSOLA")
+    //console.log(response[0]["OP1"])
     let largoD= 0
     while (largoD < (this.long+1)){
-        console.log(response[largoD])
+        //console.log(response[largoD])
         if (response[largoD]["tipo"]=="general" || response[largoD]["tipo"]==this.tip){
             this.arr.push({highlight: [response[largoD]["OP1"][2], response[largoD]["OP1"][3]],
             className: 'regla'+(largoD+this.delta)})  
