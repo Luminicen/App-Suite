@@ -158,6 +158,7 @@ localizar(e,arrbonds,largo){
     if(insideX && insideY){
       console.log('On top of "one"!');
       this.clickActual=[x,y]
+      this.teVasAEnterarX2(this.long)
       this.arrContext[largo].openMenu(x,y)
       return true
     }
