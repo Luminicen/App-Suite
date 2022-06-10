@@ -7,6 +7,7 @@ from suite.models import *
 from suite.forms import *
 import requests as req
 import json
+
 # Create your views here.
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos

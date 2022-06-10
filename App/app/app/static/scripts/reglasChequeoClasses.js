@@ -35,7 +35,7 @@ datosEspecificos(){
 }
 pedirDatos(){
     let datosAdicionales=this.datosEspecificos()
-    console.log(JSON.stringify(datosAdicionales))
+    //console.log(JSON.stringify(datosAdicionales))
     //'http://localhost:5000/passive_voice'
     axios.post('http://localhost:5000/reglas', 
     {
@@ -148,11 +148,11 @@ menuConfigurar(response){
 localizar(e,arrbonds,largo){
     var x = e.clientX + window.scrollX;
     var y = e.clientY + window.scrollY;
-    console.log(y)
-    console.log(x)
-    console.log("CHEQUEO")
-    console.log("coord X: "+ arrbonds[largo].left + "<X:"+x+"<"+arrbonds[largo].right)
-    console.log("coord Y: "+ arrbonds[largo].top + "<y:"+y+"<"+arrbonds[largo].bottom)
+    //console.log(y)
+    //console.log(x)
+    //console.log("CHEQUEO")
+    //console.log("coord X: "+ arrbonds[largo].left + "<X:"+x+"<"+arrbonds[largo].right)
+    //console.log("coord Y: "+ arrbonds[largo].top + "<y:"+y+"<"+arrbonds[largo].bottom)
     var insideX = x >= arrbonds[largo].left && x <= arrbonds[largo].right;
     var insideY = y >= arrbonds[largo].top && y <= arrbonds[largo].bottom;
     if(insideX && insideY){
