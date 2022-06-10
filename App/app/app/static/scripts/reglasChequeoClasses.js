@@ -15,11 +15,38 @@ export default class Campo {
         this.clickActual=[]
         this.data={}
         this.datosFiltro=[]
+        this.textoActual
+        this.datosFiltroActual
+        this.noEsReemplazo=true
     }
+
+chequeoDeCambios(texto){
+    if (texto == this.textoActual){
+        //console.log("ES IGUAL " + this.campo)
+        return true
+    }
+    else {
+        //console.log("CAMBIO "+ this.campo)
+        if (this.textoActual==undefined){ this.textoActual=texto}
+        return false
+    }
+}
+siCambioLaRegla(arr1,arr2){
+    let i=0
+    if (arr1==undefined)
+    {   this.datosFiltroActual=arr2.map((x) => x) //duplico
+        return true
+    }
+    for(i=0;i<this.long+1;i++){
+        if (JSON.stringify(arr1[i])!=JSON.stringify(arr2[i])){
+            console.log(arr1[i],arr2[i])
+            return true
+        }
+    }
+    return false
+}
 pedirDatosActualizar(){
-   this.arr=[]
-   this.arrContext=[]
-   this.arrbonds=[]
+   
    return this.pedirDatos()
 }
 datosEspecificos(){
@@ -35,7 +62,10 @@ datosEspecificos(){
 }
 pedirDatos(){
     let datosAdicionales=this.datosEspecificos()
-    //console.log(JSON.stringify(datosAdicionales))
+    if (this.chequeoDeCambios(document.getElementById(this.campo).value)&&this.noEsReemplazo){
+        return false
+    }
+    console.log("PIDE")
     //'http://localhost:5000/passive_voice'
     axios.post('http://localhost:5000/reglas', 
     {
@@ -45,7 +75,7 @@ pedirDatos(){
         yoSoy:this.campo,
     }
 ).then(
-        res=>{//console.log(res);
+        res=>{console.log(res);
         this.data=res.data;
         this.long=res.data.length - 1
         let i = 0
@@ -59,6 +89,17 @@ pedirDatos(){
         //console.log(this.datosFiltro)
         //console.log(this.datosFiltro[0])
         this.long= this.datosFiltro.length - 1
+        if(this.siCambioLaRegla(this.datosFiltroActual,this.datosFiltro)){
+            this.arr=[]
+            this.arrContext=[]
+            this.arrbonds=[]
+            this.datosFiltroActual=this.datosFiltro.map((x) => x)
+            console.log("CAMBIO DE REGLAS")
+        }
+        if(!this.noEsReemplazo){
+            console.log("reemplazo")
+            this.arrbonds=[]
+        }
         this.highlighterConfigurar(this.datosFiltro)
         this.menuConfigurar(res)
         //console.log(this.delta)
@@ -93,9 +134,9 @@ teVasAEnterarX3(reemplazo,response){
         aux=Campo.reemplazarTexto(this.arrbonds,response,reemplazo,document.getElementById(this.campo).value,this.clickActual)
         document.getElementById(this.campo).value=aux
         $('#'+this.campo).highlightWithinTextarea('destroy');
-        this.arr=[]
-        this.arrContext=[]
-        this.arrbonds=[]
+        this.datosFiltroActual=undefined
+        this.noEsReemplazo=false
+        this.textoActual=aux
         this.pedirDatos()
         }
 }
@@ -116,7 +157,7 @@ highlighterConfigurar(response){
       $('#'+this.campo).highlightWithinTextarea({
         highlight: this.arr
       });
-      
+      this.noEsReemplazo=true
 }
 menuConfigurar(response){
     let largo=0
