@@ -1,5 +1,4 @@
 import Campo from './reglasChequeoClasses.js';
-
 document.addEventListener('DOMContentLoaded', function () {
     var fields = JSON.parse(document.getElementById('fields').textContent);
     var tipo = JSON.parse(document.getElementById('tipo').textContent)
@@ -12,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
         cam.push(new Campo(fields[i],delta,tipo,fields))
         delta= delta + 100
         cam[i].pedirDatos()
-        cam[i].pedirDatos()
+        //cam[i].pedirDatos()
         //setInterval(cam[i].pedirDatos(),10000)
         i = i+1
     }

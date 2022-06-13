@@ -1,3 +1,4 @@
+
 export default class Campo {
     constructor(id,sep,tipo,fieldsCorrelativas){
         //console.log(sep)
@@ -18,8 +19,39 @@ export default class Campo {
         this.textoActual
         this.datosFiltroActual
         this.noEsReemplazo=true
-    }
+        this.reemplazoDesdeHasta=[]
 
+    }
+funcionBuscarRangoDeCambio(texto){
+    let aux1=-1
+    let aux2=99999
+    let diferencia= texto.length - this.textoActual
+    if (this.textoActual==undefined){
+        this.reemplazoDesdeHasta=[0,0]
+    }
+    let i=0
+    while(i<texto.length){
+        if(this.textoActual[i]!=texto[i]){
+            if (this.textoActual[i+diferencia]!=texto[i]){aux1=Math.max(aux1,i); console.log(i)}
+            //un aproach interesante: conocer el primer cambio mas cercano a la posicion 0
+            //cortar el string original en esa posicion junto con el modificado
+            //volver a buscar el siguiente string modificado de la nueva posicion del 0 y guardarlo en una var
+            //volver a repetir el mismo proc. si se encontro otro nuevo modificacion mas cercano a  cortar y actualizar la var.
+            //repetir 
+            
+            aux2=Math.min(aux2,i)
+        }
+        i=i+1
+    }
+    let z=""
+    i=aux2
+    console.log(aux1,aux2)
+    while(i<aux1+1){
+        z=z+texto[i]
+        i=i+1
+    }
+    console.log(z)
+}
 chequeoDeCambios(texto){
     if (texto == this.textoActual){
         //console.log("ES IGUAL " + this.campo)
@@ -39,7 +71,6 @@ siCambioLaRegla(arr1,arr2){
     }
     for(i=0;i<this.long+1;i++){
         if (JSON.stringify(arr1[i])!=JSON.stringify(arr2[i])){
-            console.log(arr1[i],arr2[i])
             return true
         }
     }
@@ -65,7 +96,8 @@ pedirDatos(){
     if (this.chequeoDeCambios(document.getElementById(this.campo).value)&&this.noEsReemplazo){
         return false
     }
-    console.log("PIDE")
+    
+    //console.log("PIDE")
     //'http://localhost:5000/passive_voice'
     axios.post('http://localhost:5000/reglas', 
     {
@@ -75,7 +107,7 @@ pedirDatos(){
         yoSoy:this.campo,
     }
 ).then(
-        res=>{console.log(res);
+        res=>{//console.log(res);
         this.data=res.data;
         this.long=res.data.length - 1
         let i = 0
@@ -86,28 +118,35 @@ pedirDatos(){
             }
             i = i+1
         }
-        //console.log(this.datosFiltro)
-        //console.log(this.datosFiltro[0])
         this.long= this.datosFiltro.length - 1
         if(this.siCambioLaRegla(this.datosFiltroActual,this.datosFiltro)){
             this.arr=[]
             this.arrContext=[]
             this.arrbonds=[]
             this.datosFiltroActual=this.datosFiltro.map((x) => x)
-            console.log("CAMBIO DE REGLAS")
         }
         if(!this.noEsReemplazo){
-            console.log("reemplazo")
             this.arrbonds=[]
         }
         this.highlighterConfigurar(this.datosFiltro)
         this.menuConfigurar(res)
-        //console.log(this.delta)
+        let stateCheck = setInterval(() => {
+            if (document.readyState === 'complete') {
+              clearInterval(stateCheck);
+              this.actualizarBoundings()
+            }
+          }, 100);
         }
     )
 }
-setText(text){
-    this.texto=text
+actualizarBoundings(){
+    //hace un bugFix cuando carga el doc :D
+    let i = 0
+    this.arrbonds=[]
+    while(i<(this.long + 1)){
+        this.arrbonds.push(document.querySelectorAll('.regla'+(i+this.delta))[0].getBoundingClientRect())
+        i = i+1
+    }
 }
 //LOS TE VAS A ENTERAR SOLUCIONAN EL PROBLEMA DE PASAR PARAMETROS AL ADD LISTEENER
 teVasAEnterar(long){
@@ -125,7 +164,10 @@ teVasAEnterarX2(long){
         e.preventDefault()
         let q=0 
         while(q<=this.long){this.arrContext[q].closeMenu();q= q + 1}
+        
+        //this.actualizarBoundings()
         }
+        
 }
 //SALVO ESTE QUE SIRVE PARA AYUDAR AL REEMPLAZAR
 teVasAEnterarX3(reemplazo,response){
@@ -142,11 +184,8 @@ teVasAEnterarX3(reemplazo,response){
 }
 
 highlighterConfigurar(response){
-    //console.log("CONSOLA")
-    //console.log(response[0]["OP1"])
     let largoD= 0
     while (largoD < (this.long+1)){
-        //console.log(response[largoD])
         if (response[largoD]["tipo"]=="general" || response[largoD]["tipo"]==this.tip){
             this.arr.push({highlight: [response[largoD]["OP1"][2], response[largoD]["OP1"][3]],
             className: 'regla'+(largoD+this.delta)})  
@@ -162,10 +201,6 @@ highlighterConfigurar(response){
 menuConfigurar(response){
     let largo=0
     while (largo < (this.long+1)) {
-        //console.log(this.delta)
-        //console.log(largo+this.delta)
-        //console.log('.regla'+(largo+this.delta))
-        //console.log(largo)
         this.contextMenu = CtxMenu(document.querySelectorAll('.regla'+(largo+this.delta))[0]);
         this.contextMenu.addItem(response.data[largo]["Razon"])
         let index = 1
@@ -176,13 +211,11 @@ menuConfigurar(response){
           this.contextMenu.addItem( response.data[largo]["OP"+p][0]+" "+response.data[largo]["OP"+p][1],this.teVasAEnterarX3(reemplazo,response) )
           p=p+1
         }
-    
         this.arrContext.push(this.contextMenu)
         this.Boundaries = document.querySelectorAll('.regla'+(largo+this.delta))[0].getBoundingClientRect();
         this.arrbonds.push(this.Boundaries)
         largo = largo + 1
         }
-        
         document.getElementById(''+this.campo).addEventListener('contextmenu', this.teVasAEnterar(this.long));
         document.getElementById(''+this.campo).addEventListener('click', this.teVasAEnterarX2(this.long));
 }
@@ -196,6 +229,8 @@ localizar(e,arrbonds,largo){
     //console.log("coord Y: "+ arrbonds[largo].top + "<y:"+y+"<"+arrbonds[largo].bottom)
     var insideX = x >= arrbonds[largo].left && x <= arrbonds[largo].right;
     var insideY = y >= arrbonds[largo].top && y <= arrbonds[largo].bottom;
+    //console.log("inside x: "+insideX)
+    //console.log("inside y: "+insideY)
     if(insideX && insideY){
       console.log('On top of "one"!');
       this.clickActual=[x,y]
@@ -226,10 +261,6 @@ static reemplazarTexto(arrbonds,response,text,target,clickActual){
    var firstPart = target.toString().substr(0,ini); 
    var lastPart = target.toString().substr(fin);
    target=firstPart+text+lastPart
-   //console.log(target)
-   this.arr=[]
-   this.arrContext=[]
-   this.arrbonds=[]
    return target
    }
 
