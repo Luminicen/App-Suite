@@ -1,2 +1,4 @@
 
 *.pyc
+App/app/app/__pycache__/settings.cpython-310.pyc
+*.pyc

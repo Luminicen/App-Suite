@@ -9,16 +9,22 @@ class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
         fields = ['titulo','owner']
-    choices = [(tipo.id,tipo.tipo) 
+    try:
+        choices = [(tipo.id,tipo.tipo) 
                    for tipo in TipoDeArtefacto.objects.all()]
+    except:
+        choices=[]
     titulo = forms.CharField(label='Your proyecto title', max_length=100)
     def __init__(self, *args, **kwargs):
         super(ProyectoForm, self).__init__(*args, **kwargs)
         choiceUser.append(kwargs.get('instance'))
         self.fields['owner'].initial = kwargs.get('instance')
 class ElejirArtefactoAcrear(forms.Form):
-    choices = [(tipo.id,tipo.tipo) 
+    try:
+        choices = [(tipo.id,tipo.tipo) 
                    for tipo in TipoDeArtefacto.objects.all()]
+    except:
+        choices=[]
     eleccion=forms.ChoiceField(choices=choices)
 #############################################################################
 #

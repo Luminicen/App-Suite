@@ -99,6 +99,7 @@ pedirDatos(){
     
     //console.log("PIDE")
     //'http://localhost:5000/passive_voice'
+
     axios.post('http://localhost:5000/reglas', 
     {
         texto:document.getElementById(this.campo).value,
