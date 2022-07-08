@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: rh
+  name: rh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     app: rh        
+  template:
+    metadata:            
+      labels:
+        app: rh        
+    spec:
+      containers:
+        - name: rh
+          image: luminicen/app:lastest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8000
+              protocol: TCP     
