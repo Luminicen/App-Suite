@@ -84,8 +84,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'req',
         'USER': 'root',
-        'PASSWORD': '', # poner password para docker
-        'HOST': 'localhost',   # Or an IP Address that your DB is hosted on poner db para docker
+        'PASSWORD': 'password', # poner password para docker
+        'HOST': 'db',   # Or an IP Address that your DB is hosted on poner db para docker
         'PORT': '3306',
     }
 }
