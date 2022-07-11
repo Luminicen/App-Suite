@@ -30,7 +30,7 @@ def crearProyecto(request):
     if request.method == "POST":
         formulario = ProyectoForm(request.POST)
         if formulario.is_valid():
-            print(formulario)
+            #print(formulario)
             formulario.save()   
             return redirect(reverse('proyectos')) 
     else: 
@@ -70,6 +70,8 @@ def artefactos(request,id):
     proyecto=Proyecto.objects.get(id=id)
     escen= proyecto.artefactos.all()
     ok=False
+    form=ElejirArtefactoAcrear()
+    form2=Busqueda()
     if escen:
         ok=True
     if request.method == "POST":
@@ -80,11 +82,18 @@ def artefactos(request,id):
             idP=proyecto.id
             return redirect(reverse('crearArtefactos',kwargs={'idP':idP,'idT':idT}))
     elif request.method == "GET":
+        print(request.GET)
+        if 'buscar' in request.GET:
+            fil=TipoDeArtefacto.objects.get(id=request.GET['buscar'])
+            aux=[]
+            for i in escen:
+                if i.tipoDeArtefacto == fil:
+                    aux.append(i)
+            escen=aux
         sel = request.GET.getlist('seleccionados')
         funcionalidadesRegitradas(request,sel)
     botones=listaBotones()
-    form=ElejirArtefactoAcrear()
-    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"idP":id,"botones":botones})
+    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones})
 def tipoForm(tipo,val):
     #elegirTipo
     #debe estar tal cual esta cargado en la BD

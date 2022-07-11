@@ -24,10 +24,3 @@ document.addEventListener('DOMContentLoaded', function () {
     //setTimeout(actualizar(cam,len), 10000);
 
 }
-axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
-axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-axios.post('http://localhost:8010', 
-    {
-        language:"en-US",
-        text:"a hose looks prety"
-    }).then(res=>{console.log(res);})

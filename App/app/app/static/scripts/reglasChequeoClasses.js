@@ -99,8 +99,9 @@ pedirDatos(){
     
     //console.log("PIDE")
     //'http://localhost:5000/passive_voice'
+    //http://localhost:5000/reglas
 
-    axios.post('http://localhost:5000/reglas', 
+    axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/reglas', 
     {
         texto:document.getElementById(this.campo).value,
         tipo:this.tip,
@@ -108,7 +109,7 @@ pedirDatos(){
         yoSoy:this.campo,
     }
 ).then(
-        res=>{//console.log(res);
+        res=>{console.log(res);
         this.data=res.data;
         this.long=res.data.length - 1
         let i = 0
@@ -186,6 +187,8 @@ teVasAEnterarX3(reemplazo,response){
 
 highlighterConfigurar(response){
     let largoD= 0
+    console.log("ACA HOLA!")
+    console.log(response)
     while (largoD < (this.long+1)){
         if (response[largoD]["tipo"]=="general" || response[largoD]["tipo"]==this.tip){
             this.arr.push({highlight: [response[largoD]["OP1"][2], response[largoD]["OP1"][3]],

@@ -25,7 +25,14 @@ class ElejirArtefactoAcrear(forms.Form):
                    for tipo in TipoDeArtefacto.objects.all()]
     except:
         choices=[]
-    eleccion=forms.ChoiceField(choices=choices)
+    eleccion=forms.ChoiceField(choices=choices,initial="None")
+class Busqueda(forms.Form):
+    try:
+        choices = [(tipo.id,tipo.tipo) 
+                   for tipo in TipoDeArtefacto.objects.all()]
+    except:
+        choices=[]
+    buscar=forms.ChoiceField(choices=choices,initial="None")
 #############################################################################
 #
 #Formularios Personalizados

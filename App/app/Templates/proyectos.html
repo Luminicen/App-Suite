@@ -34,7 +34,18 @@
   <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Crear Proyecto</a></p>
   <p><a href="{% url 'logout' %}">Log Out</a></p>
 {% else %}
-  <p>You are not logged in</p>
-  <a href="{% url 'login' %}">Log In</a>
+<div style="background-color:#1F1D4F; height: 100vh">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center fondoFlores py-5"> 
+      <div class="col-md-8 col-lg-6 col-xl-4 shadow-lg p-5 my-5 bg-white rounded ">
+        <div class="loginform">
+          <img src="https://www.mememaker.net/static/images/memes/4806874.jpg" alt="...">
+          <p>You are not logged in</p>
+          <a class="btn btn-primary form-control" href="{% url 'login' %}">Log In</a>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
 {% endif %}
 {% endblock %}

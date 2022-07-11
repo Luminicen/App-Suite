@@ -1,3 +1,7 @@
+#La idea de este archivo es mostrarles un ejemplo que funciona con la app y que lo tengan de referencia
+#La app llama a una funcion principal en /reglas y esta se encarga de llamar a cada funcion regla
+#para luego devolver un conjunto de cosas para marcar. Ver abajo para mas detalles!
+# :D
 from flask import Flask, jsonify, request
 from src.endpoints.spelling_checker import SpellingChecker
 from flask_cors import CORS, cross_origin
@@ -19,104 +23,20 @@ def spelling_checker():
             "result": checker.check()
         }
     )
-@cross_origin
-@app.route("/passive_voice", methods=["POST"])
-def passive_voice_checker():
-    #print("HOLA")
-    #print(request.get_json()["tipo"])
-    texto= request.get_json()["texto"]
-    if (re.search("podria regar tomates",texto) and re.search("HOLA SOY MIG",texto)and  (re.search("EL",texto))):
-        text=[{
-            "Razon":"Expresion Debil",
-            "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",12,32],
-            "OP2":["Reemplazar por:","riega tomates",12,32],
-            "tipo":"general"
-            },
-            {
-            "Razon":"FALTAN DATOS",
-            "OP1":["Reemplazar por: ","te vi tomando un gatorade",34,46],
-            "tipo":"general"
-            },
-            {
-            "Razon":"RAZON 3",
-            "OP1":["Reemplazar por: ","hola mundo",47,49],
-            "tipo":"general"
-            }
-            ]
-    elif (re.search("podria regar tomates",texto) and re.search("HOLA SOY MIG",texto)and  not(re.search("EL",texto))):
-        text=[{
-            "Razon":"Expresion Debil",
-            "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",12,32],
-            "OP2":["Reemplazar por:","riega tomates",12,32],
-            "tipo":"general"
-            },
-            {
-            "Razon":"FALTAN DATOS",
-            "OP1":["Reemplazar por: ","te vi tomando un gatorade",34,46],
-            "tipo":"general"
-            }
-            ]
-    elif (re.search("podria regar tomates",texto) and not re.search("HOLA SOY MIG",texto)and  (re.search("EL",texto))):
-        text=[{
-            "Razon":"Expresion Debil",
-            "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",12,32],
-            "OP2":["Reemplazar por:","riega tomates",12,32],
-            "tipo":"general"
-            },
-           {
-            "Razon":"RAZON 3",
-            "OP1":["Reemplazar por: ","hola mundo",47,49],
-            "tipo":"general"
-            }
-            ]
-    elif (not re.search("podria regar tomates",texto) and re.search("HOLA SOY MIG",texto)and  (re.search("EL",texto))):
-        text=[
-            {
-            "Razon":"FALTAN DATOS",
-            "OP1":["Reemplazar por: ","te vi tomando un gatorade",34,46],
-            "tipo":"general"
-            },
-            {
-            "Razon":"RAZON 3",
-            "OP1":["Reemplazar por: ","hola mundo",47,49],
-            "tipo":"general"
-            }
-            ]
-    elif ( re.search("podria regar tomates",texto) and not re.search("HOLA SOY MIG",texto)and  not (re.search("EL",texto))):
-        text=[{
-            "Razon":"Expresion Debil",
-            "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",12,32],
-            "OP2":["Reemplazar por:","riega tomates",12,32],
-            "tipo":"general"
-            }
-            ]
-    elif ( not re.search("podria regar tomates",texto) and  re.search("HOLA SOY MIG",texto)and  not (re.search("EL",texto))):
-        text=[
-            {
-            "Razon":"FALTAN DATOS",
-            "OP1":["Reemplazar por: ","te vi tomando un gatorade",34,46],
-            "tipo":"general"
-            }]
-    elif ( not re.search("podria regar tomates",texto) and  not re.search("HOLA SOY MIG",texto)and  (re.search("EL",texto))):
-        text=[{
-            "Razon":"RAZON 3",
-            "OP1":["Reemplazar por: ","hola mundo",47,49],
-            "tipo":"general"
-            }]
-    else:
-        text=[]
-    return jsonify(
-        text
-    )
 
 @app.route("/null_subject", methods=["POST"])
 def null_subject_checker():
     return jsonify(
         {"Warn": "impelementar"}
     )
+
 #######################################REGLAS DE PRUEBA########################################
 #ESTE ES SOLO UN EJEMPLO DE COMO IMPLEMENTAR LAS REGLAS
-#
+#Se MUESTRAN EJEMPLOS CON CANTIDAD FIJA DE OPCIONES Y UNO CON CANTIDAD VARIABLE DE OPCIONES:
+#regla 1, reglaEspecifica 1 y2 son de una cantidad fija de opciones
+#regla de diccionario tiene cantidad variable de opciones
+# Las reglas generales son las reglas que se aplican a todos los artefactos de especificacion
+# Las reglas especificas se aplicana un artefacto o artefacto/s en concreto
 ###############################################################################################
 def regla1(textito,tipo):
     #Esta regla sera de indole general, por ende todos los campos deben ser afectada por la misma
@@ -127,13 +47,14 @@ def regla1(textito,tipo):
         if i in simbolos_rancios:
             regla={}
             regla["Razon"]="Simbolo Rancio que no deberia estar ahi"
-            regla["OP1"]= ["Eliminar "," " ,id,id+1]
+            regla["OP1"]= ["Eliminar "," " ,id,id+1] #cantidad fija de opciones!
             regla["tipo"]= "general"
             reglas.append(regla)
     return reglas
 def reglaEspecifica1(campoActual,tipo,camposHermanos):
     #esta regla chequeara si los recursos estan siendo usados en los episodeos
     # aplica solo para Scenarios!
+    # utiliza mas de un campo!
     if tipo=="Scenario" and campoActual=="id_Resources":
         reglas=[]
         palabraActual=0
@@ -150,6 +71,7 @@ def reglaEspecifica1(campoActual,tipo,camposHermanos):
 def reglaEspecifica2(campoActual,tipo,camposHermanos):
     #esta regla chequeara si los actores estan siendo usados en los episodeos
     # aplica solo para Scenarios!
+    # utiliza mas de un campo!
     if tipo=="Scenario" and campoActual=="id_Actors":
         reglas=[]
         palabraActual=0
@@ -161,10 +83,11 @@ def reglaEspecifica2(campoActual,tipo,camposHermanos):
                 regla["tipo"]= "Scenario"
                 reglas.append(regla)
             palabraActual=palabraActual + len(i) + 1
-        #print(reglas)
         return reglas
                        
 def agregarElementos(arr,elem):
+    #lo unico que hace es fucionar los arreglos de cosas marcadas
+    #nada interesante por aca...
     if not elem:
         return arr
     for i in elem:
@@ -173,6 +96,21 @@ def agregarElementos(arr,elem):
 @cross_origin
 @app.route("/reglas", methods=["POST"])
 def principal():
+    #funcion principal que llama a las reglas (ES UN EJEMPLO)
+    #mi app llamara a esta funcion y esta funcion llamara a las reglas
+    #cada regla devuelve un arreglo de lo que hay que marcar
+    #cada arreglo se une en un unico arreglo que es devuelto a la app
+    #en el formato que espera:
+    #Formato de una sola regla:
+    #{
+    #   Razón: "RAZÓN DE LA RELGA, ¿Por qué se marco?”
+    #   OP1:[”Reemplaza”,”Lo que debe ir o piensa que va a ir”,inicio_reemplazo,Fin_Reemplazo]
+    #   …
+    #   OPN:[”Reemplaza”,”Lo que debe ir o piensa que va a ir”,inicio_reemplazo,Fin_Reemplazo]
+    #   Tipo=“general o especifico de algún formulario”
+    #}
+    # Formato que espera la app: [{regla1},{regla2}, ... ,{regla N}] o [] (si no se marca nada)
+    #Cualquier cosa consulten!
     reglas=[]
     try:
         camposAdicionales=json.loads(request.get_json()["adicional"])
@@ -188,7 +126,6 @@ def principal():
     reglas=agregarElementos(reglas,reglaEspecifica2(campoActual,tipo,camposAdicionales))
     reglas=agregarElementos(reglas,regla1(texto,tipo))
     reglas=agregarElementos(reglas,diccion(texto))
-    #diccion(texto)
     #print("Este es el resultado que devuelve la api luego de pasar las reglas")
     #print(reglas)
     return jsonify(
@@ -197,34 +134,23 @@ def principal():
 def check_word_spelling(word):
     word = Word(word)
     result = word.spellcheck()
-    #print(result)
-    #print(result[0])#devuelve una lista de las "posibles" soluciones al horror ortografico
-    #print("-----------------")
-    #if word == result[0][0]:
-    #    print(f'Spelling of "{word}" is correct!')
-    #else:
-    #    print(f'Spelling of "{word}" is not correct!')
-    #    print(f'Correct spelling of "{word}": "{result[0][0]}" (with {result[0][1]} confidence).')
     return result
 def diccion(texto):
+    #Ejemplo con multiOpcion variable
+    #La idea es encontrar horrores de ortografia y dar un conjunto
+    #de soluciones para corregir dicho error
     palabras= texto.split()
-    #print(palabras)
     palabras = [palabra.lower() for palabra in palabras]
-    #palabras = [re.sub(r'[^A-Za-z0-9]+', '', word) for word in palabras] # elimino los simbolos de puntuacion
     pos=0
     reglas=[]
     for palabra in palabras:
         corr=check_word_spelling(palabra)
-        #print(corr)
-        #print("----")
         if corr[0][0] != palabra:
-            #print(palabra)
-            #print(corr)
             regla={}
             regla["Razon"]="misspeling"
             z=0
             for i in corr:
-                regla["OP"+str(z)]= ["Reemplazar",i[0],pos,pos+len(palabra)]
+                regla["OP"+str(z)]= ["Reemplazar",i[0],pos,pos+len(palabra)]#Las opciones varian
                 z=z+1
             regla["tipo"]= "general"
             reglas.append(regla)
