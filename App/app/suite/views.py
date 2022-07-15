@@ -5,9 +5,11 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from suite.models import *
 from suite.forms import *
-import requests as req
+#import requests as req
 import json
-
+from suite.ontoscen.wikilink import Wikilink
+from suite.ontoscen.ontoscen import Ontoscen
+from suite.ontoscen.requirement import Requirement
 # Create your views here.
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
@@ -184,21 +186,7 @@ def get_all_fields_from_form(instance):
 ############################### TESTE ##########################################
 # TEST API# os.system("java -jar plantuml.jar test.txt")
 ####################################################################################
-def api(request):
-    return JsonResponse(reglaSimpleParaTextoPlano("text"))
-def reglaSimpleParaTextoPlano(text):
-    # El granjero podria regar tomates.
-    text={
-        "Razon":"Expresion Debil",
-        "OP1":["Reemplazar por: ","puede regar tomates cuando [CONDICION]",13,-1],
-        "OP2":["Reemplazar por:","riega tomates",13,-1],
-        }
-    return text
-def consumirApi(texto):
-    rta=req.post("http://127.0.0.1:5000/passive_voice",texto)
-    dec=json.loads(rta.text)
-    print(dec)
-    pass
+
 ###########################################################################################
 #CLASES
 #PARA APROBECHAR POLIMORFISMO
@@ -256,7 +244,9 @@ class KG():
                     esce.append(i)
             print(esce)
             if esce:
-                formatoToKG(esce)
+                escenarios=formatoToKG(esce)
+                data = json.loads(escenarios)
+                Wikilink().enrich(Ontoscen(list(map(lambda req: Requirement(req), data)))).serialize("data/output.ttl", format="n3", encoding="utf-8")
 def formatoToKG(esce):
     """
     The input file must be a list of JSON objects with the following
@@ -285,6 +275,7 @@ def formatoToKG(esce):
     textF=textF.rstrip(textF[-1])
     textF=textF+"]"
     print(json.loads(textF))
+    return textF
 def separarPorComa(actoresStr):
     lista=[]
     lista.extend(actoresStr.split(","))

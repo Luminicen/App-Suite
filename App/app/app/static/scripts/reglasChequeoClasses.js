@@ -100,6 +100,7 @@ pedirDatos(){
     //console.log("PIDE")
     //'http://localhost:5000/passive_voice'
     //http://localhost:5000/reglas
+    //http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/reglas
 
     axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/reglas', 
     {
@@ -187,10 +188,11 @@ teVasAEnterarX3(reemplazo,response){
 
 highlighterConfigurar(response){
     let largoD= 0
-    console.log("ACA HOLA!")
-    console.log(response)
+    //console.log("ACA HOLA!")
+    //console.log(response)
     while (largoD < (this.long+1)){
         if (response[largoD]["tipo"]=="general" || response[largoD]["tipo"]==this.tip){
+            //console.log(response[largoD]["OP1"][2]+","+response[largoD]["OP1"][3])
             this.arr.push({highlight: [response[largoD]["OP1"][2], response[largoD]["OP1"][3]],
             className: 'regla'+(largoD+this.delta)})  
         }

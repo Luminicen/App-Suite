@@ -148,7 +148,7 @@ def diccion(texto):
         if corr[0][0] != palabra:
             regla={}
             regla["Razon"]="misspeling"
-            z=0
+            z=1 #debe empezar en 1
             for i in corr:
                 regla["OP"+str(z)]= ["Reemplazar",i[0],pos,pos+len(palabra)]#Las opciones varian
                 z=z+1

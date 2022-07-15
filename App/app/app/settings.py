@@ -15,7 +15,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_ROOT=os.path.join(os.path.dirname(BASE_DIR), 'app','static')
-print(STATIC_ROOT)
+print(BASE_DIR)
 STATICFILES_DIRS = (os.path.join(
     BASE_DIR, "app", "static"),)
 MEDIA_URL='/herramientas/'
@@ -84,8 +84,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'req',
         'USER': 'root',
-        'PASSWORD': 'password', # poner password para produccion
-        'HOST': 'db',   # para produccion dejar db
+        'PASSWORD': '', # poner password para produccion
+        'HOST': 'localhost',   # para produccion dejar db
         'PORT': '3306',
     }
 }
