@@ -57,3 +57,6 @@ class Scenarios(forms.Form):
     Resources=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
     Actors=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
     Episodes=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
+class KnowledgeGraphs(forms.Form):
+    nombre=forms.CharField(max_length=255,label="Nombre")
+    graphOutput=forms.CharField(widget=forms.Textarea())

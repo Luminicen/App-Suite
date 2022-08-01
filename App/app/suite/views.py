@@ -65,8 +65,8 @@ def modificarProyecto(request,id):
     return render(request, "proyecto-crear.html", {"form" : formulario})
 
 
-############################### Escenarios ##########################################
-# En este lugar estaran todos los codigos del modulo de Escenarios
+############################### arte4facto ##########################################
+# En este lugar estaran todos los codigos del modulo de artefacto
 ####################################################################################
 def artefactos(request,id):
     proyecto=Proyecto.objects.get(id=id)
@@ -93,7 +93,11 @@ def artefactos(request,id):
                     aux.append(i)
             escen=aux
         sel = request.GET.getlist('seleccionados')
-        funcionalidadesRegitradas(request,sel)
+        if funcionalidadesRegitradas(request,sel) == 'kg':
+            tipo=TipoDeArtefacto.objects.get(tipo="KnowledgeGraph")
+            fields=[]
+            fields.append("NONE")
+            return redirect(reverse('crearKG',kwargs={'idP':id}))
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones})
 def tipoForm(tipo,val):
@@ -102,7 +106,7 @@ def tipoForm(tipo,val):
     formulario=None
     formulario=globals()[tipo.tipo]().formulario(val)
     if formulario==None:
-        raise("TE OLVIDASTE DE CONFIGURAR LA FUNCION TIPO FORM GIL")
+        raise("TE OLVIDASTE DE DECLARAR EL OBJETO DEL FORM ")
     return formulario
 def convertidorDeForms(tipo,form,usr):
     #transformo los fomularios a un texto X
@@ -127,13 +131,13 @@ def crearArtefactos(request,idP,idT):
     else:
         #uso None para inicializar un form vacio
         form=tipoForm(tipo,None)
-
     all_fields = form.declared_fields.keys()
     fields=[]
     for i in all_fields:
         if i != 'nombre':
             fields.append('id_'+i)
     return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+
 
 def modificarArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
@@ -151,7 +155,6 @@ def modificarArtefacto(request,id,idP):
         #uso None para inicializar un form vacio
         form=tipoForm(artefacto.tipoDeArtefacto,texto)
     #queda llenar el form y mandarlo como siempre
-    ##print(type(get_all_fields_from_form(form)))
     all_fields = form.declared_fields.keys()
     fields=[]
     for i in all_fields:
@@ -181,7 +184,32 @@ def get_all_fields_from_form(instance):
         if field not in fields:
             fields.append(field)
     return fields
-    
+def crearArtefactoKG(request,idP):
+    #idP = id del Proyecto
+    #idT = id del Tipo
+    print("ENTRO A CREAR ARTEFACTOKG")
+    proyecto=Proyecto.objects.get(id=idP)
+    tipo=TipoDeArtefacto.objects.get(tipo='KnowledgeGraph')
+    if request.method == "POST":
+        formulario = KnowledgeGraphs(request.POST)
+        print(formulario)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            texto=convertidorDeForms(tipo,infForma,request.user)  
+            texto.save()
+            proyecto.artefactos.add(texto)
+            proyecto.save()
+            return redirect(reverse('artefactos',kwargs={'id':idP}))
+    else:
+        file=open("data/output.ttl", mode="r", encoding="utf-8")
+        data={'graphOutput': file.read()}
+        form=KnowledgeGraphs(data)
+    all_fields = form.declared_fields.keys()
+    fields=[]
+    for i in all_fields:
+        if i != 'nombre':
+            fields.append('id_'+i)
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
 
 ############################### TESTE ##########################################
 # TEST API# os.system("java -jar plantuml.jar test.txt")
@@ -206,6 +234,13 @@ class Scenario:
             formulario = Scenarios(val)
         else:
             formulario = Scenarios()
+        return formulario
+class KnowledgeGraph:
+    def formulario(self,val):
+        if val!=None:
+            formulario = KnowledgeGraphs(val)
+        else:
+            formulario = KnowledgeGraphs()
         return formulario
 class Boton():
     def __init__(self,nom,clave):
@@ -232,8 +267,10 @@ def listaBotones():
 def funcionalidadesRegitradas(request,entidadesSeleccionadas):
     #REGISTRE ACA SU FUNCIONALIDAD
     #paradigma por broadcast event based
-    KG.knowledgeGraph(entidadesSeleccionadas,request)
-    dumy.funcionalidad(entidadesSeleccionadas,request)
+    if KG.knowledgeGraph(entidadesSeleccionadas,request):
+        return 'kg'
+    if dumy.funcionalidad(entidadesSeleccionadas,request):
+        return 'dm'
 
 class KG():
     def knowledgeGraph(sel,request):
@@ -247,6 +284,13 @@ class KG():
                 escenarios=formatoToKG(esce)
                 data = json.loads(escenarios)
                 Wikilink().enrich(Ontoscen(list(map(lambda req: Requirement(req), data)))).serialize("data/output.ttl", format="n3", encoding="utf-8")
+                file=open("data/output.ttl", mode="r", encoding="utf-8")
+                
+                return "SI"
+        else:
+            return None
+                
+
 def formatoToKG(esce):
     """
     The input file must be a list of JSON objects with the following
@@ -288,3 +332,4 @@ class dumy:
     def funcionalidad(ent,request):
          if 'dm' in request.GET:
             print("SOY DUMMY")
+            return "SI"
