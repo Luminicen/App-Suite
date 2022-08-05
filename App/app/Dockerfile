@@ -1,6 +1,7 @@
 FROM python:3
 COPY . /app/
 WORKDIR /app/
+RUN chmod -R 777 data
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 EXPOSE 8000
