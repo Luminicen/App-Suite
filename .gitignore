@@ -21,3 +21,6 @@ App/app/mysql-data/ibtmp1
 App/app/mysql-data/undo_001
 App/app/mysql-data/undo_002
 *.pyc
+*.pyc
+*.pyc
+App/app/mysql-data/\#innodb_redo/\#ib_redo10_tmp

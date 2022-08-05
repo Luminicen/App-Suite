@@ -365,6 +365,14 @@ class UML:
         for i in textosId:
             art=Artefacto.objects.get(id=i)
             texto.append(json.loads(art.texto)["texto"])
+        texto=["""empresa ofrecer travesía.
+                  Kayakista contratar travesía.
+                  Travesia contener itinerario.
+                  Travesia contener costo.
+                  Itinerario contener lugar.
+                  Experto ser kayakista.
+                  Inexperto ser kayakista.
+                """]
         #print(texto)
         #texto es un arreglo con los textos que vienen seleccionados
         if not texto:
