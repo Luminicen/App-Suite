@@ -84,6 +84,24 @@ def reglaEspecifica2(campoActual,tipo,camposHermanos):
                 reglas.append(regla)
             palabraActual=palabraActual + len(i) + 1
         return reglas
+
+def reglaSujetoSimple (texto): 
+    
+    sujeto = False
+    reglas=[]
+    for id,i in enumerate(texto): 
+        if i.dep_ == "nsubj":
+            sujeto=True 
+            regla = {}
+            regla["OP1"]= ["El sujeto es ",id,id+1]
+            regla["tipo"]= "general"
+            reglas.append(regla)
+    if sujeto== False:
+        regla = {}
+        regla["OP1"]= ["Esta oracion no tiene sujeto"]
+        regla["tipo"]= "general"
+        reglas.append(regla)
+    return reglas
                        
 def agregarElementos(arr,elem):
     #lo unico que hace es fucionar los arreglos de cosas marcadas
@@ -122,6 +140,7 @@ def principal():
     tipo=request.get_json()["tipo"]
     campoActual=request.get_json()["yoSoy"]
     #registre sus reglas aca!
+    reglas=agregarElementos(reglas,reglaSujetoSimple(campoActual))
     reglas=agregarElementos(reglas,reglaEspecifica1(campoActual,tipo,camposAdicionales))
     reglas=agregarElementos(reglas,reglaEspecifica2(campoActual,tipo,camposAdicionales))
     reglas=agregarElementos(reglas,regla1(texto,tipo))
