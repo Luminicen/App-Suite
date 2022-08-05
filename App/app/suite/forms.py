@@ -60,3 +60,19 @@ class Scenarios(forms.Form):
 class KnowledgeGraphs(forms.Form):
     nombre=forms.CharField(max_length=255,label="Nombre")
     graphOutput=forms.CharField(widget=forms.Textarea())
+
+class ScenariosWithKeyWords(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ScenariosWithKeyWords, self).__init__(*args, **kwargs)
+    nombre=forms.CharField(max_length=255,label="ScenarioName")#<---
+    nombreKeyWords=forms.CharField(max_length=255,label="KeyWords de Name")
+    Goal=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    GoalKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Goal")
+    Context=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    ContextKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Context")
+    Resources=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    ResourcesKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Resources")
+    Actors=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    ActorsKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Actors")
+    Episodes=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
+    EpisodesKeyWords=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="KeyWords de Episodes")

@@ -228,6 +228,14 @@ class textoplano:
         else:
             formulario = textoPlano()
         return formulario
+class ScenariosWithKeyWord:
+
+    def formulario(self,val):
+        if val!=None:
+            formulario = ScenariosWithKeyWords(val)
+        else:
+            formulario = ScenariosWithKeyWords()
+        return formulario
 class Scenario:
     def formulario(self,val):
         if val!=None:

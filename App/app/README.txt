@@ -22,6 +22,7 @@ una vez loggeado como admin, ir al sitio web admin, a Tipos de artefacto y agreg
 textoplano
 Scenario
 KnowledgeGraph
+ScenarioWithKeyWords
 En un futuro este paso va a desaparecer!
 ERRORES POSIBLES:
 En Linux:
