@@ -93,11 +93,14 @@ def artefactos(request,id):
                     aux.append(i)
             escen=aux
         sel = request.GET.getlist('seleccionados')
-        if funcionalidadesRegitradas(request,sel) == 'kg':
+        funcionalidad=funcionalidadesRegitradas(request,sel,id)
+        if funcionalidad == 'kg':
             tipo=TipoDeArtefacto.objects.get(tipo="KnowledgeGraph")
             fields=[]
             fields.append("NONE")
             return redirect(reverse('crearKG',kwargs={'idP':id}))
+        elif funcionalidad=="cskw":
+            return redirect(reverse('artefactos',kwargs={'id':id}))
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones})
 def tipoForm(tipo,val):
@@ -271,14 +274,17 @@ def listaBotones():
     botones=[]
     botones.append(Boton("A Grafo de Conocimiento","kg"))
     botones.append(Boton("A UML","uml"))
+    botones.append(Boton("Convertir a ScenarioKeyWords","cskw"))
     return botones
-def funcionalidadesRegitradas(request,entidadesSeleccionadas):
+def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
     #REGISTRE ACA SU FUNCIONALIDAD
     #paradigma por broadcast event based
     if KG.knowledgeGraph(entidadesSeleccionadas,request):
         return 'kg'
     if UML.funcionalidad(entidadesSeleccionadas,request):
         return 'uml'
+    if TransformarAScenariosKeyWords.funcionalidad(entidadesSeleccionadas,request,idP):
+        return 'cskw'
 
 class KG():
     def knowledgeGraph(sel,request):
@@ -400,3 +406,37 @@ class UML:
         #data es lo que devolveria luego del procesamiento
         #print(data)
         return data
+class TransformarAScenariosKeyWords:
+    #CONVIERTE UN ESCENARIO NORMAL A UNO CON KEYWORDS
+    def funcionalidad(sel,request,idP):
+        if 'cskw' in request.GET:
+            esce=[]
+            for i in sel:
+                if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
+                    esce.append(i)
+            print(esce)
+            for i in esce:
+                TransformarAScenariosKeyWords.convertidor(Artefacto.objects.get(id=i),request,idP)
+            return "OK"
+        else:
+            return None
+    def convertidor(escenario,request,idP):
+        cont=json.loads(escenario.texto)
+        escKW={
+            "nombreKeyWords":" ",
+            "Goal":cont["Context"],
+            "GoalKeyWords":" ",
+            "Resources":cont["Resources"],
+            "ResourcesKeyWords":" ",
+            "Actors":cont["Actors"],
+            "ActorsKeyWords":" ",
+            "Episodes": cont["Episodes"],
+            "EpisodesKeyWords":" "
+        }
+        nuev=Artefacto(owner=request.user,nombre=escenario.nombre,tipoDeArtefacto=TipoDeArtefacto.objects.get(tipo="ScenariosWithKeyWord"),texto=json.dumps(escKW))
+        nuev.save()
+        p= Proyecto.objects.get(id=idP)
+        p.artefactos.add(nuev)
+        p.save()
+
+        
