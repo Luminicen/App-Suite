@@ -17,6 +17,12 @@ python manage.py createsuperuser
 Paso 6: log in!
 ponen en su navegador la ip que les salta y su puerto asi:
 ip:puerto
+Paso 7:agregar
+una vez loggeado como admin, ir al sitio web admin, a Tipos de artefacto y agregar los siguientes:
+textoplano
+Scenario
+KnowledgeGraph
+En un futuro este paso va a desaparecer!
 ERRORES POSIBLES:
 En Linux:
 -si por alguna razon no te deja entrar con mysql y te salta un error de ese tipo con xampp:
