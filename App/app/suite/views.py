@@ -261,16 +261,16 @@ def listaBotones():
     #es la que se ejecutara
     #MUY IMPORTANTE CHEQUEAR POR LA CLAVE EN EL OBJETO DE LA FUNCIONALIDAD!
     botones=[]
-    botones.append(Boton("TO KNOWLEDGE GRAPH","kg"))
-    botones.append(Boton("DUMMY","dm"))
+    botones.append(Boton("A Grafo de Conocimiento","kg"))
+    botones.append(Boton("A UML","uml"))
     return botones
 def funcionalidadesRegitradas(request,entidadesSeleccionadas):
     #REGISTRE ACA SU FUNCIONALIDAD
     #paradigma por broadcast event based
     if KG.knowledgeGraph(entidadesSeleccionadas,request):
         return 'kg'
-    if dumy.funcionalidad(entidadesSeleccionadas,request):
-        return 'dm'
+    if UML.funcionalidad(entidadesSeleccionadas,request):
+        return 'uml'
 
 class KG():
     def knowledgeGraph(sel,request):
@@ -333,3 +333,54 @@ class dumy:
          if 'dm' in request.GET:
             print("SOY DUMMY")
             return "SI"
+class UML:
+    @classmethod
+    def identificarClases(self,texxto):
+        clasesIdentificadas=[]
+        #SU CODIGO
+        clasesIdentificadas=["empresa", "travesia", "kayakista", "itinerario", "costo", "lugar", "expert", "inexperto"]
+        return clasesIdentificadas
+    @classmethod
+    def identicarMetodosDeClase(self,clases,texto):
+        metodosDeClaseIdentificados={}
+        #SU CODIGO
+        metodosDeClaseIdentificados={"travesia":["ofrecer", "contratar"]}
+        return metodosDeClaseIdentificados
+    @classmethod
+    def identificarRelaciones(self,clases,texto):
+        relacionesIdentificadas={}
+        #SU CODIGO
+        relacionesIdentificadas={"empresa":{"conoce":["travesia"],"subclase":[]},"kayakista":{"conoce":["travesia"],"subclase":["experto","inexperto" ]},"travesia":{"conoce":["itinerario","costo"],"subclase":[]}}
+        return relacionesIdentificadas
+    @classmethod
+    def funcionalidad(self,sel,request):
+        if 'uml' in request.GET:
+            textosId=[]
+            for i in sel:
+                if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="textoplano":
+                    textosId.append(i)
+        else:
+            return None
+        texto=[]
+        for i in textosId:
+            art=Artefacto.objects.get(id=i)
+            texto.append(json.loads(art.texto)["texto"])
+        #print(texto)
+        #texto es un arreglo con los textos que vienen seleccionados
+        if not texto:
+            return None
+        clases=UML.identificarClases(texto)
+        metodos=UML.identicarMetodosDeClase(clases,texto)
+        relaciones=UML.identificarRelaciones(clases,texto)
+        data=[]
+        for clase in clases:
+            arr=[]
+            if clase in metodos:
+                arr.append(metodos[clase])
+            if clase in relaciones:
+                arr.append(relaciones[clase])
+            c={clase : arr}
+            data.append(c)
+        #data es lo que devolveria luego del procesamiento
+        #print(data)
+        return data
