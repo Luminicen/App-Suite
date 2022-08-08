@@ -32,7 +32,7 @@ class Busqueda(forms.Form):
                    for tipo in TipoDeArtefacto.objects.all()]
     except:
         choices=[]
-    buscar=forms.ChoiceField(choices=choices,initial="None")
+    buscar=forms.ChoiceField(choices=choices,initial="None",label="Filtrar")
 #############################################################################
 #
 #Formularios Personalizados

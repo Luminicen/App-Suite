@@ -12,10 +12,10 @@
     <form method="get">
       <div class="d-flex d-inline-block">
       {{ formB.as_table }}
-    <button class="btn btn-primary"  type="submit">Buscar</button>
+    <button class="btn btn-primary"  type="submit">Filtrar</button>
   </div>
     </form>
-    <a class="btn btn-primary" href="{% url 'artefactos' idP%} ">Limpiar</a>
+    <a class="btn btn-primary" href="{% url 'artefactos' idP%} ">Limpiar Filtro</a>
   </div>
   <form method="get">
   <table class="table">
@@ -55,7 +55,7 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-  <button class="btn btn-primary mt-2" type="submit">Submit</button>
+  <button class="btn btn-primary mt-2" type="submit">Crear</button>
 </form>
 {% else %}
 <div style="background-color:#1F1D4F; height: 100vh">

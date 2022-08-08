@@ -103,6 +103,12 @@ def artefactos(request,id):
             return redirect(reverse('artefactos',kwargs={'id':id}))
         elif funcionalidad=="uml":
             return redirect(reverse('crearUML',kwargs={'idP':id}))
+        elif funcionalidad=="exportSKW":
+            aTxt=request.session["textoTxt"]
+            response = HttpResponse(content_type='text/plain')  
+            response['Content-Disposition'] = 'attachment; filename="keyWordsDeLosEscenarios.txt"'
+            response.write(aTxt)
+            return response
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones})
 def tipoForm(tipo,val):
@@ -303,9 +309,10 @@ def listaBotones():
     #es la que se ejecutara
     #MUY IMPORTANTE CHEQUEAR POR LA CLAVE EN EL OBJETO DE LA FUNCIONALIDAD!
     botones=[]
-    botones.append(Boton("A Grafo de Conocimiento","kg"))
+    botones.append(Boton("Crear grafo de conocimiento","kg"))
     botones.append(Boton("A UML","uml"))
     botones.append(Boton("Convertir a ScenarioKeyWords","cskw"))
+    botones.append(Boton("Exportar Scenario con keywords a txt","exportSKW"))
     return botones
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
     #REGISTRE ACA SU FUNCIONALIDAD
@@ -316,6 +323,8 @@ def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
         return 'uml'
     if TransformarAScenariosKeyWords.funcionalidad(entidadesSeleccionadas,request,idP):
         return 'cskw'
+    if ExportarEscenariosKeyWordsATxt.funcionalidad(entidadesSeleccionadas,request):
+        return 'exportSKW'
 
 class KG():
     def knowledgeGraph(sel,request):
@@ -461,9 +470,12 @@ class TransformarAScenariosKeyWords:
     def convertidor(escenario,request,idP):
         cont=json.loads(escenario.texto)
         escKW={
+            "nombre":cont["nombre"],
             "nombreKeyWords":" ",
-            "Goal":cont["Context"],
+            "Goal":cont["Goal"],
             "GoalKeyWords":" ",
+            "Context":cont["Context"],
+            "ContextKeyWords":" ",
             "Resources":cont["Resources"],
             "ResourcesKeyWords":" ",
             "Actors":cont["Actors"],
@@ -476,5 +488,31 @@ class TransformarAScenariosKeyWords:
         p= Proyecto.objects.get(id=idP)
         p.artefactos.add(nuev)
         p.save()
-
+class ExportarEscenariosKeyWordsATxt:
+    def linea(escenario):
+        #recibo escenanario y lo convierto en una linea
+        nombre=escenario.nombre
+        contenido=json.loads(escenario.texto)
+        separador=";"
+        line=""+"Escenario: "+nombre+separador
+        line=line+" "+"GoalKeWords: "+contenido["GoalKeyWords"]+separador
+        line=line+" "+"ContextKeyWords: "+contenido["ContextKeyWords"]+separador
+        line=line+" "+"ResourcesKeyWords: "+contenido["ResourcesKeyWords"]+separador
+        line=line+" "+"ActorsKeyWords: "+contenido["ActorsKeyWords"]+separador
+        line=line+" "+"EpisodesKeyWords: "+contenido["EpisodesKeyWords"]+separador
+        line=line+"\n"#salto de pagina
+        return line
+    def funcionalidad(sel,request):
+        texto=""
+        if 'exportSKW' in request.GET:
+            for i in sel:
+                esc=Artefacto.objects.get(id=i)
+                if esc.tipoDeArtefacto.tipo=="ScenariosWithKeyWord":
+                    texto=texto+ExportarEscenariosKeyWordsATxt.linea(esc)
+            #print(texto)
+            request.session["textoTxt"] = texto
+            #response = HttpResponse(content_type='text/plain')  
+            #response['Content-Disposition'] = 'attachment; filename="keyWordsDeLosEscenarios.txt"'
+            #response.write('Hello')
+            return "OK"
         
