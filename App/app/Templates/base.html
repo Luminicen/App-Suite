@@ -39,8 +39,10 @@
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                 <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar Sesion</a></li>
-                <li><a class="dropdown-item" href="#">Another action</a></li>
-                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                <li><a class="dropdown-item" href="{% url 'proyectos' %}">Proyecto</a></li>
+                {% if request.user.is_staff %}
+                <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administracion</a></li>
+                {% endif %}
               </ul>
             </div>
           </li>
