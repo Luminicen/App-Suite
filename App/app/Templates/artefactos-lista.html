@@ -54,12 +54,13 @@
   <h3>No tienes Artefactos</h3>
   {% endif %}
   <br> 
-  <h3>Crear Artefacto</h3>
-  <p>Elije el tipo de artefacto que quiere crear</p>
   <form method="post">
+    <div class="d-flex d-inline-block">
     {% csrf_token %}
-    {{ form.as_p }}
-  <button class="btn btn-primary mt-2" type="submit">Crear</button>
+    {{ form.as_table }}
+    <button class="btn btn-primary mt-2" type="submit">Crear</button>
+  </div>
+  
 </form>
 {% else %}
 <div style="background-color:#1F1D4F; height: 100vh">
