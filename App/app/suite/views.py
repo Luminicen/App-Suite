@@ -101,6 +101,8 @@ def artefactos(request,id):
             return redirect(reverse('crearKG',kwargs={'idP':id}))
         elif funcionalidad=="cskw":
             return redirect(reverse('artefactos',kwargs={'id':id}))
+        elif funcionalidad=="uml":
+            return redirect(reverse('crearUML',kwargs={'idP':id}))
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones})
 def tipoForm(tipo,val):
@@ -190,7 +192,7 @@ def get_all_fields_from_form(instance):
 def crearArtefactoKG(request,idP):
     #idP = id del Proyecto
     #idT = id del Tipo
-    print("ENTRO A CREAR ARTEFACTOKG")
+    #print("ENTRO A CREAR ARTEFACTOKG")
     proyecto=Proyecto.objects.get(id=idP)
     tipo=TipoDeArtefacto.objects.get(tipo='KnowledgeGraph')
     if request.method == "POST":
@@ -212,6 +214,34 @@ def crearArtefactoKG(request,idP):
     for i in all_fields:
         if i != 'nombre':
             fields.append('id_'+i)
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+def crearArtefactoUML(request,idP):
+    uml= request.session["UMLDATA"]
+    #idP = id del Proyecto
+    #idT = id del Tipo
+    print("ENTRO A CREAR ARTEFACTOUML")
+    proyecto=Proyecto.objects.get(id=idP)
+    tipo=TipoDeArtefacto.objects.get(tipo='UML')
+    if request.method == "POST":
+        formulario = UMLs(request.POST)
+        print(formulario)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            texto=convertidorDeForms(tipo,infForma,request.user)  
+            texto.save()
+            proyecto.artefactos.add(texto)
+            proyecto.save()
+            return redirect(reverse('artefactos',kwargs={'id':idP}))
+    else:
+        data={'uml': uml}
+        form=UMLs(data)
+    all_fields = form.declared_fields.keys()
+    fields=[]
+    for i in all_fields:
+        if i != 'nombre':
+            fields.append('id_'+i)
+    #si queres usar otro template hacelo, tenes que crear un html ubicarlo en la carperta templates
+    #luego reemplaza proyecto-crear por el nombre de tu template
     return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
 
 ############################### TESTE ##########################################
@@ -253,6 +283,7 @@ class KnowledgeGraph:
         else:
             formulario = KnowledgeGraphs()
         return formulario
+ 
 class Boton():
     def __init__(self,nom,clave):
         self.nombre=nom
@@ -281,7 +312,7 @@ def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
     #paradigma por broadcast event based
     if KG.knowledgeGraph(entidadesSeleccionadas,request):
         return 'kg'
-    if UML.funcionalidad(entidadesSeleccionadas,request):
+    if UML.funcionalidad(entidadesSeleccionadas,request,idP):
         return 'uml'
     if TransformarAScenariosKeyWords.funcionalidad(entidadesSeleccionadas,request,idP):
         return 'cskw'
@@ -348,6 +379,12 @@ class dumy:
             print("SOY DUMMY")
             return "SI"
 class UML:
+    def formulario(self,val):
+        if val!=None:
+            formulario = UMLs(val)
+        else:
+            formulario = UMLs()
+        return formulario
     @classmethod
     def identificarClases(self,texxto):
         clasesIdentificadas=[]
@@ -367,7 +404,7 @@ class UML:
         relacionesIdentificadas={"empresa":{"conoce":["travesia"],"subclase":[]},"kayakista":{"conoce":["travesia"],"subclase":["experto","inexperto" ]},"travesia":{"conoce":["itinerario","costo"],"subclase":[]}}
         return relacionesIdentificadas
     @classmethod
-    def funcionalidad(self,sel,request):
+    def funcionalidad(self,sel,request,idP):
         if 'uml' in request.GET:
             textosId=[]
             for i in sel:
@@ -405,7 +442,8 @@ class UML:
             data.append(c)
         #data es lo que devolveria luego del procesamiento
         #print(data)
-        return data
+        request.session["UMLDATA"] = json.dumps(data) 
+        return "OK"
 class TransformarAScenariosKeyWords:
     #CONVIERTE UN ESCENARIO NORMAL A UNO CON KEYWORDS
     def funcionalidad(sel,request,idP):

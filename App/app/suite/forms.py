@@ -60,6 +60,9 @@ class Scenarios(forms.Form):
 class KnowledgeGraphs(forms.Form):
     nombre=forms.CharField(max_length=255,label="Nombre")
     graphOutput=forms.CharField(widget=forms.Textarea())
+class UMLs(forms.Form):
+    nombre=forms.CharField(max_length=255,label="Nombre")
+    uml=forms.CharField(widget=forms.Textarea())
 
 class ScenariosWithKeyWords(forms.Form):
     def __init__(self, *args, **kwargs):
