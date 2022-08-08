@@ -25,15 +25,24 @@
     <div class="container-fluid">
       <a class="navbar-brand" href="{% url 'home' %}">
         <img src="{% static 'imagenes/logotipo.png' %}" alt="" width="50" height="40" class="d-inline-block align-text-top">
-        Usuario: {{ user.username }}
+        Requirements Healer
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-              <a class="nav-link" href="{% url 'logout' %}">Cerrar Sesion</a>
+          <li class="nav-item dropdown">
+            <div class="dropdown">
+              <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                Usuario: {{ user.username }}
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Cerrar Sesion</a></li>
+                <li><a class="dropdown-item" href="#">Another action</a></li>
+                <li><a class="dropdown-item" href="#">Something else here</a></li>
+              </ul>
+            </div>
           </li>
         </ul>
       </div>
