@@ -16,6 +16,10 @@
   </div>
     </form>
     <a class="btn btn-primary" href="{% url 'artefactos' idP%} ">Limpiar Filtro</a>
+  <div class="d-flex ms-auto">
+    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', true);" class="btn btn-primary">Seleccionar Todo</button>
+    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', false);" class="btn btn-primary">Deseleccionar Todo</button>
+  </div>
   </div>
   <form method="get">
   <table class="table">
