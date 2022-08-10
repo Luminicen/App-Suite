@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-%+xt5%%3tpy#8y3x*n58&!h59sddil(tj*j)1+^+ga)u@p^hxf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['app-requirements-healer.okd.lifia.info.unlp.edu.ar','localhost','db','127.0.0.1']
+ALLOWED_HOSTS = ['app-requirements-healer.okd.lifia.info.unlp.edu.ar','localhost','db']
 
 
 # Application definition
