@@ -334,6 +334,7 @@ class dumy:
             print("SOY DUMMY")
             return "SI"
 class UML:
+    #después poner botones 
     @classmethod
     def identificarClases(self,texxto):
         clasesIdentificadas=[]
