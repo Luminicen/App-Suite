@@ -1,8 +1,9 @@
-from cgitb import text
+import os
 from MySQLdb import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
+from app.settings import STATICFILES_DIRS
 from suite.models import *
 from suite.forms import *
 #import requests as req
@@ -221,34 +222,54 @@ def crearArtefactoKG(request,idP):
         if i != 'nombre':
             fields.append('id_'+i)
     return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
-def crearArtefactoUML(request,idP):
-    uml= request.session["UMLDATA"]
-    #idP = id del Proyecto
-    #idT = id del Tipo
-    print("ENTRO A CREAR ARTEFACTOUML")
-    proyecto=Proyecto.objects.get(id=idP)
-    tipo=TipoDeArtefacto.objects.get(tipo='UML')
-    if request.method == "POST":
-        formulario = UMLs(request.POST)
-        print(formulario)
-        if formulario.is_valid():
-            infForma=formulario.cleaned_data
-            texto=convertidorDeForms(tipo,infForma,request.user)  
-            texto.save()
-            proyecto.artefactos.add(texto)
-            proyecto.save()
-            return redirect(reverse('artefactos',kwargs={'id':idP}))
-    else:
-        data={'uml': uml}
-        form=UMLs(data)
-    all_fields = form.declared_fields.keys()
-    fields=[]
-    for i in all_fields:
-        if i != 'nombre':
-            fields.append('id_'+i)
-    #si queres usar otro template hacelo, tenes que crear un html ubicarlo en la carperta templates
-    #luego reemplaza proyecto-crear por el nombre de tu template
-    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+
+def crearArtefactoUML(request, idP):
+    data = request.body.decode('utf-8')
+
+    context = {}
+    try:
+        static_url = STATICFILES_DIRS[0]
+        filename = os.path.join(static_url, "uml", f"uml_{idP}.txt")
+        file = open(filename, "w")
+        file.write("@startuml\n")
+
+        for clase in data:
+            nombre_clase = str(clase["nombre"]).capitalize()
+            file.write("class " + nombre_clase + "\n")
+            try:
+                for atributo in clase["atributos"]:
+                    file.write(f"{nombre_clase} : {atributo}" + "\n")
+            except:
+                pass
+            try:
+                for relacion in clase["relaciones"]:
+                    relacion = str(relacion).capitalize()
+                    file.write(f"{nombre_clase} --> {relacion}" + "\n")
+            except:
+                pass
+            try:
+                for metodo in clase["metodos"]:
+                    file.write(f"{nombre_clase} : {metodo}()" + "\n")
+            except:
+                pass
+            try:
+                for subclase in clase["subclases"]:
+                    subclase = str(subclase).capitalize()
+                    file.write(f"{nombre_clase} <|-- {subclase}" + "\n")
+            except:
+                pass
+
+        file.write("@enduml")
+        file.close()
+
+        os.system(f"java -jar {static_url}/plantuml.jar {static_url}/uml/uml_{idP}.txt")
+
+    except Exception as e:
+        context["error"] = str(e)
+        print(e)
+
+    context["img_name"] = f"uml_{idP}.png"
+    return render(request, 'uml-visualizer.html', context=context)
 
 ############################### TESTE ##########################################
 # TEST API# os.system("java -jar plantuml.jar test.txt")
