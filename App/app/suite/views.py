@@ -400,21 +400,38 @@ def buscarClase(arr,clase):
     return None
 class UML:
     @classmethod
-    def identificarClases(self,texxto):
-        clasesIdentificadas=[]
-        #SU CODIGO
-        clasesIdentificadas=["empresa", "travesia", "kayakista", "itinerario", "costo", "lugar", "expert", "inexperto"]
+    def identificarClases(self,texto):
+        matcher = Matcher(nlp.vocab)
+        pattern = [{"POS": "NOUN"}]
+        matcher.add("Class Candidate", [pattern])
+        pattern = [{"DEP": {"IN": ["nsubj", "dobj", "iobj"]}}]
+        matcher.add("Class Candidate", [pattern])
+        clasesIdentificadas = set()
+        for o in texto:
+            doc = nlp(o)
+            matches = matcher(doc)
+            for match_id, start, end in matches:
+                matched_span = doc[start:end]
+                clasesIdentificadas.add(matched_span.lemma_.lower())
         return clasesIdentificadas
+
     @classmethod
-    def identicarMetodosDeClase(self,clases,texto):
-        metodosDeClaseIdentificados=[]
-        #SU CODIGO
-        ejemplo1={
-        "nombre":"travesia",
-        "metodos":["ofrecer", "contratar"]
-        }
-        metodosDeClaseIdentificados.append(ejemplo1)
+    def identificarMetodosDeClase(self,clases,texto):
+        metodosDeClaseIdentificados={}
+        verbosProhibidos = ["contener", "ser", "es"]
+        for o in texto:
+            doc = nlp(o)
+            for classToken in doc:
+                if (classToken.dep_ == "obj") & (classToken.lemma_.lower() in clases):
+                    claseLeida = classToken.lemma_.lower()
+                    for verbToken in doc:
+                        if (verbToken.pos_ == "VERB") & (verbToken.lemma_ not in verbosProhibidos):
+                            if claseLeida not in metodosDeClaseIdentificados:
+                                metodosDeClaseIdentificados[claseLeida] = []
+                            metodosDeClaseIdentificados[claseLeida].append(verbToken.lemma_)                    
         return metodosDeClaseIdentificados
+    
+    
     @classmethod
     def identificarRelaciones(self,clases,texto):
         relacionesIdentificadas=[]
