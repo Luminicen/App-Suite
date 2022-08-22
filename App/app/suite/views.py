@@ -24,7 +24,12 @@ def proyectos(request):
         if p.owner==usuario:
             mio.append(p)
             ok=True
-    return render(request,'proyectos.html',{"ok":ok,"proyectos":mio})
+    otros=[]
+    for p in proyectos:
+        if not (p in mio):
+            otros.append(p)
+    print(otros)
+    return render(request,'proyectos.html',{"ok":ok,"proyectos":mio,"otro_p":otros})
 
 def crearProyecto(request):
     #creo el formulario proyecto y lo mando al template
@@ -41,6 +46,8 @@ def crearProyecto(request):
 def eliminarProyecto(request,id):
     #obtengo el proyecto a eliminar por id y lo elimino
     proyecto=Proyecto.objects.get(id=id)
+    if request.user != proyecto.owner:
+        return HttpResponse("NO SOS EL OWNER")
     try:
         proyecto.delete()
     except IntegrityError as e:
@@ -382,11 +389,15 @@ def separarPorPunto(actoresStr):
     lista=[]
     lista.extend(actoresStr.split("."))
     return lista
-class dumy:
-    def funcionalidad(ent,request):
-         if 'dm' in request.GET:
-            print("SOY DUMMY")
-            return "SI"
+
+def buscarClase(arr,clase):
+
+    for i in arr:
+        #
+        if (i["nombre"]==clase):
+            #print("ENCONTRO")
+            return i
+    return None
 class UML:
     def formulario(self,val):
         if val!=None:
@@ -402,15 +413,39 @@ class UML:
         return clasesIdentificadas
     @classmethod
     def identicarMetodosDeClase(self,clases,texto):
-        metodosDeClaseIdentificados={}
+        metodosDeClaseIdentificados=[]
         #SU CODIGO
-        metodosDeClaseIdentificados={"travesia":["ofrecer", "contratar"]}
+        ejemplo1={
+        "nombre":"travesia",
+        "metodos":["ofrecer", "contratar"]
+        }
+        metodosDeClaseIdentificados.append(ejemplo1)
         return metodosDeClaseIdentificados
     @classmethod
     def identificarRelaciones(self,clases,texto):
-        relacionesIdentificadas={}
+        relacionesIdentificadas=[]
         #SU CODIGO
-        relacionesIdentificadas={"empresa":{"conoce":["travesia"],"subclase":[]},"kayakista":{"conoce":["travesia"],"subclase":["experto","inexperto" ]},"travesia":{"conoce":["itinerario","costo"],"subclase":[]}}
+        ejemplo1={
+                "nombre":"empresa",
+                "relacion":["travesia"],
+                "subclase":[]
+                }
+        print(type(ejemplo1))
+        ejemplo2= {
+                "nombre":"kayakista",
+                "relacion":["travesia"],
+                "subclase":["experto","inexperto"]
+                }
+        print(type(ejemplo2))
+        ejemplo3={
+                "nombre":"travesia",
+                "relacion":["itinerario","costo"],
+                "subclase":[]
+                }
+        print(type(ejemplo3))
+        relacionesIdentificadas.append(ejemplo1)
+        relacionesIdentificadas.append(ejemplo2)
+        relacionesIdentificadas.append(ejemplo3)
         return relacionesIdentificadas
     @classmethod
     def funcionalidad(self,sel,request,idP):
@@ -441,18 +476,39 @@ class UML:
         metodos=UML.identicarMetodosDeClase(clases,texto)
         relaciones=UML.identificarRelaciones(clases,texto)
         data=[]
+        #expression_if_true if condition else expression_if_false
         for clase in clases:
-            arr=[]
-            if clase in metodos:
-                arr.append(metodos[clase])
-            if clase in relaciones:
-                arr.append(relaciones[clase])
-            c={clase : arr}
+            z=buscarClase(relaciones,clase)
+            c={
+                "nombre" : clase,
+                "metodos":buscarClase(metodos,clase),
+                "subclases":z["relacion"] if z!=None else [],
+                "atributos":[],
+                "relaciones":z["subclase"] if z!=None else []
+                }
             data.append(c)
         #data es lo que devolveria luego del procesamiento
-        #print(data)
+        print(data)
         request.session["UMLDATA"] = json.dumps(data) 
         return "OK"
+ #diccionario= obj clase
+ # data = [
+ #       {
+  #          "nombre": "empresa",
+  #          "atributos": ["travesia", "calle", "numero", "codigoPostal", "ciudad", "provincia", "pais"],
+  #          "relaciones": ["cliente", "proveedor", "empleado"],
+  #          "metodos": ["ofrecer", "pedir", "pagar", "pagar_servicio"],
+  #          "subclases": ["empresa_publica", "empresa_privada"],
+  #      },
+  #      {
+  #          "nombre": "empresa_publica",
+  #          "atributos": ["travesia"],
+  #          "relaciones": [],
+   #         "metodos": ["ofrecer"],
+   #         "subclases": [],
+   #     },
+   # ]
+       
 class TransformarAScenariosKeyWords:
     #CONVIERTE UN ESCENARIO NORMAL A UNO CON KEYWORDS
     def funcionalidad(sel,request,idP):
