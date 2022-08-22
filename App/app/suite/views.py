@@ -5,18 +5,18 @@ from django.shortcuts import redirect, render
 from django.urls import reverse
 from suite.models import *
 from suite.forms import *
-#import requests as req
+import requests as req
 import json
 from suite.ontoscen.wikilink import Wikilink
 from suite.ontoscen.ontoscen import Ontoscen
 from suite.ontoscen.requirement import Requirement
 import spacy
 from spacy.matcher import Matcher
+nlp = spacy.load("es_dep_news_trf")
 # Create your views here.
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
-nlp = spacy.load("en_core_web_trf")
 def proyectos(request):
     #obtengo todos los proyectos y filtro por los que son mios
     proyectos=Proyecto.objects.all()
@@ -429,9 +429,14 @@ class UML:
                     claseLeida = classToken.lemma_.lower()
                     for verbToken in doc:
                         if (verbToken.pos_ == "VERB") & (verbToken.lemma_ not in verbosProhibidos):
-                            if claseLeida not in metodosDeClaseIdentificados:
-                                metodosDeClaseIdentificados[claseLeida] = []
-                            metodosDeClaseIdentificados[claseLeida].append(verbToken.lemma_)                    
+                            if (claseLeida in metodosDeClaseIdentificados.values()):
+                               pos = buscarClase(metodosDeClaseIdentificados,claseLeida)
+                               metodosDeClaseIdentificados[pos]["metodos"].append(verbToken.lemma_)
+                            else:
+                                 metodosDeClaseIdentificados = {
+                                    "nombre" : claseLeida,
+                                    "metodos" : [verbToken.lemma_]
+                                }
         return metodosDeClaseIdentificados
     
     
