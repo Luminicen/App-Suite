@@ -10,10 +10,13 @@ import json
 from suite.ontoscen.wikilink import Wikilink
 from suite.ontoscen.ontoscen import Ontoscen
 from suite.ontoscen.requirement import Requirement
+import spacy
+from spacy.matcher import Matcher
 # Create your views here.
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
+nlp = spacy.load("en_core_web_trf")
 def proyectos(request):
     #obtengo todos los proyectos y filtro por los que son mios
     proyectos=Proyecto.objects.all()
@@ -457,6 +460,7 @@ class UML:
         return relacionesIdentificadas
     @classmethod
     def funcionalidad(self,sel,request,idP):
+
         if 'uml' in request.GET:
             textosId=[]
             for i in sel:
@@ -465,6 +469,7 @@ class UML:
         else:
             return None
         texto=[]
+        
         for i in textosId:
             art=Artefacto.objects.get(id=i)
             texto.append(json.loads(art.texto)["texto"])
@@ -481,7 +486,7 @@ class UML:
         if not texto:
             return None
         clases=UML.identificarClases(texto)
-        metodos=UML.identicarMetodosDeClase(clases,texto)
+        metodos=UML.identificarMetodosDeClase(clases,texto)
         relaciones=UML.identificarRelaciones(clases,texto)
         data=[]
         #expression_if_true if condition else expression_if_false

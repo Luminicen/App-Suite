@@ -6,6 +6,7 @@
 {% if user.is_authenticated %}
 {{ tipo | json_script:"tipo" }}
 {{ campos | json_script:"fields" }}
+<div id="advertencias"></div>
     <form method="post">
       <div>
         {% csrf_token %}
@@ -37,4 +38,5 @@
 <script src="{% static 'ctxmenu/ctxmenu.js' %}"></script>
 <script type="module" src="{% static 'scripts/reglasChequeoMain.js' %}"></script>
 <script type="module" src="{% static 'scripts/reglasChequeoClasses.js' %}"></script>
+<script type="module" src="{% static 'scripts/alertasDeReglas.js' %}"></script>
 {% endblock %}
