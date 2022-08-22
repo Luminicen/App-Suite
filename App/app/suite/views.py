@@ -430,19 +430,16 @@ class UML:
                 "relacion":["travesia"],
                 "subclase":[]
                 }
-        print(type(ejemplo1))
         ejemplo2= {
                 "nombre":"kayakista",
                 "relacion":["travesia"],
                 "subclase":["experto","inexperto"]
                 }
-        print(type(ejemplo2))
         ejemplo3={
                 "nombre":"travesia",
                 "relacion":["itinerario","costo"],
                 "subclase":[]
                 }
-        print(type(ejemplo3))
         relacionesIdentificadas.append(ejemplo1)
         relacionesIdentificadas.append(ejemplo2)
         relacionesIdentificadas.append(ejemplo3)
