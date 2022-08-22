@@ -32,7 +32,7 @@ class Busqueda(forms.Form):
                    for tipo in TipoDeArtefacto.objects.all()]
     except:
         choices=[]
-    buscar=forms.ChoiceField(choices=choices,initial="None")
+    buscar=forms.ChoiceField(choices=choices,initial="None",label="Filtrar")
 #############################################################################
 #
 #Formularios Personalizados
@@ -60,3 +60,22 @@ class Scenarios(forms.Form):
 class KnowledgeGraphs(forms.Form):
     nombre=forms.CharField(max_length=255,label="Nombre")
     graphOutput=forms.CharField(widget=forms.Textarea())
+class UMLs(forms.Form):
+    nombre=forms.CharField(max_length=255,label="Nombre")
+    uml=forms.CharField(widget=forms.Textarea())
+
+class ScenariosWithKeyWords(forms.Form):
+    def __init__(self, *args, **kwargs):
+        super(ScenariosWithKeyWords, self).__init__(*args, **kwargs)
+    nombre=forms.CharField(max_length=255,label="ScenarioName")#<---
+    nombreKeyWords=forms.CharField(max_length=255,label="KeyWords de Name",required=False)
+    Goal=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    GoalKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Goal",required=False)
+    Context=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    ContextKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Context",required=False)
+    Resources=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    ResourcesKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Resources",required=False)
+    Actors=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
+    ActorsKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Actors",required=False)
+    Episodes=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
+    EpisodesKeyWords=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="KeyWords de Episodes",required=False)

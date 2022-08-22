@@ -24,7 +24,12 @@ def proyectos(request):
         if p.owner==usuario:
             mio.append(p)
             ok=True
-    return render(request,'proyectos.html',{"ok":ok,"proyectos":mio})
+    otros=[]
+    for p in proyectos:
+        if not (p in mio):
+            otros.append(p)
+    print(otros)
+    return render(request,'proyectos.html',{"ok":ok,"proyectos":mio,"otro_p":otros})
 
 def crearProyecto(request):
     #creo el formulario proyecto y lo mando al template
@@ -41,6 +46,8 @@ def crearProyecto(request):
 def eliminarProyecto(request,id):
     #obtengo el proyecto a eliminar por id y lo elimino
     proyecto=Proyecto.objects.get(id=id)
+    if request.user != proyecto.owner:
+        return HttpResponse("NO SOS EL OWNER")
     try:
         proyecto.delete()
     except IntegrityError as e:
@@ -93,11 +100,22 @@ def artefactos(request,id):
                     aux.append(i)
             escen=aux
         sel = request.GET.getlist('seleccionados')
-        if funcionalidadesRegitradas(request,sel) == 'kg':
+        funcionalidad=funcionalidadesRegitradas(request,sel,id)
+        if funcionalidad == 'kg':
             tipo=TipoDeArtefacto.objects.get(tipo="KnowledgeGraph")
             fields=[]
             fields.append("NONE")
             return redirect(reverse('crearKG',kwargs={'idP':id}))
+        elif funcionalidad=="cskw":
+            return redirect(reverse('artefactos',kwargs={'id':id}))
+        elif funcionalidad=="uml":
+            return redirect(reverse('crearUML',kwargs={'idP':id}))
+        elif funcionalidad=="exportSKW":
+            aTxt=request.session["textoTxt"]
+            response = HttpResponse(content_type='text/plain')  
+            response['Content-Disposition'] = 'attachment; filename="keyWordsDeLosEscenarios.txt"'
+            response.write(aTxt)
+            return response
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones})
 def tipoForm(tipo,val):
@@ -187,7 +205,7 @@ def get_all_fields_from_form(instance):
 def crearArtefactoKG(request,idP):
     #idP = id del Proyecto
     #idT = id del Tipo
-    print("ENTRO A CREAR ARTEFACTOKG")
+    #print("ENTRO A CREAR ARTEFACTOKG")
     proyecto=Proyecto.objects.get(id=idP)
     tipo=TipoDeArtefacto.objects.get(tipo='KnowledgeGraph')
     if request.method == "POST":
@@ -210,6 +228,34 @@ def crearArtefactoKG(request,idP):
         if i != 'nombre':
             fields.append('id_'+i)
     return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+def crearArtefactoUML(request,idP):
+    uml= request.session["UMLDATA"]
+    #idP = id del Proyecto
+    #idT = id del Tipo
+    print("ENTRO A CREAR ARTEFACTOUML")
+    proyecto=Proyecto.objects.get(id=idP)
+    tipo=TipoDeArtefacto.objects.get(tipo='UML')
+    if request.method == "POST":
+        formulario = UMLs(request.POST)
+        print(formulario)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            texto=convertidorDeForms(tipo,infForma,request.user)  
+            texto.save()
+            proyecto.artefactos.add(texto)
+            proyecto.save()
+            return redirect(reverse('artefactos',kwargs={'id':idP}))
+    else:
+        data={'uml': uml}
+        form=UMLs(data)
+    all_fields = form.declared_fields.keys()
+    fields=[]
+    for i in all_fields:
+        if i != 'nombre':
+            fields.append('id_'+i)
+    #si queres usar otro template hacelo, tenes que crear un html ubicarlo en la carperta templates
+    #luego reemplaza proyecto-crear por el nombre de tu template
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
 
 ############################### TESTE ##########################################
 # TEST API# os.system("java -jar plantuml.jar test.txt")
@@ -228,6 +274,14 @@ class textoplano:
         else:
             formulario = textoPlano()
         return formulario
+class ScenariosWithKeyWord:
+
+    def formulario(self,val):
+        if val!=None:
+            formulario = ScenariosWithKeyWords(val)
+        else:
+            formulario = ScenariosWithKeyWords()
+        return formulario
 class Scenario:
     def formulario(self,val):
         if val!=None:
@@ -242,6 +296,7 @@ class KnowledgeGraph:
         else:
             formulario = KnowledgeGraphs()
         return formulario
+ 
 class Boton():
     def __init__(self,nom,clave):
         self.nombre=nom
@@ -261,16 +316,22 @@ def listaBotones():
     #es la que se ejecutara
     #MUY IMPORTANTE CHEQUEAR POR LA CLAVE EN EL OBJETO DE LA FUNCIONALIDAD!
     botones=[]
-    botones.append(Boton("A Grafo de Conocimiento","kg"))
+    botones.append(Boton("Crear grafo de conocimiento","kg"))
     botones.append(Boton("A UML","uml"))
+    botones.append(Boton("Convertir a ScenarioKeyWords","cskw"))
+    botones.append(Boton("Exportar Scenario con keywords a txt","exportSKW"))
     return botones
-def funcionalidadesRegitradas(request,entidadesSeleccionadas):
+def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
     #REGISTRE ACA SU FUNCIONALIDAD
     #paradigma por broadcast event based
     if KG.knowledgeGraph(entidadesSeleccionadas,request):
         return 'kg'
-    if UML.funcionalidad(entidadesSeleccionadas,request):
+    if UML.funcionalidad(entidadesSeleccionadas,request,idP):
         return 'uml'
+    if TransformarAScenariosKeyWords.funcionalidad(entidadesSeleccionadas,request,idP):
+        return 'cskw'
+    if ExportarEscenariosKeyWordsATxt.funcionalidad(entidadesSeleccionadas,request):
+        return 'exportSKW'
 
 class KG():
     def knowledgeGraph(sel,request):
@@ -328,13 +389,16 @@ def separarPorPunto(actoresStr):
     lista=[]
     lista.extend(actoresStr.split("."))
     return lista
-class dumy:
-    def funcionalidad(ent,request):
-         if 'dm' in request.GET:
-            print("SOY DUMMY")
-            return "SI"
+
+def buscarClase(arr,clase):
+
+    for i in arr:
+        #
+        if (i["nombre"]==clase):
+            #print("ENCONTRO")
+            return i
+    return None
 class UML:
-    #después poner botones 
     @classmethod
     def identificarClases(self,texxto):
         clasesIdentificadas=[]
@@ -343,18 +407,39 @@ class UML:
         return clasesIdentificadas
     @classmethod
     def identicarMetodosDeClase(self,clases,texto):
-        metodosDeClaseIdentificados={}
+        metodosDeClaseIdentificados=[]
         #SU CODIGO
-        metodosDeClaseIdentificados={"travesia":["ofrecer", "contratar"]}
+        ejemplo1={
+        "nombre":"travesia",
+        "metodos":["ofrecer", "contratar"]
+        }
+        metodosDeClaseIdentificados.append(ejemplo1)
         return metodosDeClaseIdentificados
     @classmethod
     def identificarRelaciones(self,clases,texto):
-        relacionesIdentificadas={}
+        relacionesIdentificadas=[]
         #SU CODIGO
-        relacionesIdentificadas={"empresa":{"conoce":["travesia"],"subclase":[]},"kayakista":{"conoce":["travesia"],"subclase":["experto","inexperto" ]},"travesia":{"conoce":["itinerario","costo"],"subclase":[]}}
+        ejemplo1={
+                "nombre":"empresa",
+                "relacion":["travesia"],
+                "subclase":[]
+                }
+        ejemplo2= {
+                "nombre":"kayakista",
+                "relacion":["travesia"],
+                "subclase":["experto","inexperto"]
+                }
+        ejemplo3={
+                "nombre":"travesia",
+                "relacion":["itinerario","costo"],
+                "subclase":[]
+                }
+        relacionesIdentificadas.append(ejemplo1)
+        relacionesIdentificadas.append(ejemplo2)
+        relacionesIdentificadas.append(ejemplo3)
         return relacionesIdentificadas
     @classmethod
-    def funcionalidad(self,sel,request):
+    def funcionalidad(self,sel,request,idP):
         if 'uml' in request.GET:
             textosId=[]
             for i in sel:
@@ -366,6 +451,14 @@ class UML:
         for i in textosId:
             art=Artefacto.objects.get(id=i)
             texto.append(json.loads(art.texto)["texto"])
+        texto=["""empresa ofrecer travesía.
+                  Kayakista contratar travesía.
+                  Travesia contener itinerario.
+                  Travesia contener costo.
+                  Itinerario contener lugar.
+                  Experto ser kayakista.
+                  Inexperto ser kayakista.
+                """]
         #print(texto)
         #texto es un arreglo con los textos que vienen seleccionados
         if not texto:
@@ -374,14 +467,99 @@ class UML:
         metodos=UML.identicarMetodosDeClase(clases,texto)
         relaciones=UML.identificarRelaciones(clases,texto)
         data=[]
+        #expression_if_true if condition else expression_if_false
         for clase in clases:
-            arr=[]
-            if clase in metodos:
-                arr.append(metodos[clase])
-            if clase in relaciones:
-                arr.append(relaciones[clase])
-            c={clase : arr}
+            z=buscarClase(relaciones,clase)
+            c={
+                "nombre" : clase,
+                "metodos":buscarClase(metodos,clase),
+                "subclases":z["relacion"] if z!=None else [],
+                "atributos":[],
+                "relaciones":z["subclase"] if z!=None else []
+                }
             data.append(c)
         #data es lo que devolveria luego del procesamiento
-        #print(data)
-        return data
+        print(data)
+        request.session["UMLDATA"] = json.dumps(data) 
+        return "OK"
+ #diccionario= obj clase
+ # data = [
+ #       {
+  #          "nombre": "empresa",
+  #          "atributos": ["travesia", "calle", "numero", "codigoPostal", "ciudad", "provincia", "pais"],
+  #          "relaciones": ["cliente", "proveedor", "empleado"],
+  #          "metodos": ["ofrecer", "pedir", "pagar", "pagar_servicio"],
+  #          "subclases": ["empresa_publica", "empresa_privada"],
+  #      },
+  #      {
+  #          "nombre": "empresa_publica",
+  #          "atributos": ["travesia"],
+  #          "relaciones": [],
+   #         "metodos": ["ofrecer"],
+   #         "subclases": [],
+   #     },
+   # ]
+       
+class TransformarAScenariosKeyWords:
+    #CONVIERTE UN ESCENARIO NORMAL A UNO CON KEYWORDS
+    def funcionalidad(sel,request,idP):
+        if 'cskw' in request.GET:
+            esce=[]
+            for i in sel:
+                if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
+                    esce.append(i)
+            print(esce)
+            for i in esce:
+                TransformarAScenariosKeyWords.convertidor(Artefacto.objects.get(id=i),request,idP)
+            return "OK"
+        else:
+            return None
+    def convertidor(escenario,request,idP):
+        cont=json.loads(escenario.texto)
+        escKW={
+            "nombre":cont["nombre"],
+            "nombreKeyWords":" ",
+            "Goal":cont["Goal"],
+            "GoalKeyWords":" ",
+            "Context":cont["Context"],
+            "ContextKeyWords":" ",
+            "Resources":cont["Resources"],
+            "ResourcesKeyWords":" ",
+            "Actors":cont["Actors"],
+            "ActorsKeyWords":" ",
+            "Episodes": cont["Episodes"],
+            "EpisodesKeyWords":" "
+        }
+        nuev=Artefacto(owner=request.user,nombre=escenario.nombre,tipoDeArtefacto=TipoDeArtefacto.objects.get(tipo="ScenariosWithKeyWord"),texto=json.dumps(escKW))
+        nuev.save()
+        p= Proyecto.objects.get(id=idP)
+        p.artefactos.add(nuev)
+        p.save()
+class ExportarEscenariosKeyWordsATxt:
+    def linea(escenario):
+        #recibo escenanario y lo convierto en una linea
+        nombre=escenario.nombre
+        contenido=json.loads(escenario.texto)
+        separador=";"
+        line=""+"Escenario: "+nombre+separador
+        line=line+" "+"GoalKeWords: "+contenido["GoalKeyWords"]+separador
+        line=line+" "+"ContextKeyWords: "+contenido["ContextKeyWords"]+separador
+        line=line+" "+"ResourcesKeyWords: "+contenido["ResourcesKeyWords"]+separador
+        line=line+" "+"ActorsKeyWords: "+contenido["ActorsKeyWords"]+separador
+        line=line+" "+"EpisodesKeyWords: "+contenido["EpisodesKeyWords"]+separador
+        line=line+"\n"#salto de pagina
+        return line
+    def funcionalidad(sel,request):
+        texto=""
+        if 'exportSKW' in request.GET:
+            for i in sel:
+                esc=Artefacto.objects.get(id=i)
+                if esc.tipoDeArtefacto.tipo=="ScenariosWithKeyWord":
+                    texto=texto+ExportarEscenariosKeyWordsATxt.linea(esc)
+            #print(texto)
+            request.session["textoTxt"] = texto
+            #response = HttpResponse(content_type='text/plain')  
+            #response['Content-Disposition'] = 'attachment; filename="keyWordsDeLosEscenarios.txt"'
+            #response.write('Hello')
+            return "OK"
+        

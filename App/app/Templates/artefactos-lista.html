@@ -12,10 +12,14 @@
     <form method="get">
       <div class="d-flex d-inline-block">
       {{ formB.as_table }}
-    <button class="btn btn-primary"  type="submit">Buscar</button>
+    <button class="btn btn-primary"  type="submit">Filtrar</button>
   </div>
     </form>
-    <a class="btn btn-primary" href="{% url 'artefactos' idP%} ">Limpiar</a>
+    <a class="btn btn-primary" href="{% url 'artefactos' idP%} ">Limpiar Filtro</a>
+  <div class="d-flex ms-auto">
+    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', true);" class="btn btn-primary">Seleccionar Todo</button>
+    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', false);" class="btn btn-primary">Deseleccionar Todo</button>
+  </div>
   </div>
   <form method="get">
   <table class="table">
@@ -50,12 +54,13 @@
   <h3>No tienes Artefactos</h3>
   {% endif %}
   <br> 
-  <h3>Crear Artefacto</h3>
-  <p>Elije el tipo de artefacto que quiere crear</p>
   <form method="post">
+    <div class="d-flex d-inline-block">
     {% csrf_token %}
-    {{ form.as_p }}
-  <button class="btn btn-primary mt-2" type="submit">Submit</button>
+    {{ form.as_table }}
+    <button class="btn btn-primary mt-2" type="submit">Crear</button>
+  </div>
+  
 </form>
 {% else %}
 <div style="background-color:#1F1D4F; height: 100vh">

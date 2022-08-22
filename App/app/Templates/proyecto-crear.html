@@ -11,7 +11,10 @@
         {% csrf_token %}
         {{ form | crispy }}
       </div>
-    <button class="btn btn-primary mt-2" type="submit">Submit</button>
+    <div class="d-flex d-inline-block">
+    <button class="btn btn-primary mt-2" type="submit">Guardar</button>
+    <button class="btn btn-primary mt-2" onClick="history.go(-1);" type="button">Cancelar</button>
+    </div>
     </form>
 {% else %}
 <div style="background-color:#1F1D4F; height: 100vh">

@@ -21,7 +21,7 @@
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.titulo}}</td>
-        <td><a href="{% url 'destruirProyecto' p.id%}">Eliminar</a> | <a href="{% url 'modificarProyecto' p.id%}">Modificar</a> | <a href="{% url 'artefactos' p.id%}">Artefactos</a></td>
+        <td><a href="{% url 'destruirProyecto' p.id%}">Eliminar</a> | <a href="{% url 'modificarProyecto' p.id%}">Modificar datos del proyecto</a> | <a href="{% url 'artefactos' p.id%}">Lista de Artefactos Del Proyecto</a></td>
       </tr>
       {% endfor %}
       
