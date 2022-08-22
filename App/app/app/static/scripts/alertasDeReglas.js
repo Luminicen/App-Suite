@@ -26,7 +26,31 @@ res=>{
             element.removeChild(element.firstChild)
         }
     }
+
 })
+
+axios.post('http://localhost:5000/null_subject', 
+{
+    data:document.getElementById(this.campo).value,
+}
+).then(
+
+res=>{ 
+    const element = document.getElementById("advertencias");
+    if (res.data.length !=0){
+        let para = document.createElement("h5");
+        let node = document.createTextNode("No hay sujeto en "+this.campo.slice(3,-1));
+        para.appendChild(node);
+        element.appendChild(para);
+    }
+    else{
+        while(element.firstChild){
+            element.removeChild(element.firstChild)
+        }
+    }
+    
+})
+
 
 }
 ejecutarLimpieza(){
