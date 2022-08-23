@@ -102,7 +102,7 @@ pedirDatos(){
     //http://localhost:5000/reglas
     //http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/reglas
 
-    axios.post('http://localhost:5000/check_all', 
+    axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/reglas', 
     {
         texto:document.getElementById(this.campo).value,
         tipo:this.tip,
