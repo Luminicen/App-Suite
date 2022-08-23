@@ -3,3 +3,5 @@
 # in the context root
 modules/*
 mysql-data
+../entorno
+../okd

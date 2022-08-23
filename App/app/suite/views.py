@@ -272,7 +272,7 @@ def crearArtefactoUML(request, idP):
         file.write("@enduml")
         file.close()
 
-        os.system(f"java -jar {static_url}/plantuml.jar {static_url}/uml/uml_{idP}.txt")
+        os.system(f"java -jar {static_url}/app/plantuml.jar {static_url}/uml/uml_{idP}.txt")
 
     except Exception as e:
         context["error"] = str(e)
@@ -511,8 +511,15 @@ class UML:
         #texto es un arreglo con los textos que vienen seleccionados
         if not texto:
             return None
+        metodosDeClaseIdentificados=[]
+        ejemplo1={
+        "nombre":"travesia",
+        "metodos":["ofrecer", "contratar"]
+        }
+        metodosDeClaseIdentificados.append(ejemplo1)
         clases=UML.identificarClases(texto)
-        metodos=UML.identificarMetodosDeClase(clases,texto)
+        metodos=metodosDeClaseIdentificados
+        #UML.identificarMetodosDeClase(clases,texto)
         relaciones=UML.identificarRelaciones(clases,texto)
         data=[]
         #expression_if_true if condition else expression_if_false
