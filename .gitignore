@@ -1,6 +1,8 @@
-
+.env
 *.pyc
-App/app/app/__pycache__/settings.cpython-310.pyc
+App/app/app/__pycache__/
+App/app/suite/__pycache__/
+App/app/db.sqlite3
 *.pyc
 *.sdi
 *.ibd
