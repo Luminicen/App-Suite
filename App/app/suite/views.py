@@ -441,8 +441,8 @@ class UML:
 
     @classmethod
     def identificarMetodosDeClase(self,clases,texto):
-        metodosDeClaseIdentificados={}
         verbosProhibidos = ["contener", "ser", "es"]
+        metodosDeClaseIdentificados = []
         for o in texto:
             doc = nlp(o)
             for classToken in doc:
@@ -450,14 +450,15 @@ class UML:
                     claseLeida = classToken.lemma_.lower()
                     for verbToken in doc:
                         if (verbToken.pos_ == "VERB") & (verbToken.lemma_ not in verbosProhibidos):
-                            if (claseLeida in metodosDeClaseIdentificados.values()):
-                               pos = buscarClase(metodosDeClaseIdentificados,claseLeida)
-                               metodosDeClaseIdentificados[pos]["metodos"].append(verbToken.lemma_)
-                            else:
-                                 metodosDeClaseIdentificados = {
+                            repetido = buscarClase(metodosDeClaseIdentificados, claseLeida)
+                            if (repetido == None):
+                                aux = {
                                     "nombre" : claseLeida,
                                     "metodos" : [verbToken.lemma_]
                                 }
+                                metodosDeClaseIdentificados.append(aux)
+                            else:
+                                repetido["metodos"].append(verbToken.lemma_)
         return metodosDeClaseIdentificados
     
     
