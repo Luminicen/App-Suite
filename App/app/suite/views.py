@@ -1,3 +1,4 @@
+import os
 from cgitb import text
 from MySQLdb import IntegrityError
 from django.http import HttpResponse, JsonResponse
@@ -10,6 +11,9 @@ import json
 from suite.ontoscen.wikilink import Wikilink
 from suite.ontoscen.ontoscen import Ontoscen
 from suite.ontoscen.requirement import Requirement
+import spacy
+from spacy.matcher import Matcher
+nlp = spacy.load("es_dep_news_trf")
 # Create your views here.
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
@@ -405,12 +409,49 @@ class UML:
         metodosDeClaseIdentificados={}
         #SU CODIGO
         metodosDeClaseIdentificados={"travesia":["ofrecer", "contratar"]}
-        return metodosDeClaseIdentificados
+        return metodosDeClaseIdentificados    
     @classmethod
     def identificarRelaciones(self,clases,texto):
-        relacionesIdentificadas={}
-        #SU CODIGO
-        relacionesIdentificadas={"empresa":{"conoce":["travesia"],"subclase":[]},"kayakista":{"conoce":["travesia"],"subclase":["experto","inexperto" ]},"travesia":{"conoce":["itinerario","costo"],"subclase":[]}}
+
+        def buscarSiYaExiste(sustantivo,relacionesIdentificados):
+            for palabra in relacionesIdentificados:
+                if(palabra["nombre"]==sustantivo): 
+                    return True
+            return False
+
+        def evaluarPalabra(sustantivo,sustantivoRelacion,relaciones,esHerencia):
+            if(not(buscarSiYaExiste(sustantivo,relaciones))):
+                palabra = {
+                            "nombre": sustantivo, 
+                            "relacion":[], 
+                            "subclase": []
+                        }
+                relaciones.append(palabra)
+            for palabra in relaciones:
+                if(palabra["nombre"]==sustantivo): 
+                    if esHerencia:
+                        palabra["subclase"].append(sustantivoRelacion)
+                    else:
+                        palabra["relacion"].append(sustantivoRelacion)
+
+        matcher = Matcher(nlp.vocab)
+        pattern_subclase = [{'POS': {"IN":['NOUN','ADJ']}}, {'POS': 'AUX'}, {'POS': {"IN":['NOUN','PROPN']}}]
+        pattern_conoc = [{'POS': {"IN":['NOUN','PROPN','VERB','ADJ']}}, {'POS': 'VERB'}, {'POS': 'NOUN'}]
+        matcher.add("conocimiento", [pattern_conoc])
+        matcher.add("subclase", [pattern_subclase])
+        relacionesIdentificadas=[]
+        for o in texto:
+            doc = nlp(o)
+            matches = matcher(doc)
+            for match_id, start, end in matches:
+                sustantivo1= doc[start:start+1].text.lower()
+                sustantivo2= doc[end-1:end].text.lower()
+                verb = doc[start + 1:end - 1].text.lower()
+                if(sustantivo1,sustantivo2 in clases):
+                    if verb =="ser":
+                        evaluarPalabra(sustantivo2,sustantivo1,relacionesIdentificadas,True)
+                    else:
+                        evaluarPalabra(sustantivo1,sustantivo2,relacionesIdentificadas,False)           
         return relacionesIdentificadas
     @classmethod
     def funcionalidad(self,sel,request,idP):
