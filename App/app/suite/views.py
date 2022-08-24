@@ -234,8 +234,9 @@ def crearArtefactoKG(request,idP):
     return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
 
 def crearArtefactoUML(request, idP):
-    data = request.body.decode('utf-8')
-
+    #aTxt=request.session["UMLDATA"]
+    data = request.session["UMLDATA"]
+    #print(data)
     context = {}
     try:
         static_url = STATICFILES_DIRS[0]
@@ -272,7 +273,7 @@ def crearArtefactoUML(request, idP):
         file.write("@enduml")
         file.close()
 
-        os.system(f"java -jar {static_url}/app/plantuml.jar {static_url}/uml/uml_{idP}.txt")
+        os.system(f"java -jar {static_url}/plantuml.jar {static_url}/uml/uml_{idP}.txt")
 
     except Exception as e:
         context["error"] = str(e)
@@ -422,6 +423,11 @@ def buscarClase(arr,clase):
             #print("ENCONTRO")
             return i
     return None
+def tranfSetArr(set):
+    arr=[]
+    for i in set:
+        arr.append(i)
+    return arr
 class UML:
     @classmethod
     def identificarClases(self,texto):
@@ -500,8 +506,8 @@ class UML:
         for i in textosId:
             art=Artefacto.objects.get(id=i)
             texto.append(json.loads(art.texto)["texto"])
-        texto=["""empresa ofrecer travesía.
-                  Kayakista contratar travesía.
+        texto=["""empresa ofrecer travesia.
+                  Kayakista contratar travesia.
                   Travesia contener itinerario.
                   Travesia contener costo.
                   Itinerario contener lugar.
@@ -518,25 +524,28 @@ class UML:
         "metodos":["ofrecer", "contratar"]
         }
         metodosDeClaseIdentificados.append(ejemplo1)
-        clases=UML.identificarClases(texto)
-        metodos=metodosDeClaseIdentificados
-        #UML.identificarMetodosDeClase(clases,texto)
+        clases=tranfSetArr(UML.identificarClases(texto))
+        metodos=UML.identificarMetodosDeClase(clases,texto)
+        
         relaciones=UML.identificarRelaciones(clases,texto)
         data=[]
         #expression_if_true if condition else expression_if_false
+        #print(clases)
         for clase in clases:
             z=buscarClase(relaciones,clase)
+            x=buscarClase(metodos,clase)
+            print(buscarClase(metodos,clase))
             c={
                 "nombre" : clase,
-                "metodos":buscarClase(metodos,clase),
+                "metodos":x["metodos"] if x!=None else [],
                 "subclases":z["relacion"] if z!=None else [],
                 "atributos":[],
                 "relaciones":z["subclase"] if z!=None else []
                 }
             data.append(c)
         #data es lo que devolveria luego del procesamiento
-        print(data)
-        request.session["UMLDATA"] = json.dumps(data) 
+        #print(data)
+        request.session["UMLDATA"] = data
         return "OK"
  #diccionario= obj clase
  # data = [
