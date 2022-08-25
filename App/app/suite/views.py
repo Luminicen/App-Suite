@@ -1,4 +1,7 @@
+from io import StringIO
+import mimetypes
 import os
+import webbrowser
 from MySQLdb import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -6,12 +9,13 @@ from django.urls import reverse
 from app.settings import STATICFILES_DIRS
 from suite.models import *
 from suite.forms import *
-import requests as req
 import json
 from suite.ontoscen.wikilink import Wikilink
 from suite.ontoscen.ontoscen import Ontoscen
 from suite.ontoscen.requirement import Requirement
 import spacy
+import requests
+
 from spacy.matcher import Matcher
 nlp = spacy.load("es_dep_news_trf")
 # Create your views here.
@@ -41,7 +45,7 @@ def crearProyecto(request):
     if request.method == "POST":
         formulario = ProyectoForm(request.POST)
         if formulario.is_valid():
-            #print(formulario)
+            print(formulario)
             formulario.save()   
             return redirect(reverse('proyectos')) 
     else: 
@@ -114,10 +118,16 @@ def artefactos(request,id):
             return redirect(reverse('artefactos',kwargs={'id':id}))
         elif funcionalidad=="uml":
             return redirect(reverse('crearUML',kwargs={'idP':id}))
-        elif funcionalidad=="exportSKW":
+        elif funcionalidad=="exportSKW" :
             aTxt=request.session["textoTxt"]
             response = HttpResponse(content_type='text/plain')  
             response['Content-Disposition'] = 'attachment; filename="keyWordsDeLosEscenarios.txt"'
+            response.write(aTxt)
+            return response
+        elif funcionalidad=="shacl4j":
+            aTxt=request.session["textoTxt"]
+            response = HttpResponse(content_type='text/plain')  
+            response['Content-Disposition'] = 'attachment; filename="reporte.txt"'
             response.write(aTxt)
             return response
     botones=listaBotones()
@@ -142,17 +152,27 @@ def crearArtefactos(request,idP,idT):
     proyecto=Proyecto.objects.get(id=idP)
     tipo=TipoDeArtefacto.objects.get(id=idT)
     if request.method == "POST":
-        formulario = form=tipoForm(tipo,request.POST)
-        if formulario.is_valid():
-            infForma=formulario.cleaned_data
-            texto=convertidorDeForms(tipo,infForma,request.user)  
-            texto.save()
-            proyecto.artefactos.add(texto)
+        if (request.FILES):
+            response= requests.post("http://localhost:5000/graph", files={"file": request.FILES["file"]})
+            a= Artefacto(nombre=request.POST["nombre"],texto=response.text,owner=request.user,tipoDeArtefacto=tipo)
+            a.save()
+            proyecto.artefactos.add(a)
             proyecto.save()
             return redirect(reverse('artefactos',kwargs={'id':idP}))
+            
+        else:
+            formulario = form=tipoForm(tipo,request.POST)
+            if formulario.is_valid():
+                infForma=formulario.cleaned_data
+                texto=convertidorDeForms(tipo,infForma,request.user)  
+                texto.save()
+                proyecto.artefactos.add(texto)
+                proyecto.save()
+                return redirect(reverse('artefactos',kwargs={'id':idP}))
     else:
         #uso None para inicializar un form vacio
         form=tipoForm(tipo,None)
+
     all_fields = form.declared_fields.keys()
     fields=[]
     for i in all_fields:
@@ -214,7 +234,6 @@ def crearArtefactoKG(request,idP):
     tipo=TipoDeArtefacto.objects.get(tipo='KnowledgeGraph')
     if request.method == "POST":
         formulario = KnowledgeGraphs(request.POST)
-        print(formulario)
         if formulario.is_valid():
             infForma=formulario.cleaned_data
             texto=convertidorDeForms(tipo,infForma,request.user)  
@@ -299,6 +318,15 @@ class textoplano:
         else:
             formulario = textoPlano()
         return formulario
+
+class ProjectFile:
+    def formulario(self,val):
+        if val!=None:
+            formulario = ProjectFileForm(val)
+        else:
+            formulario = ProjectFileForm()
+        return formulario
+        
 class ScenariosWithKeyWord:
 
     def formulario(self,val):
@@ -345,7 +373,9 @@ def listaBotones():
     botones.append(Boton("A UML","uml"))
     botones.append(Boton("Convertir a ScenarioKeyWords","cskw"))
     botones.append(Boton("Exportar Scenario con keywords a txt","exportSKW"))
+    botones.append(Boton("Validar grafo de requerimientos","shacl4j"))
     return botones
+    
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
     #REGISTRE ACA SU FUNCIONALIDAD
     #paradigma por broadcast event based
@@ -357,6 +387,18 @@ def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
         return 'cskw'
     if ExportarEscenariosKeyWordsATxt.funcionalidad(entidadesSeleccionadas,request):
         return 'exportSKW'
+    if SHACL4J.funcionalidad(entidadesSeleccionadas,request):
+        return 'shacl4j'
+
+class SHACL4J:
+    def funcionalidad(sel,request):
+        if "shacl4j" in request.GET:
+            file= StringIO(Artefacto.objects.get(id=sel[0]).texto)
+            response_report= requests.post("http://localhost:5000/validate_ttl", files={"file": file})
+            request.session["textoTxt"] = response_report.text
+            return "OK"
+        else:
+            return None
 
 class KG():
     def knowledgeGraph(sel,request):
