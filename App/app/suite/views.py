@@ -153,7 +153,7 @@ def crearArtefactos(request,idP,idT):
     tipo=TipoDeArtefacto.objects.get(id=idT)
     if request.method == "POST":
         if (request.FILES):
-            response= requests.post("http://localhost:5000/graph", files={"file": request.FILES["file"]})
+            response= requests.post("https://guarded-falls-24810.herokuapp.com/graph", files={"file": request.FILES["file"]})
             a= Artefacto(nombre=request.POST["nombre"],texto=response.text,owner=request.user,tipoDeArtefacto=tipo)
             a.save()
             proyecto.artefactos.add(a)
@@ -394,7 +394,7 @@ class SHACL4J:
     def funcionalidad(sel,request):
         if "shacl4j" in request.GET:
             file= StringIO(Artefacto.objects.get(id=sel[0]).texto)
-            response_report= requests.post("http://localhost:5000/validate_ttl", files={"file": file})
+            response_report= requests.post("https://guarded-falls-24810.herokuapp.com/validate_ttl", files={"file": file})
             request.session["textoTxt"] = response_report.text
             return "OK"
         else:
