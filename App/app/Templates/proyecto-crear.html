@@ -5,9 +5,13 @@
 {% block content %}
 {% if user.is_authenticated %}
 {{ tipo | json_script:"tipo" }}
-{{ campos | json_script:"fields" }}
 <div id="advertencias"></div>
-    <form method="post">
+{% if tipo != "ProjectFile" %}
+{{ campos | json_script:"fields" }}
+<form method="post">
+{%else%}
+<form method="post" enctype="multipart/form-data">
+{% endif %}
       <div>
         {% csrf_token %}
         {{ form | crispy }}

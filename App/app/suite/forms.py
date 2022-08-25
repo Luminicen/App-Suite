@@ -79,3 +79,9 @@ class ScenariosWithKeyWords(forms.Form):
     ActorsKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Actors",required=False)
     Episodes=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
     EpisodesKeyWords=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="KeyWords de Episodes",required=False)
+
+
+
+class ProjectFileForm(forms.Form):
+    nombre = forms.CharField(max_length=50)
+    file = forms.FileField() 

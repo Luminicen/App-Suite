@@ -31297,5 +31297,550 @@
                 }
             }
         ]
+    },
+    "cargar usuario": {
+        "limit": 10,
+        "results": []
+    },
+    "sistema": {
+        "limit": 10,
+        "results": [
+            {
+                "id": "Q1781702",
+                "title": "Q1781702",
+                "pageid": 1713510,
+                "display": {
+                    "label": {
+                        "value": "Sistema",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "large Russian conglomerate company",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q1781702",
+                "concepturi": "http://www.wikidata.org/entity/Q1781702",
+                "label": "Sistema",
+                "description": "large Russian conglomerate company",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema"
+                }
+            },
+            {
+                "id": "Q21444537",
+                "title": "Q21444537",
+                "pageid": 23490209,
+                "display": {
+                    "label": {
+                        "value": "Sistema",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "natural watercourse in Angola",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q21444537",
+                "concepturi": "http://www.wikidata.org/entity/Q21444537",
+                "label": "Sistema",
+                "description": "natural watercourse in Angola",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema"
+                }
+            },
+            {
+                "id": "Q96333696",
+                "title": "Q96333696",
+                "pageid": 95065258,
+                "display": {
+                    "label": {
+                        "value": "Sistema",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "Spanish scientific journal",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q96333696",
+                "concepturi": "http://www.wikidata.org/entity/Q96333696",
+                "label": "Sistema",
+                "description": "Spanish scientific journal",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema"
+                }
+            },
+            {
+                "id": "Q4314565",
+                "title": "Q4314565",
+                "pageid": 4123945,
+                "display": {
+                    "label": {
+                        "value": "Scientific and Technical Center for Legal Information",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "database of Russian Federation legal acts, created and maintained by the Federal Security Service of the Russian Federation",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q4314565",
+                "concepturi": "http://www.wikidata.org/entity/Q4314565",
+                "label": "Scientific and Technical Center for Legal Information",
+                "description": "database of Russian Federation legal acts, created and maintained by the Federal Security Service of the Russian Federation",
+                "match": {
+                    "type": "alias",
+                    "language": "en",
+                    "text": "Sistema"
+                },
+                "aliases": [
+                    "Sistema"
+                ]
+            },
+            {
+                "id": "Q201496",
+                "title": "Q201496",
+                "pageid": 198150,
+                "display": {
+                    "label": {
+                        "value": "Sistema Ibérico",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "mountain range",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q201496",
+                "concepturi": "http://www.wikidata.org/entity/Q201496",
+                "label": "Sistema Ibérico",
+                "description": "mountain range",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema Ibérico"
+                }
+            },
+            {
+                "id": "Q965371",
+                "title": "Q965371",
+                "pageid": 915106,
+                "display": {
+                    "label": {
+                        "value": "Sistema Brasileiro de Televisão",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "Brazilian television network",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q965371",
+                "concepturi": "http://www.wikidata.org/entity/Q965371",
+                "label": "Sistema Brasileiro de Televisão",
+                "description": "Brazilian television network",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema Brasileiro de Televisão"
+                }
+            },
+            {
+                "id": "Q6129743",
+                "title": "Q6129743",
+                "pageid": 5922520,
+                "display": {
+                    "label": {
+                        "value": "Sistema de Información Cultural de la Argentina",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q6129743",
+                "concepturi": "http://www.wikidata.org/entity/Q6129743",
+                "label": "Sistema de Información Cultural de la Argentina",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema de Información Cultural de la Argentina"
+                }
+            },
+            {
+                "id": "Q62007231",
+                "title": "Q62007231",
+                "pageid": 61834456,
+                "display": {
+                    "label": {
+                        "value": "Brazilian National Dam Safety Information System",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "Brazilian national database of information on dams",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q62007231",
+                "concepturi": "http://www.wikidata.org/entity/Q62007231",
+                "label": "Brazilian National Dam Safety Information System",
+                "description": "Brazilian national database of information on dams",
+                "match": {
+                    "type": "alias",
+                    "language": "en",
+                    "text": "Sistema Nacional de Informações de Segurança de Barragens"
+                },
+                "aliases": [
+                    "Sistema Nacional de Informações de Segurança de Barragens"
+                ]
+            },
+            {
+                "id": "Q80199870",
+                "title": "Q80199870",
+                "pageid": 79607256,
+                "display": {
+                    "label": {
+                        "value": "Sistema Cultura",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "database of archives, libraries and museums of Regione Toscana",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q80199870",
+                "concepturi": "http://www.wikidata.org/entity/Q80199870",
+                "label": "Sistema Cultura",
+                "description": "database of archives, libraries and museums of Regione Toscana",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema Cultura"
+                }
+            },
+            {
+                "id": "Q18706905",
+                "title": "Q18706905",
+                "pageid": 20236459,
+                "display": {
+                    "label": {
+                        "value": "Sistema de Informação para o Património Arquitectónico",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "architectural heritage database in Portugal",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q18706905",
+                "concepturi": "http://www.wikidata.org/entity/Q18706905",
+                "label": "Sistema de Informação para o Património Arquitectónico",
+                "description": "architectural heritage database in Portugal",
+                "match": {
+                    "type": "label",
+                    "language": "en",
+                    "text": "Sistema de Informação para o Património Arquitectónico"
+                }
+            }
+        ]
+    },
+    "usuario": {
+        "limit": 10,
+        "results": [
+            {
+                "id": "Q782543",
+                "title": "Q782543",
+                "pageid": 735558,
+                "display": {
+                    "label": {
+                        "value": "graphical user interface",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "user interface allowing interaction through graphical icons and visual indicators",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q782543",
+                "concepturi": "http://www.wikidata.org/entity/Q782543",
+                "label": "graphical user interface",
+                "description": "user interface allowing interaction through graphical icons and visual indicators",
+                "match": {
+                    "type": "alias",
+                    "language": "pt",
+                    "text": "usuário"
+                },
+                "aliases": [
+                    "usuário"
+                ]
+            },
+            {
+                "id": "Q1523",
+                "title": "Q1523",
+                "pageid": 1981,
+                "display": {
+                    "label": {
+                        "value": "Ramesses II",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "Third pharaoh of the Nineteenth Dynasty of Egypt",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q1523",
+                "concepturi": "http://www.wikidata.org/entity/Q1523",
+                "label": "Ramesses II",
+                "description": "Third pharaoh of the Nineteenth Dynasty of Egypt",
+                "match": {
+                    "type": "alias",
+                    "language": "es",
+                    "text": "Usuariomaatra Setepenra"
+                },
+                "aliases": [
+                    "Usuariomaatra Setepenra"
+                ]
+            },
+            {
+                "id": "Q278368",
+                "title": "Q278368",
+                "pageid": 269091,
+                "display": {
+                    "label": {
+                        "value": "user",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "person who uses a computer or network service",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q278368",
+                "concepturi": "http://www.wikidata.org/entity/Q278368",
+                "label": "user",
+                "description": "person who uses a computer or network service",
+                "match": {
+                    "type": "label",
+                    "language": "pt-br",
+                    "text": "usuário"
+                },
+                "aliases": [
+                    "usuário"
+                ]
+            },
+            {
+                "id": "Q3604202",
+                "title": "Q3604202",
+                "pageid": 3432412,
+                "display": {
+                    "label": {
+                        "value": "user account",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "entity representing a user of a computer system or network service",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q3604202",
+                "concepturi": "http://www.wikidata.org/entity/Q3604202",
+                "label": "user account",
+                "description": "entity representing a user of a computer system or network service",
+                "match": {
+                    "type": "alias",
+                    "language": "es",
+                    "text": "usuario"
+                },
+                "aliases": [
+                    "usuario"
+                ]
+            },
+            {
+                "id": "Q64667545",
+                "title": "Q64667545",
+                "pageid": 64334448,
+                "display": {
+                    "label": {
+                        "value": "Pro Unlimited account",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "SoundCloud subscription plan and account type",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q64667545",
+                "concepturi": "http://www.wikidata.org/entity/Q64667545",
+                "label": "Pro Unlimited account",
+                "description": "SoundCloud subscription plan and account type",
+                "match": {
+                    "type": "label",
+                    "language": "pt-br",
+                    "text": "usuário Pro Ilimitado"
+                },
+                "aliases": [
+                    "usuário Pro Ilimitado"
+                ]
+            },
+            {
+                "id": "Q4147903",
+                "title": "Q4147903",
+                "pageid": 3956161,
+                "display": {
+                    "label": {
+                        "value": "borders of the Roman Empire",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "world heritage site (limes in Germany and UK)",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q4147903",
+                "concepturi": "http://www.wikidata.org/entity/Q4147903",
+                "label": "borders of the Roman Empire",
+                "description": "world heritage site (limes in Germany and UK)",
+                "match": {
+                    "type": "alias",
+                    "language": "pt",
+                    "text": "Usuário(a):Domusaurea/Fronteiras do Império Romano"
+                },
+                "aliases": [
+                    "Usuário(a):Domusaurea/Fronteiras do Império Romano"
+                ]
+            },
+            {
+                "id": "Q782812",
+                "title": "Q782812",
+                "pageid": 735823,
+                "display": {
+                    "label": {
+                        "value": "Avaré",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "city in the State of São Paulo, Brazil, located 270 km from the state capital, São Paulo",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q782812",
+                "concepturi": "http://www.wikidata.org/entity/Q782812",
+                "label": "Avaré",
+                "description": "city in the State of São Paulo, Brazil, located 270 km from the state capital, São Paulo",
+                "match": {
+                    "type": "alias",
+                    "language": "pt",
+                    "text": "Usuário(a) Discussão:Fabio j. odon"
+                },
+                "aliases": [
+                    "Usuário(a) Discussão:Fabio j. odon"
+                ]
+            },
+            {
+                "id": "Q41546637",
+                "title": "Q41546637",
+                "pageid": 42862320,
+                "display": {
+                    "label": {
+                        "value": "Wikimedian",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "contributor in the Wikimedia movement",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q41546637",
+                "concepturi": "http://www.wikidata.org/entity/Q41546637",
+                "label": "Wikimedian",
+                "description": "contributor in the Wikimedia movement",
+                "match": {
+                    "type": "alias",
+                    "language": "es",
+                    "text": "Usuario de Wikimedia"
+                },
+                "aliases": [
+                    "Usuario de Wikimedia"
+                ]
+            },
+            {
+                "id": "Q3926105",
+                "title": "Q3926105",
+                "pageid": 3744242,
+                "display": {
+                    "label": {
+                        "value": "Template:Userbox",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "Wikimedia template",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q3926105",
+                "concepturi": "http://www.wikidata.org/entity/Q3926105",
+                "label": "Template:Userbox",
+                "description": "Wikimedia template",
+                "match": {
+                    "type": "label",
+                    "language": "es",
+                    "text": "Usuario:Userbox/Userbox"
+                },
+                "aliases": [
+                    "Usuario:Userbox/Userbox"
+                ]
+            },
+            {
+                "id": "Q798599",
+                "title": "Q798599",
+                "pageid": 751534,
+                "display": {
+                    "label": {
+                        "value": "sockpuppet",
+                        "language": "en"
+                    },
+                    "description": {
+                        "value": "online identity used for purposes of deception.",
+                        "language": "en"
+                    }
+                },
+                "repository": "wikidata",
+                "url": "//www.wikidata.org/wiki/Q798599",
+                "concepturi": "http://www.wikidata.org/entity/Q798599",
+                "label": "sockpuppet",
+                "description": "online identity used for purposes of deception.",
+                "match": {
+                    "type": "label",
+                    "language": "es",
+                    "text": "usuario títere"
+                },
+                "aliases": [
+                    "usuario títere"
+                ]
+            }
+        ]
     }
 }

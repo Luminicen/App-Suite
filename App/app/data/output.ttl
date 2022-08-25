@@ -2,75 +2,31 @@
 @prefix ns2: <https://schema.org/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-ns1:action0 a ns1:Action ;
-    rdfs:label "put" .
-
 ns1:actor0 a ns1:Actor ;
-    rdfs:label "I",
-        "iodine" ;
-    = <http://www.wikidata.org/entity/Q1103> ;
-    ns2:description "chemical element with symbol I and the atomic number of 53" .
-
-ns1:condition0 a ns1:Condition ;
-    rdfs:label "in a reunion" .
-
-ns1:condition1 a ns1:Condition ;
-    rdfs:label "to make a delicious ice cream" .
-
-ns1:condition2 a ns1:Condition ;
-    rdfs:label "have a ice cream machine" .
-
-ns1:resource2 a ns1:Resource ;
-    rdfs:label "water" ;
-    = <http://www.wikidata.org/entity/Q283> ;
-    ns2:description "chemical compound; main constituent of the fluids of most living organisms" .
-
-ns1:resource3 a ns1:Resource ;
-    rdfs:label "machine" ;
-    = <http://www.wikidata.org/entity/Q11019> ;
-    ns2:description "tool containing one or more parts that uses energy to perform an intended action" .
-
-ns1:scenario1 a ns1:Scenario ;
-    rdfs:label "make icecream" ;
-    ns1:hasActor ns1:actor1 ;
-    ns1:hasContext ns1:condition2 ;
-    ns1:hasEpisode ns1:episode1 ;
-    ns1:hasGoal ns1:condition1 ;
-    ns1:hasResource ns1:resource1,
-        ns1:resource2,
-        ns1:resource3 ;
-    ns1:requiredBy ns1:episode1 .
+    rdfs:label "graphical user interface",
+        "usuario" ;
+    = <http://www.wikidata.org/entity/Q782543> ;
+    ns2:description "user interface allowing interaction through graphical icons and visual indicators" .
 
 ns1:actor1 a ns1:Actor ;
-    rdfs:label "employee" ;
-    = <http://www.wikidata.org/entity/Q703534> ;
-    ns2:description "person who works for an employer" .
+    rdfs:label "cargar usuario" .
 
-ns1:episode0 a ns1:Episode ;
-    rdfs:label "i will talk politely" ;
-    ns1:dependsOn ns1:scenario0 ;
-    ns1:hasAction ns1:resource0 .
-
-ns1:episode1 a ns1:Episode ;
-    rdfs:label "the employee put the milk and water in the machine" ;
-    ns1:dependsOn ns1:scenario1 ;
-    ns1:hasAction ns1:action0 ;
-    ns1:hasActor ns1:actor1 ;
-    ns1:hasResource ns1:resource1 .
+ns1:condition0 a ns1:Condition ;
+    rdfs:label "usuarios sin registrar" .
 
 ns1:resource0 a ns1:Resource ;
-    rdfs:label "lecture",
-        "talk" ;
-    = <http://www.wikidata.org/entity/Q603773> ;
-    ns2:description "oral presentation intended to present information or teach people about a particular subject" .
+    rdfs:label "Sistema",
+        "sistema" ;
+    = <http://www.wikidata.org/entity/Q1781702> ;
+    ns2:description "large Russian conglomerate company" .
 
-ns1:resource1 a ns1:Resource ;
-    rdfs:label "milk" ;
-    = <http://www.wikidata.org/entity/Q8495> ;
-    ns2:description "white liquid produced by the mammary glands of mammals" .
+ns1:episode0 a ns1:Episode ;
+    rdfs:label "cargar usuarios en portal de tramitess" ;
+    ns1:dependsOn ns1:scenario0 ;
+    ns1:hasActor ns1:actor1 .
 
 ns1:scenario0 a ns1:Scenario ;
-    rdfs:label "be gentle" ;
+    rdfs:label "cargar usuarios en portal de tramites" ;
     ns1:hasActor ns1:actor0 ;
     ns1:hasContext ns1:condition0 ;
     ns1:hasEpisode ns1:episode0 ;
