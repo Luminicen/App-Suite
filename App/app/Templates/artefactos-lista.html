@@ -38,7 +38,15 @@
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.nombre}}</td>
         <td>{{p.tipoDeArtefacto}}</td>
-        <td><a href="{% url 'modificarArtefactos' p.id idP%}">Modificar</a> | <a href="{% url 'destruirArtefactos' p.id idP%}">Eliminar</a></td>
+        <td>
+          {% if "ProjectFile" != p.tipoDeArtefacto.tipo %}
+          <a href="{% url 'modificarArtefactos' p.id idP%}">Modificar</a> |
+          {% endif %}
+          <a href="{% url 'destruirArtefactos' p.id idP%}">Eliminar</a>
+          {% if "ProjectFile" == p.tipoDeArtefacto.tipo %}
+          | <a href="{% url 'verArtefactos' p.id%}">Ver</a>
+          {% endif %}
+        </td>
         <td><input type="checkbox" id="{{p.id}}" value="{{p.id}}" name="seleccionados"></td>
       </tr>
       {% endfor %}

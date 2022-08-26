@@ -146,6 +146,11 @@ def convertidorDeForms(tipo,form,usr):
     aux=json.dumps(form,indent=4)
     texto=Artefacto(nombre=form['nombre'],texto=aux,owner=usr,tipoDeArtefacto=tipo)
     return texto
+
+def verArtefactos(request, id):
+    artefacto=Artefacto.objects.get(id=id)
+    return render(request, "ver.html", {"artefacto" : artefacto})
+
 def crearArtefactos(request,idP,idT):
     #idP = id del Proyecto
     #idT = id del Tipo

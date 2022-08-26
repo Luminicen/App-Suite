@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}Artefactos del proyecto{% endblock %}
+{% block head %}
+    {{ super }}
+    <link rel="stylesheet" href="./css/botton.css" />
+    {% endblock %}
+{% block content %}
+
+{{ artefacto.texto }}
+{% endblock %}

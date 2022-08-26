@@ -10,6 +10,7 @@
 {{ campos | json_script:"fields" }}
 <form method="post">
 {%else%}
+<button id="botonTemplate" class="btn btn-outline-primary my-2" >Obtener template</button>
 <form method="post" enctype="multipart/form-data">
 {% endif %}
       <div>
@@ -43,4 +44,5 @@
 <script type="module" src="{% static 'scripts/reglasChequeoMain.js' %}"></script>
 <script type="module" src="{% static 'scripts/reglasChequeoClasses.js' %}"></script>
 <script type="module" src="{% static 'scripts/alertasDeReglas.js' %}"></script>
+<script type="module" src="{% static 'scripts/getXLSXTemplate.js' %}"></script>
 {% endblock %}
