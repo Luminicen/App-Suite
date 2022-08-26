@@ -2,6 +2,7 @@ from io import StringIO
 import mimetypes
 import os
 import webbrowser
+from cgitb import text
 from MySQLdb import IntegrityError
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -15,7 +16,6 @@ from suite.ontoscen.ontoscen import Ontoscen
 from suite.ontoscen.requirement import Requirement
 import spacy
 import requests
-
 from spacy.matcher import Matcher
 nlp = spacy.load("es_dep_news_trf")
 # Create your views here.
@@ -36,7 +36,7 @@ def proyectos(request):
     for p in proyectos:
         if not (p in mio):
             otros.append(p)
-    print(otros)
+    #print(otros)
     return render(request,'proyectos.html',{"ok":ok,"proyectos":mio,"otro_p":otros})
 
 def crearProyecto(request):
@@ -45,7 +45,7 @@ def crearProyecto(request):
     if request.method == "POST":
         formulario = ProyectoForm(request.POST)
         if formulario.is_valid():
-            print(formulario)
+            #print(formulario)
             formulario.save()   
             return redirect(reverse('proyectos')) 
     else: 
@@ -99,7 +99,7 @@ def artefactos(request,id):
             idP=proyecto.id
             return redirect(reverse('crearArtefactos',kwargs={'idP':idP,'idT':idT}))
     elif request.method == "GET":
-        print(request.GET)
+        #print(request.GET)
         if 'buscar' in request.GET:
             fil=TipoDeArtefacto.objects.get(id=request.GET['buscar'])
             aux=[]
@@ -412,7 +412,7 @@ class KG():
             for i in sel:
                 if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
                     esce.append(i)
-            print(esce)
+            #print(esce)
             if esce:
                 escenarios=formatoToKG(esce)
                 data = json.loads(escenarios)
@@ -451,7 +451,7 @@ def formatoToKG(esce):
         textF=textF+"},"
     textF=textF.rstrip(textF[-1])
     textF=textF+"]"
-    print(json.loads(textF))
+    #print(json.loads(textF))
     return textF
 def separarPorComa(actoresStr):
     lista=[]
@@ -513,30 +513,47 @@ class UML:
                             else:
                                 repetido["metodos"].append(verbToken.lemma_)
         return metodosDeClaseIdentificados
-    
-    
-    @classmethod
     def identificarRelaciones(self,clases,texto):
+
+        def buscarSiYaExiste(sustantivo,relacionesIdentificados):
+            for palabra in relacionesIdentificados:
+                if(palabra["nombre"]==sustantivo): 
+                    return True
+            return False
+
+        def evaluarPalabra(sustantivo,sustantivoRelacion,relaciones,esHerencia):
+            if(not(buscarSiYaExiste(sustantivo,relaciones))):
+                palabra = {
+                            "nombre": sustantivo, 
+                            "relacion":[], 
+                            "subclase": []
+                        }
+                relaciones.append(palabra)
+            for palabra in relaciones:
+                if(palabra["nombre"]==sustantivo): 
+                    if esHerencia:
+                        palabra["subclase"].append(sustantivoRelacion)
+                    else:
+                        palabra["relacion"].append(sustantivoRelacion)
+
+        matcher = Matcher(nlp.vocab)
+        pattern_subclase = [{'POS': {"IN":['NOUN','ADJ']}}, {'POS': 'AUX'}, {'POS': {"IN":['NOUN','PROPN']}}]
+        pattern_conoc = [{'POS': {"IN":['NOUN','PROPN','VERB','ADJ']}}, {'POS': 'VERB'}, {'POS': 'NOUN'}]
+        matcher.add("conocimiento", [pattern_conoc])
+        matcher.add("subclase", [pattern_subclase])
         relacionesIdentificadas=[]
-        #SU CODIGO
-        ejemplo1={
-                "nombre":"empresa",
-                "relacion":["travesia"],
-                "subclase":[]
-                }
-        ejemplo2= {
-                "nombre":"kayakista",
-                "relacion":["travesia"],
-                "subclase":["experto","inexperto"]
-                }
-        ejemplo3={
-                "nombre":"travesia",
-                "relacion":["itinerario","costo"],
-                "subclase":[]
-                }
-        relacionesIdentificadas.append(ejemplo1)
-        relacionesIdentificadas.append(ejemplo2)
-        relacionesIdentificadas.append(ejemplo3)
+        for o in texto:
+            doc = nlp(o)
+            matches = matcher(doc)
+            for match_id, start, end in matches:
+                sustantivo1= doc[start:start+1].text.lower()
+                sustantivo2= doc[end-1:end].text.lower()
+                verb = doc[start + 1:end - 1].text.lower()
+                if(sustantivo1,sustantivo2 in clases):
+                    if verb =="ser":
+                        evaluarPalabra(sustantivo2,sustantivo1,relacionesIdentificadas,True)
+                    else:
+                        evaluarPalabra(sustantivo1,sustantivo2,relacionesIdentificadas,False)           
         return relacionesIdentificadas
     @classmethod
     def funcionalidad(self,sel,request,idP):
@@ -553,35 +570,21 @@ class UML:
         for i in textosId:
             art=Artefacto.objects.get(id=i)
             texto.append(json.loads(art.texto)["texto"])
-        texto=["""empresa ofrecer travesia.
-                  Kayakista contratar travesia.
-                  Travesia contener itinerario.
-                  Travesia contener costo.
-                  Itinerario contener lugar.
-                  Experto ser kayakista.
-                  Inexperto ser kayakista.
-                """]
         #print(texto)
         #texto es un arreglo con los textos que vienen seleccionados
         if not texto:
             return None
-        metodosDeClaseIdentificados=[]
-        ejemplo1={
-        "nombre":"travesia",
-        "metodos":["ofrecer", "contratar"]
-        }
-        metodosDeClaseIdentificados.append(ejemplo1)
         clases=tranfSetArr(UML.identificarClases(texto))
         metodos=UML.identificarMetodosDeClase(clases,texto)
         
-        relaciones=UML.identificarRelaciones(clases,texto)
+        relaciones=UML.identificarRelaciones(self,clases,texto)
         data=[]
         #expression_if_true if condition else expression_if_false
         #print(clases)
         for clase in clases:
             z=buscarClase(relaciones,clase)
             x=buscarClase(metodos,clase)
-            print(buscarClase(metodos,clase))
+            #print(buscarClase(metodos,clase))
             c={
                 "nombre" : clase,
                 "metodos":x["metodos"] if x!=None else [],
@@ -620,7 +623,7 @@ class TransformarAScenariosKeyWords:
             for i in sel:
                 if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
                     esce.append(i)
-            print(esce)
+            #print(esce)
             for i in esce:
                 TransformarAScenariosKeyWords.convertidor(Artefacto.objects.get(id=i),request,idP)
             return "OK"
