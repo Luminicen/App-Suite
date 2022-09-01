@@ -1,6 +1,7 @@
 appdirs==1.4.4
 asgiref==3.5.1
 autocorrect==2.6.1
+backports.zoneinfo==0.2.1
 blis==0.7.7
 catalogue==2.0.7
 certifi==2021.10.8
@@ -11,9 +12,10 @@ colorama==0.4.4
 contextualSpellCheck==0.4.1
 cymem==2.0.6
 Django==4.0.4
+django-cors-headers==3.13.0
 django-crispy-forms==1.14.0
 django-js-asset==2.0.0
-editdistance==0.5.3    
+editdistance==0.5.3
 es-dep-news-trf @ https://github.com/explosion/spacy-models/releases/download/es_dep_news_trf-3.3.0/es_dep_news_trf-3.3.0-py3-none-any.whl
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.3.0/en_core_web_sm-3.3.0-py3-none-any.whl       
 filelock==3.7.0
@@ -21,6 +23,7 @@ Flask==2.1.2
 Flask-Cors==3.0.10
 huggingface-hub==0.6.0
 idna==3.3
+importlib-metadata==4.12.0
 isodate==0.6.1
 itsdangerous==2.1.2
 Jinja2==3.1.2
@@ -67,3 +70,4 @@ urllib3==1.26.9
 wasabi==0.9.1
 Werkzeug==2.1.2
 wikibase-api==0.1.2
+zipp==3.8.1
