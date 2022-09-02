@@ -494,7 +494,7 @@ class UML:
 
     @classmethod
     def identificarMetodosDeClase(self,clases,texto):
-        verbosProhibidos = ["contener", "ser", "es", "tener"]
+        verbosProhibidos = ["contener", "ser", "es"]
         metodosDeClaseIdentificados = []
         for o in texto:
             doc = nlp(o)
@@ -511,8 +511,7 @@ class UML:
                                 }
                                 metodosDeClaseIdentificados.append(aux)
                             else:
-                                if (verbToken.lemma_ not in repetido["metodos"]):
-                                    repetido["metodos"].append(verbToken.lemma_)
+                                repetido["metodos"].append(verbToken.lemma_)
         return metodosDeClaseIdentificados
     def identificarRelaciones(self,clases,texto):
 
@@ -556,6 +555,9 @@ class UML:
                     else:
                         evaluarPalabra(sustantivo1,sustantivo2,relacionesIdentificadas,False)           
         return relacionesIdentificadas
+    def eliminar_tildes(self,texto: str) -> str:
+        import unidecode
+        return unidecode.unidecode(texto.lower())
     @classmethod
     def funcionalidad(self,sel,request,idP):
 
@@ -575,6 +577,10 @@ class UML:
         #texto es un arreglo con los textos que vienen seleccionados
         if not texto:
             return None
+        aux=[]
+        for i in texto:
+            aux.append(self.eliminar_tildes(self,i))
+        texto=aux
         clases=tranfSetArr(UML.identificarClases(texto))
         metodos=UML.identificarMetodosDeClase(clases,texto)
         
@@ -591,7 +597,7 @@ class UML:
                 "metodos":x["metodos"] if x!=None else [],
                 "subclases":z["subclase"] if z!=None else [],
                 "atributos":[],
-                "relaciones":z["relacion"] if z!=None else []#relacion
+                "relaciones":z["relacion"] if z!=None else []
                 }
             data.append(c)
         #data es lo que devolveria luego del procesamiento

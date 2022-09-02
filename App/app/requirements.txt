@@ -72,3 +72,4 @@ wasabi==0.9.1
 Werkzeug==2.1.2
 wikibase-api==0.1.2
 zipp==3.8.1
+Unidecode==1.3.4
