@@ -588,9 +588,9 @@ class UML:
             c={
                 "nombre" : clase,
                 "metodos":x["metodos"] if x!=None else [],
-                "subclases":z["relacion"] if z!=None else [],
+                "subclases":z["subclase"] if z!=None else [],
                 "atributos":[],
-                "relaciones":z["subclase"] if z!=None else []
+                "relaciones":z["relacion"] if z!=None else []#relacion
                 }
             data.append(c)
         #data es lo que devolveria luego del procesamiento
