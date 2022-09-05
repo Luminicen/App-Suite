@@ -26,6 +26,14 @@ def tienePermiso(user,proyecto):
     if (proyecto.owner==user) or (user in proyecto.participantes.all()):
         return True
     return False
+def puedeEscribirEnBd(id_artefacto):
+    #solucion momentanea a la concurrencia
+    #si la ultima modificacione es mas vieja que hace 20 segundos entonses puedo escribir
+    art=Artefacto.objects.get(id=id_artefacto)
+    if art.ultima_modificacion < datetime.datetime.now(art.ultima_modificacion.tzinfo)-datetime.timedelta(seconds=20):
+        return True
+    return False
+
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
@@ -57,7 +65,7 @@ def crearProyecto(request):
             return redirect(reverse('proyectos')) 
     else: 
         formulario = ProyectoForm(instance=request.user)
-    return render(request, "proyecto-crear.html", {"form" : formulario})
+    return render(request, "proyecto-crear_conParticipantes.html", {"form" : formulario})
 def eliminarProyecto(request,id):
     #obtengo el proyecto a eliminar por id y lo elimino
     proyecto=Proyecto.objects.get(id=id)
@@ -84,7 +92,7 @@ def modificarProyecto(request,id):
     else:
         datosAModificar={'titulo': proyecto.titulo,'owner':proyecto.owner,'participantes':proyecto.participantes.all()}
         formulario = ProyectoForm(datosAModificar,instance=request.user,initial=datosAModificar)
-    return render(request, "proyecto-crear.html", {"form" : formulario})
+    return render(request, "proyecto-crear_conParticipantes.html", {"form" : formulario})
 
 
 ############################### arte4facto ##########################################
@@ -200,6 +208,7 @@ def crearArtefactos(request,idP,idT):
 def modificarArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
     texto=json.loads(artefacto.texto)
+    no_escribir=False
     if request.method == "POST":
         formulario = form=tipoForm(artefacto.tipoDeArtefacto,request.POST)
         if formulario.is_valid():
@@ -207,8 +216,14 @@ def modificarArtefacto(request,id,idP):
             aux=json.dumps(infForma,indent=4)
             artefacto.nombre=infForma['nombre']
             artefacto.texto=aux
-            artefacto.save()
-            return redirect(reverse('artefactos',kwargs={'id':idP}))
+            #recurrencia
+
+            if puedeEscribirEnBd(id):
+                artefacto.ultima_modificacion=datetime.datetime.now(artefacto.ultima_modificacion.tzinfo)
+                artefacto.save()
+                return redirect(reverse('artefactos',kwargs={'id':idP}))
+            else:
+                no_escribir=True
     else:
         #uso None para inicializar un form vacio
         form=tipoForm(artefacto.tipoDeArtefacto,texto)
@@ -218,7 +233,7 @@ def modificarArtefacto(request,id,idP):
     for i in all_fields:
         if i != 'nombre':
             fields.append('id_'+i)
-    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":artefacto.tipoDeArtefacto.tipo})
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":artefacto.tipoDeArtefacto.tipo,"no_escribir":no_escribir})
 
 def destruirArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)

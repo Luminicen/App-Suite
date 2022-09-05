@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block title %}Proyectos{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+{{form.media}}
+<form method="post">
+      <div>
+        {% csrf_token %}
+        {{ form | crispy }}
+      </div>
+<br>
+    <div class="d-inline-flex  justify-content-center align-items-end ">
+    <button class="btn btn-outline-primary mt-2" type="submit">Guardar</button>
+    <button class="btn btn-outline-primary mt-2" onClick="history.go(-1);" type="button">Cancelar</button>
+    </div>
+    </form>
+{% else %}
+<div style="background-color:#1F1D4F; height: 100vh">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center fondoFlores py-5"> 
+      <div class="col-md-8 col-lg-6 col-xl-4 shadow-lg p-5 my-5 bg-white rounded ">
+        <div class="loginform">
+          <div class="d-flex justify-content-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Padlock-lightblue.svg" alt="...">
+          </div>
+          <p>You are not logged in</p>
+          <a class="btn btn-primary form-control" href="{% url 'login' %}">Log In</a>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+{% endif %}
+{% endblock %}
