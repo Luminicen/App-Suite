@@ -1,0 +1,96 @@
+[
+    {
+        "model": "suite.tipodeartefacto",
+        "pk": 1,
+        "fields": {
+            "tipo": "textoplano",
+            "descripcion": "Un archivo de texto plano sin estructura"
+        }
+    },
+    {
+        "model": "suite.tipodeartefacto",
+        "pk": 2,
+        "fields": {
+            "tipo": "Scenario",
+            "descripcion": "A semi-structured requierement"
+        }
+    },
+    {
+        "model": "suite.tipodeartefacto",
+        "pk": 4,
+        "fields": {
+            "tipo": "KnowledgeGraph",
+            "descripcion": "un grafo"
+        }
+    },
+    {
+        "model": "suite.tipodeartefacto",
+        "pk": 5,
+        "fields": {
+            "tipo": "ScenariosWithKeyWord",
+            "descripcion": "Es un escenario con campos adicionales keywords"
+        }
+    },
+    {
+        "model": "suite.tipodeartefacto",
+        "pk": 6,
+        "fields": {
+            "tipo": "UML",
+            "descripcion": "artefacto UML"
+        }
+    },
+    {
+        "model": "suite.tipodeartefacto",
+        "pk": 7,
+        "fields": {
+            "tipo": "ProjectFile",
+            "descripcion": "ProjectFile"
+        }
+    },
+    {
+        "model": "suite.proyecto",
+        "pk": 10,
+        "fields": {
+            "titulo": "test5",
+            "owner": 1,
+            "participantes": [],
+            "artefactos": [
+                18
+            ]
+        }
+    },
+    {
+        "model": "suite.proyecto",
+        "pk": 13,
+        "fields": {
+            "titulo": "test",
+            "owner": 1,
+            "participantes": [],
+            "artefactos": []
+        }
+    },
+    {
+        "model": "suite.proyecto",
+        "pk": 15,
+        "fields": {
+            "titulo": "proyecto A",
+            "owner": 1,
+            "participantes": [
+                1,
+                2
+            ],
+            "artefactos": []
+        }
+    },
+    {
+        "model": "suite.artefacto",
+        "pk": 18,
+        "fields": {
+            "nombre": "Artefacto de texto de prueba",
+            "texto": "{\n    \"nombre\": \"Artefacto de texto de prueba\",\n    \"texto\": \"Esto es un artefacto de prueba. Escriba aca y luego pulse revisar\"\n}",
+            "owner": 1,
+            "tipoDeArtefacto": 1,
+            "ultima_modificacion": "2022-09-05T16:34:19.838Z"
+        }
+    }
+    ]

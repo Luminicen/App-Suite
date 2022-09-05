@@ -19,7 +19,10 @@ STATICFILES_DIRS = (os.path.join(
     BASE_DIR, "app", "static"),)
 MEDIA_URL='/herramientas/'
 MEDIA_ROOT=os.path.join(BASE_DIR,'herramientas')
-
+FIXTURE_DIRS = (
+   os.path.join(os.path.join(
+    BASE_DIR, "app", "fixtures"),),
+)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -86,7 +89,7 @@ DATABASES = {
         'NAME': 'req',
         'USER': 'root',
         'PASSWORD': '', # poner password para produccion
-        'HOST': '127.0.0.1',   # para produccion dejar db
+        'HOST': 'localhost',   # para produccion dejar db
         'PORT': '3306',
 
     }
