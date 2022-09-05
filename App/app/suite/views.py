@@ -17,6 +17,7 @@ from suite.ontoscen.requirement import Requirement
 import spacy
 import requests
 from spacy.matcher import Matcher
+from django.views.decorators.cache import cache_control
 nlp = spacy.load("es_dep_news_trf")
 # Create your views here.
 ############################### Permisos ##########################################
@@ -26,14 +27,16 @@ def tienePermiso(user,proyecto):
     if (proyecto.owner==user) or (user in proyecto.participantes.all()):
         return True
     return False
-def puedeEscribirEnBd(id_artefacto):
+def puedeEscribirEnBd(user,id):
     #solucion momentanea a la concurrencia
     #si la ultima modificacione es mas vieja que hace 20 segundos entonses puedo escribir
-    art=Artefacto.objects.get(id=id_artefacto)
-    if art.ultima_modificacion < datetime.datetime.now(art.ultima_modificacion.tzinfo)-datetime.timedelta(seconds=20):
+    concu=Concurrencia.objects.get(nombre=user.username)
+    if Artefacto.objects.get(id=id).texto == concu.texto_anterior:
         return True
     return False
-
+def eliminarConcurrencia(user):
+    for i in Concurrencia.objects.filter(nombre=user.username):
+        i.delete()
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
@@ -103,6 +106,7 @@ def artefactos(request,id):
     escen= proyecto.artefactos.all()
     if not tienePermiso(request.user,proyecto):
         return render(request,'ERRORES/403.html',{})
+    eliminarConcurrencia(request.user)
     ok=False
     form=ElejirArtefactoAcrear()
     form2=Busqueda()
@@ -202,14 +206,14 @@ def crearArtefactos(request,idP,idT):
     for i in all_fields:
         if i != 'nombre':
             fields.append('id_'+i)
-    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo,"idP":idP})
 
-
+@cache_control(no_cache=True, must_revalidate=True)
 def modificarArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
     texto=json.loads(artefacto.texto)
     no_escribir=False
-    if request.method == "POST":
+    if request.method == "POST" and Concurrencia.objects.filter(nombre=request.user.username):
         formulario = form=tipoForm(artefacto.tipoDeArtefacto,request.POST)
         if formulario.is_valid():
             infForma=formulario.cleaned_data
@@ -218,15 +222,20 @@ def modificarArtefacto(request,id,idP):
             artefacto.texto=aux
             #recurrencia
 
-            if puedeEscribirEnBd(id):
-                artefacto.ultima_modificacion=datetime.datetime.now(artefacto.ultima_modificacion.tzinfo)
+            if puedeEscribirEnBd(request.user,id):
+                concu=Concurrencia.objects.get(nombre=request.user.username)
+                concu.delete()
                 artefacto.save()
                 return redirect(reverse('artefactos',kwargs={'id':idP}))
             else:
                 no_escribir=True
+                concu=Concurrencia.objects.get(nombre=request.user.username)
+                concu.delete()
     else:
         #uso None para inicializar un form vacio
         form=tipoForm(artefacto.tipoDeArtefacto,texto)
+        concu=Concurrencia(nombre=request.user.username,texto_anterior=artefacto.texto)
+        concu.save()
     #queda llenar el form y mandarlo como siempre
     all_fields = form.declared_fields.keys()
     fields=[]

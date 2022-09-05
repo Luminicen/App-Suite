@@ -24,6 +24,8 @@ class Artefacto(models.Model):
     texto = models.TextField()
     owner= models.ForeignKey(User, on_delete=models.CASCADE)
     tipoDeArtefacto= models.ForeignKey('tipoDeArtefacto', on_delete=models.CASCADE)
-    ultima_modificacion= models.DateTimeField(default=datetime.datetime.now())
     def __str__(self):
         return f"Texto de tipo {self.tipoDeArtefacto.tipo} de {self.owner.username} llamado {self.nombre}"
+class Concurrencia(models.Model):
+    nombre=models.CharField(max_length=255)
+    texto_anterior=models.TextField()

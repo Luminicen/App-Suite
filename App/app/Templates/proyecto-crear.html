@@ -11,7 +11,7 @@
 {% if no_escribir %}
 <div id="concurrencia" class="alert alert-warning">
   <h5>Alguien actualizo los datos, porfavor recargue la pagina. 
-    Si guarda asi sobreescribira los cambios luego de 20 segundos</h5>
+    </h5>
 </div>
 {% endif %}
 {% if tipo != "ProjectFile" %}
@@ -27,7 +27,9 @@
       </div>
 <br>
     <div class="d-flex ">
+    {% if not no_escribir %}
     <button class="btn btn-primary mt-2" type="submit">Guardar</button>
+    {% endif %}
     <button class="btn btn-primary mt-2" onClick="history.go(-1);" type="button">Cancelar</button>
     <button class="btn btn-primary mt-2" type="button" id="corrector" >Revisar</button>
     </div>
