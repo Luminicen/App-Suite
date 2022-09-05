@@ -2,19 +2,33 @@ from platform import mac_ver
 from django import forms
 from pkg_resources import require
 from suite.models import *
+from django.contrib.admin.widgets import FilteredSelectMultiple
 ##Proyectos (titulo, owner, tiposDeArtefactos)
 
 choiceUser = []
 class ProyectoForm(forms.ModelForm):
     class Meta:
         model = Proyecto
-        fields = ['titulo','owner']
+        fields = ['titulo','owner','participantes']
+    
     try:
         choices = [(tipo.id,tipo.tipo) 
                    for tipo in TipoDeArtefacto.objects.all()]
     except:
         choices=[]
     titulo = forms.CharField(label='Your proyecto title', max_length=100)
+    participantes=forms.ModelMultipleChoiceField(queryset=User.objects.all(),
+                                          label="Elegi usuarios",
+                                          required=False,
+                                          widget=FilteredSelectMultiple("participantes",False))
+    class Media:
+        css = {
+            'all':['admin/css/widgets.css',
+                   'css/uid-manage-form.css'],
+        }
+        # Adding this javascript is crucial
+        js = ['/admin/jsi18n/']
+    
     def __init__(self, *args, **kwargs):
         super(ProyectoForm, self).__init__(*args, **kwargs)
         choiceUser.append(kwargs.get('instance'))
