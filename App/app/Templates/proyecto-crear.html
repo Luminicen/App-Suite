@@ -5,6 +5,8 @@
 {% block content %}
 {% if user.is_authenticated %}
 {{ tipo | json_script:"tipo" }}
+{{ campos | json_script:"fields" }}
+{{form.media}}
 <div id="advertencias"></div>
 {% if tipo != "ProjectFile" %}
 {{ campos | json_script:"fields" }}
@@ -17,7 +19,8 @@
         {% csrf_token %}
         {{ form | crispy }}
       </div>
-    <div class="d-flex d-inline-block">
+<br>
+    <div class="d-flex ">
     <button class="btn btn-primary mt-2" type="submit">Guardar</button>
     <button class="btn btn-primary mt-2" onClick="history.go(-1);" type="button">Cancelar</button>
     <button class="btn btn-primary mt-2" type="button" id="corrector" >Revisar</button>

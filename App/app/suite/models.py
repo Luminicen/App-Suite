@@ -12,6 +12,7 @@ class Proyecto(models.Model):
     #cada proyecto tiene varios artefactos
     titulo=models.CharField(max_length=255,blank=False)
     owner=models.ForeignKey(User, on_delete=models.CASCADE)
+    participantes=models.ManyToManyField(User,blank=True,related_name='participantes')
     artefactos=models.ManyToManyField("Artefacto",blank=True)
     def __str__(self):
         return f"Proyecto {self.titulo} de {self.owner.username}"

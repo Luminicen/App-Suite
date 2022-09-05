@@ -19,6 +19,13 @@ import requests
 from spacy.matcher import Matcher
 nlp = spacy.load("es_dep_news_trf")
 # Create your views here.
+############################### Permisos ##########################################
+# Codigos de los permisos
+####################################################################################
+def tienePermiso(user,proyecto):
+    if (proyecto.owner==user) or (user in proyecto.participantes.all()):
+        return True
+    return False
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
@@ -34,7 +41,7 @@ def proyectos(request):
             ok=True
     otros=[]
     for p in proyectos:
-        if not (p in mio):
+        if (usuario in p.participantes.all()):
             otros.append(p)
     #print(otros)
     return render(request,'proyectos.html',{"ok":ok,"proyectos":mio,"otro_p":otros})
@@ -45,7 +52,7 @@ def crearProyecto(request):
     if request.method == "POST":
         formulario = ProyectoForm(request.POST)
         if formulario.is_valid():
-            #print(formulario)
+            print(formulario)
             formulario.save()   
             return redirect(reverse('proyectos')) 
     else: 
@@ -75,7 +82,7 @@ def modificarProyecto(request,id):
             proyecto.save()   
             return redirect(reverse('proyectos')) 
     else:
-        datosAModificar={'titulo': proyecto.titulo,'owner':proyecto.owner}
+        datosAModificar={'titulo': proyecto.titulo,'owner':proyecto.owner,'participantes':proyecto.participantes.all()}
         formulario = ProyectoForm(datosAModificar,instance=request.user,initial=datosAModificar)
     return render(request, "proyecto-crear.html", {"form" : formulario})
 
@@ -86,6 +93,8 @@ def modificarProyecto(request,id):
 def artefactos(request,id):
     proyecto=Proyecto.objects.get(id=id)
     escen= proyecto.artefactos.all()
+    if not tienePermiso(request.user,proyecto):
+        return render(request,'ERRORES/403.html',{})
     ok=False
     form=ElejirArtefactoAcrear()
     form2=Busqueda()
@@ -155,6 +164,8 @@ def crearArtefactos(request,idP,idT):
     #idP = id del Proyecto
     #idT = id del Tipo
     proyecto=Proyecto.objects.get(id=idP)
+    if not tienePermiso(request.user,proyecto):
+        return render(request,'ERRORES/403.html',{})
     tipo=TipoDeArtefacto.objects.get(id=idT)
     if request.method == "POST":
         if (request.FILES):
@@ -212,6 +223,8 @@ def modificarArtefacto(request,id,idP):
 def destruirArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
     proyecto= Proyecto.objects.get(id=idP)
+    if not tienePermiso(request.user,proyecto):
+        return render(request,'ERRORES/403.html',{})
     proyecto.artefactos.remove(artefacto)
     artefacto.delete()
     return redirect(reverse('artefactos',kwargs={'id':idP}))

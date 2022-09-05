@@ -4,10 +4,12 @@
 {% block head %}
     {{ super }}
     <link rel="stylesheet" href="./css/botton.css" />
+    
     {% endblock %}
 {% block content %}
 {% if user.is_authenticated %}
   {% if ok %}
+  <h2>Mis proyectos</h2>
   <table class="table">
     <thead>
       <tr>
@@ -32,6 +34,30 @@
   <h3>No tienes proyectos</h3>
   {% endif %}
   <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Crear Proyecto</a></p>
+  <br>
+  <h2>Otros Proyectos</h2>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Proyect Name</th>
+        <th scope="col">Proyect Owner</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in otro_p %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{p.titulo}}</td>
+        <td>{{p.owner}}</td>
+        <td><a href="{% url 'artefactos' p.id%}">Lista de Artefactos Del Proyecto</a></td>
+      </tr>
+      {% endfor %}
+      
+    </tbody>
+  </table>
+
 {% else %}
 <div style="background-color:#1F1D4F; height: 100vh">
   <div class="container-fluid h-custom">
