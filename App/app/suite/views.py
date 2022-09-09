@@ -234,6 +234,9 @@ def modificarArtefacto(request,id,idP):
     else:
         #uso None para inicializar un form vacio
         form=tipoForm(artefacto.tipoDeArtefacto,texto)
+        conc=Concurrencia.objects.filter(nombre=request.user.username)
+        if conc:
+            eliminarConcurrencia(request.user)
         concu=Concurrencia(nombre=request.user.username,texto_anterior=artefacto.texto)
         concu.save()
     #queda llenar el form y mandarlo como siempre

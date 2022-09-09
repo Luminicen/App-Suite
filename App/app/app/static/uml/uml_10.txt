@@ -1,2 +1,7 @@
 @startuml
+class Invento
+class Auto
+class App
+class Perfeccion
+class Programa
 @enduml
