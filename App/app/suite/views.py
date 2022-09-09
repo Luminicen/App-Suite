@@ -574,23 +574,32 @@ class UML:
                         palabra["relacion"].append(sustantivoRelacion)
 
         matcher = Matcher(nlp.vocab)
-        pattern_subclase = [{'POS': {"IN":['NOUN','ADJ']}}, {'POS': 'AUX'}, {'POS': {"IN":['NOUN','PROPN']}}]
-        pattern_conoc = [{'POS': {"IN":['NOUN','PROPN','VERB','ADJ']}}, {'POS': 'VERB'}, {'POS': 'NOUN'}]
+        #pattern_subclase = [{'POS': {"IN":['NOUN','ADJ']}}, {"OP": "?"}, {'POS': 'AUX'}, {"OP": "?"},{'POS': {"IN":['NOUN','PROPN']}}]
+        #pattern_conoc = [{'POS': 'NOUN'}, {"OP": "?"}, {'POS': 'VERB'}, {"OP": "?"}, {'POS': 'NOUN'}]
+        pattern_subclase = [{'POS': {"IN":['NOUN','ADJ']}}, {"OP": "?"}, {'POS': 'AUX'}, {"OP": "?"}, {'POS': {"IN":['NOUN','PROPN']}}]
+        pattern_conoc = [{'POS': {"IN":['NOUN','PROPN','ADJ']}}, {"OP": "?"}, {'POS': 'VERB'}, {"OP": "?"}, {'POS': 'NOUN'}] 
+        #PATRON_MEJORADO = [{'POS': {"IN":['NOUN','PROPN','ADJ']}}, {"OP": "?"}, {'POS':{"IN":['VERB','AUX']}}, {"OP": "?"}, {'POS': {"IN":['NOUN','PROPN']}}] 
         matcher.add("conocimiento", [pattern_conoc])
         matcher.add("subclase", [pattern_subclase])
         relacionesIdentificadas=[]
         for o in texto:
-            doc = nlp(o)
+            doc= nlp(o)
+            texto_2 = "".join([token.lemma_+" " for token in doc])      
+            doc= nlp(texto_2)
             matches = matcher(doc)
             for match_id, start, end in matches:
-                sustantivo1= doc[start:start+1].text.lower()
-                sustantivo2= doc[end-1:end].text.lower()
-                verb = doc[start + 1:end - 1].text.lower()
-                if(sustantivo1,sustantivo2 in clases):
-                    if verb =="ser":
-                        evaluarPalabra(sustantivo2,sustantivo1,relacionesIdentificadas,True)
+                frase = doc[start : end]
+                sustantivo = []
+                for tok in frase:
+                    if tok.pos_ == "NOUN" or tok.pos_== "ADJ" or tok.pos_== "PROPN":
+                        sustantivo.append(tok.text)
+                    elif tok.pos_ == "VERB" or tok.pos_=="AUX":
+                        verb = tok.text
+                if(sustantivo[0],sustantivo[1] in clases):
+                    if verb == "ser":
+                        evaluarPalabra(sustantivo[1],sustantivo[0],relacionesIdentificadas,True)
                     else:
-                        evaluarPalabra(sustantivo1,sustantivo2,relacionesIdentificadas,False)           
+                        evaluarPalabra(sustantivo[0],sustantivo[1],relacionesIdentificadas,False)                       
         return relacionesIdentificadas
     def eliminar_tildes(self,texto: str) -> str:
         import unidecode
