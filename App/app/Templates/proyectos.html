@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Proyectos{% endblock %}
+{% block title %}Projects{% endblock %}
 {% block head %}
     {{ super }}
     <link rel="stylesheet" href="./css/botton.css" />
@@ -9,12 +9,12 @@
 {% block content %}
 {% if user.is_authenticated %}
   {% if ok %}
-  <h2>Mis proyectos</h2>
+  <h2>Projects I manage</h2>
   <table class="table">
     <thead>
       <tr>
         <th scope="col">#</th>
-        <th scope="col">Proyect Name</th>
+        <th scope="col">Project Name</th>
         <th scope="col">Actions</th>
       </tr>
     </thead>
@@ -23,7 +23,7 @@
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.titulo}}</td>
-        <td><a href="{% url 'destruirProyecto' p.id%}">Eliminar</a> | <a href="{% url 'modificarProyecto' p.id%}">Modificar datos del proyecto</a> | <a href="{% url 'artefactos' p.id%}">Lista de Artefactos Del Proyecto</a></td>
+        <td><a href="{% url 'destruirProyecto' p.id%}">Delete</a> | <a href="{% url 'modificarProyecto' p.id%}">Modify project data</a> | <a href="{% url 'artefactos' p.id%}">Project's artifacts list</a></td>
       </tr>
       {% endfor %}
       
@@ -31,17 +31,17 @@
   </table>
 
   {% else %}
-  <h3>No tienes proyectos</h3>
+  <h3>You don't have projects</h3>
   {% endif %}
-  <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Crear Proyecto</a></p>
+  <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Create Proyect</a></p>
   <br>
-  <h2>Otros Proyectos</h2>
+  <h2>Projects I participate in</h2>
   <table class="table">
     <thead>
       <tr>
         <th scope="col">#</th>
-        <th scope="col">Proyect Name</th>
-        <th scope="col">Proyect Owner</th>
+        <th scope="col">Project Name</th>
+        <th scope="col">Project Owner</th>
         <th scope="col">Actions</th>
       </tr>
     </thead>
@@ -51,7 +51,7 @@
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.titulo}}</td>
         <td>{{p.owner}}</td>
-        <td><a href="{% url 'artefactos' p.id%}">Lista de Artefactos Del Proyecto</a></td>
+        <td><a href="{% url 'artefactos' p.id%}">Project's artifacts list</a></td>
       </tr>
       {% endfor %}
       

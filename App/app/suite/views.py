@@ -90,6 +90,7 @@ def modificarProyecto(request,id):
         if formulario.is_valid():
             infForma=formulario.cleaned_data
             proyecto.titulo=infForma['titulo']
+            proyecto.participantes.set(infForma['participantes'])
             proyecto.save()   
             return redirect(reverse('proyectos')) 
     else:
@@ -516,6 +517,9 @@ def tranfSetArr(set):
         arr.append(i)
     return arr
 class UML:
+    def algo(texto):
+        textoTransformado = texto
+        return textoTransformado
     @classmethod
     def identificarClases(self,texto):
         matcher = Matcher(nlp.vocab)

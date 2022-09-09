@@ -18,7 +18,7 @@ class ProyectoForm(forms.ModelForm):
         choices=[]
     titulo = forms.CharField(label='Your proyecto title', max_length=100)
     participantes=forms.ModelMultipleChoiceField(queryset=User.objects.all(),
-                                          label="Elegi usuarios",
+                                          label="select users",
                                           required=False,
                                           widget=FilteredSelectMultiple("participantes",False))
     class Media:
@@ -46,7 +46,7 @@ class Busqueda(forms.Form):
                    for tipo in TipoDeArtefacto.objects.all()]
     except:
         choices=[]
-    buscar=forms.ChoiceField(choices=choices,initial="None",label="Filtrar")
+    buscar=forms.ChoiceField(choices=choices,initial="None",label="Filter")
 #############################################################################
 #
 #Formularios Personalizados
@@ -72,27 +72,27 @@ class Scenarios(forms.Form):
     Actors=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
     Episodes=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
 class KnowledgeGraphs(forms.Form):
-    nombre=forms.CharField(max_length=255,label="Nombre")
+    nombre=forms.CharField(max_length=255,label="Name")
     graphOutput=forms.CharField(widget=forms.Textarea())
 class UMLs(forms.Form):
-    nombre=forms.CharField(max_length=255,label="Nombre")
+    nombre=forms.CharField(max_length=255,label="Name")
     uml=forms.CharField(widget=forms.Textarea())
 
 class ScenariosWithKeyWords(forms.Form):
     def __init__(self, *args, **kwargs):
         super(ScenariosWithKeyWords, self).__init__(*args, **kwargs)
     nombre=forms.CharField(max_length=255,label="ScenarioName")#<---
-    nombreKeyWords=forms.CharField(max_length=255,label="KeyWords de Name",required=False)
+    nombreKeyWords=forms.CharField(max_length=255,label="Name's KeyWords",required=False)
     Goal=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
-    GoalKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Goal",required=False)
+    GoalKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="Goal's KeyWords",required=False)
     Context=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
-    ContextKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Context",required=False)
+    ContextKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="Context's KeyWords",required=False)
     Resources=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
-    ResourcesKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Resources",required=False)
+    ResourcesKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="Resources 's KeyWords",required=False)
     Actors=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}))
-    ActorsKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="KeyWords de Actors",required=False)
+    ActorsKeyWords=forms.CharField(max_length=255,widget=forms.Textarea(attrs={'rows': 5, 'cols': 5}),label="Actors's KeyWords",required=False)
     Episodes=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
-    EpisodesKeyWords=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="KeyWords de Episodes",required=False)
+    EpisodesKeyWords=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="Episodes's KeyWords",required=False)
 
 
 

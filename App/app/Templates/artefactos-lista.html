@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Artefactos del proyecto{% endblock %}
+{% block title %}Project's artifacts{% endblock %}
 {% block head %}
     {{ super }}
     <link rel="stylesheet" href="./css/botton.css" />
@@ -12,13 +12,13 @@
     <form method="get">
       <div class="d-flex d-inline-block">
       {{ formB.as_table }}
-    <button class="btn btn-primary"  type="submit">Filtrar</button>
+    <button class="btn btn-primary"  type="submit">Filter</button>
   </div>
     </form>
-    <a class="btn btn-primary" href="{% url 'artefactos' idP%} ">Limpiar Filtro</a>
+    <a class="btn btn-primary" href="{% url 'artefactos' idP%} ">Clean Filter</a>
   <div class="d-flex ms-auto">
-    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', true);" class="btn btn-primary">Seleccionar Todo</button>
-    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', false);" class="btn btn-primary">Deseleccionar Todo</button>
+    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', true);" class="btn btn-primary">Select All</button>
+    <button type="button" onclick=" $('input[type=checkbox]').prop('checked', false);" class="btn btn-primary">Deselect All</button>
   </div>
   </div>
   <form method="get">
@@ -29,7 +29,7 @@
         <th scope="col">Artifact Name</th>
         <th scope="col">Type</th>
         <th scope="col">Actions</th>
-        <th scope="col">Seleccionado</th>
+        <th scope="col">Selected</th>
       </tr>
     </thead>
     <tbody>
@@ -59,14 +59,14 @@
  </form>
 
   {% else %}
-  <h3>No tienes Artefactos</h3>
+  <h3>You don't have Artifacts</h3>
   {% endif %}
   <br> 
   <form method="post">
     <div class="d-flex d-inline-block">
     {% csrf_token %}
     {{ form.as_table }}
-    <button class="btn btn-primary mt-2" type="submit">Crear</button>
+    <button class="btn btn-primary mt-2" type="submit">Create</button>
   </div>
   
 </form>

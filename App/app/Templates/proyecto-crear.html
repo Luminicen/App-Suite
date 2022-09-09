@@ -1,21 +1,21 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
-{% block title %}Proyectos{% endblock %}
+{% block title %}Projects{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
 {{ tipo | json_script:"tipo" }}
-{{ campos | json_script:"fields" }}
 {{form.media}}
 
 {% if no_escribir %}
 <div id="concurrencia" class="alert alert-warning">
-  <h5>Alguien actualizo los datos mientras usted los estaba editando. Precione cancelar para ver los datos actuales. 
+  <h5>Someone updated the data while you were editing it. Press cancel to see the current data. 
     </h5>
 </div>
 {% endif %}
 {% if tipo != "ProjectFile" %}
 {{ campos | json_script:"fields" }}
+
 <form method="post">
 {%else%}
 <button id="botonTemplate" class="btn btn-outline-primary my-2" >Obtener template</button>
@@ -29,12 +29,12 @@
 <div id="advertencias" class="alert alert-warning"></div>
     <div class="d-flex ">
     {% if not no_escribir %}
-    <button class="btn btn-primary mt-2" type="submit">Guardar</button>
-    <button class="btn btn-primary mt-2" onClick="window.location.href=window.location.href" type="button">Cancelar</button>
+    <button class="btn btn-primary mt-2" type="submit">Save</button>
+    <button class="btn btn-primary mt-2" onClick="window.location.href=window.location.href" type="button">Cancel</button>
     {%else%}
-    <button class="btn btn-primary mt-2" onClick="history.go(-1);" type="button">Cancelar</button>
+    <button class="btn btn-primary mt-2" onClick="history.go(-1);" type="button">Cancel</button>
     {% endif %}
-    <button class="btn btn-primary mt-2" type="button" id="corrector" >Revisar</button>
+    <button class="btn btn-primary mt-2" type="button" id="corrector" >Check</button>
     </div>
     </form>
 {% else %}

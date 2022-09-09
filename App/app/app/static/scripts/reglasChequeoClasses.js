@@ -99,10 +99,10 @@ pedirDatos(){
     
     //console.log("PIDE")
     //'http://localhost:5000/passive_voice'
-    //http://localhost:5000/reglas
+    //http://localhost:5000/spelling
     //http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/reglas
 
-    axios.post('http://localhost:5000/check_all', 
+    axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/reglas', 
     {
         texto:document.getElementById(this.campo).value,
         tipo:this.tip,

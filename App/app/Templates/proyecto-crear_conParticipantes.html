@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
-{% block title %}Proyectos{% endblock %}
+{% block title %}Projects{% endblock %}
 
 {% block content %}
 {% if user.is_authenticated %}
@@ -13,8 +13,8 @@
       </div>
 <br>
     <div class="d-inline-flex  justify-content-center align-items-end ">
-    <button class="btn btn-outline-primary mt-2" type="submit">Guardar</button>
-    <button class="btn btn-outline-primary mt-2" onClick="history.go(-1);" type="button">Cancelar</button>
+    <button class="btn btn-outline-primary mt-2" type="submit">Save</button>
+    <button class="btn btn-outline-primary mt-2" onClick="history.go(-1);" type="button">Cancel</button>
     </div>
     </form>
 {% else %}
