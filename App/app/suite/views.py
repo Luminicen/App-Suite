@@ -517,7 +517,7 @@ def tranfSetArr(set):
         arr.append(i)
     return arr
 class UML:
-    def algo(texto):
+    def transformarTexto(texto):
         textoTransformado = texto
         return textoTransformado
     @classmethod
