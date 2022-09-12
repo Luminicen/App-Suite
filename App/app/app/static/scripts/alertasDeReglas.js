@@ -42,7 +42,7 @@ devolverLineasAfectadas(res){
 ejecutar(){
 
 
-axios.post('http://localhost:5000/one_verb', 
+axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/one_verb', 
 {
     data:document.getElementById(this.campo).value,
 }
@@ -52,19 +52,14 @@ res=>{
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         let para = document.createElement("h5");
-        let node = document.createTextNode("Exceso de verbos en "+this.campo.slice(3,-1)+", en linea/as "+this.devolverLineasAfectadas(res)+" se recomienda eliminar verbos");
+        let node = document.createTextNode("Excess of verbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res)+" it is recommended to eliminate verbs");
         para.appendChild(node);
         element.appendChild(para);
-    }
-    else{
-        while(element.firstChild){
-            element.removeChild(element.firstChild)
-        }
     }
 
 })
 
-axios.post('http://localhost:5000/null_subject', 
+axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/null_subject', 
 {
     data:document.getElementById(this.campo).value,
 }
@@ -74,18 +69,30 @@ res=>{
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         let para = document.createElement("h5");
-        let node = document.createTextNode("No hay sujeto en "+this.campo.slice(3,-1));
+        let node = document.createTextNode("There is no subject in the field : "+this.campo.slice(3,-1)+" In line/s :"+this.devolverLineasAfectadas(res));
         para.appendChild(node);
         element.appendChild(para);
     }
-    else{
-        while(element.firstChild){
-            element.removeChild(element.firstChild)
-        }
+
+})
+axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/adj_and_adv', 
+{
+    data:document.getElementById(this.campo).value,
+}
+).then(
+
+res=>{ 
+    const element = document.getElementById("advertencias");
+    if (res.data.length !=0){
+        let para = document.createElement("h5");
+        let node = document.createTextNode("There is a sentence with adjectives or adverbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res));
+        para.appendChild(node);
+        element.appendChild(para);
     }
+
     
 })
-axios.post('http://localhost:5000/passive_voice', 
+axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/passive_voice', 
 {
     data:document.getElementById(this.campo).value,
 }
@@ -95,45 +102,23 @@ res=>{
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         let para = document.createElement("h5");
-        let node = document.createTextNode("Existe una oracion con adjetivos o adverbios en "+this.campo.slice(3,-1)+", en linea/as "+this.devolverLineasAfectadas(res));
+        let node = document.createTextNode("There is a sentence with passive voice "+this.campo.slice(3,-1)+" in line/s "+this.devolverLineasAfectadas(res));
         para.appendChild(node);
         element.appendChild(para);
     }
-    else{
-        while(element.firstChild){
-            element.removeChild(element.firstChild)
-        }
-    }
-    
-})
-axios.post('http://localhost:5000/adj_and_adv', 
-{
-    data:document.getElementById(this.campo).value,
-}
-).then(
 
-res=>{ 
-    const element = document.getElementById("advertencias");
-    if (res.data.length !=0){
-        let para = document.createElement("h5");
-        let node = document.createTextNode("Existe una oracion en voz pasiva en "+this.campo.slice(3,-1)+"en linea/as "+this.devolverLineasAfectadas(res));
-        para.appendChild(node);
-        element.appendChild(para);
-    }
-    else{
-        while(element.firstChild){
-            element.removeChild(element.firstChild)
-        }
-    }
     
 })
 
 }
 ejecutarLimpieza(){
     const element = document.getElementById("advertencias");
+    console.log("LIMPIEZA")
     while(element.firstChild){
         element.removeChild(element.firstChild)
     }
+    this.ejecutar()
     
     }
+
 }

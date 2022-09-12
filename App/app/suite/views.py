@@ -415,11 +415,11 @@ def listaBotones():
     #es la que se ejecutara
     #MUY IMPORTANTE CHEQUEAR POR LA CLAVE EN EL OBJETO DE LA FUNCIONALIDAD!
     botones=[]
-    botones.append(Boton("Crear grafo de conocimiento","kg"))
-    botones.append(Boton("A UML","uml"))
-    botones.append(Boton("Convertir a ScenarioKeyWords","cskw"))
-    botones.append(Boton("Exportar Scenario con keywords a txt","exportSKW"))
-    botones.append(Boton("Validar grafo de requerimientos","shacl4j"))
+    botones.append(Boton("Create a knowledge graph","kg"))
+    botones.append(Boton("To UML","uml"))
+    botones.append(Boton("Convert to ScenarioKeyWords","cskw"))
+    botones.append(Boton("Export Scenario with keywords to txt file","exportSKW"))
+    botones.append(Boton("Validate knowledge graph","shacl4j"))
     return botones
     
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):

@@ -39,7 +39,7 @@ class ElejirArtefactoAcrear(forms.Form):
                    for tipo in TipoDeArtefacto.objects.all()]
     except:
         choices=[]
-    eleccion=forms.ChoiceField(choices=choices,initial="None")
+    eleccion=forms.ChoiceField(choices=choices,initial="None",label="Choose")
 class Busqueda(forms.Form):
     try:
         choices = [(tipo.id,tipo.tipo) 
@@ -60,8 +60,8 @@ class textoPlano(forms.Form):
     def __init__(self, *args, **kwargs):
         super(textoPlano, self).__init__(*args, **kwargs)
         self.fields['texto'].widget.attrs['class'] = 'texto' # para el lighter
-    nombre=forms.CharField(max_length=255)#<---
-    texto=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}))
+    nombre=forms.CharField(max_length=255,label="Name")#<---
+    texto=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="Text")
 class Scenarios(forms.Form):
     def __init__(self, *args, **kwargs):
         super(Scenarios, self).__init__(*args, **kwargs)

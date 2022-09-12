@@ -28,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function () {
     while(i<len){
         cam[i].pedirDatosActualizar()
         adv[i].ejecutarLimpieza()
-        adv[i].ejecutar()
         i= i+1
         //console.log(i)
     }
