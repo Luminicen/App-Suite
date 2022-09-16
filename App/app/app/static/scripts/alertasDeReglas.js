@@ -52,7 +52,7 @@ res=>{
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         let para = document.createElement("h5");
-        let node = document.createTextNode("Excess of verbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res)+" it is recommended to eliminate verbs");
+        let node = document.createTextNode("Excess of verbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res)+". It is recommended to split the sentence");
         para.appendChild(node);
         element.appendChild(para);
     }
@@ -69,7 +69,7 @@ res=>{
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         let para = document.createElement("h5");
-        let node = document.createTextNode("There is no subject in the field : "+this.campo.slice(3,-1)+" In line/s :"+this.devolverLineasAfectadas(res));
+        let node = document.createTextNode("There is no subject in  : "+this.campo.slice(3,-1)+" in line/s :"+this.devolverLineasAfectadas(res));
         para.appendChild(node);
         element.appendChild(para);
     }
@@ -85,7 +85,7 @@ res=>{
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         let para = document.createElement("h5");
-        let node = document.createTextNode("There is a sentence with adjectives or adverbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res));
+        let node = document.createTextNode("There is a sentence with adjectives or adverbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res)+". Please consider replace the adjectives and adverbs with new sentences describing them");
         para.appendChild(node);
         element.appendChild(para);
     }

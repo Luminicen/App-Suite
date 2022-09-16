@@ -537,7 +537,9 @@ class UML:
         return clasesIdentificadas
 
     @classmethod
+
     def identificarMetodosDeClase(self,clases,texto):
+
         verbosProhibidos = ["contener", "ser", "es", "tener"]
         metodosDeClaseIdentificados = []
         for o in texto:
@@ -653,6 +655,8 @@ class UML:
                 "atributos":[],
                 "relaciones":z["relacion"] if z!=None else []
                 }
+            x=[]
+            z=[]
             data.append(c)
         #data es lo que devolveria luego del procesamiento
         #print(data)
@@ -690,27 +694,66 @@ class TransformarAScenariosKeyWords:
             return "OK"
         else:
             return None
+    def get_scenario_with_keywords(data):
+        NLP = spacy.load("en_core_web_trf")
+        try:
+            scenario_with_keywords = {
+                "nombre": data["nombre"],
+                "nombreKeyWords": [token.text for token in NLP(data["nombre"]) if token.pos_ == "VERB"][0],
+                "Goal": data["Goal"],
+                "GoalKeyWords": [token.text for token in NLP(data["Goal"]) if token.pos_ == "VERB"][0],
+                "Context": data["Context"],
+                "ContextKeyWords": [token.text for token in NLP(data["Context"]) if token.pos_ == "NOUN"][0],
+                "Resources": data["Resources"],
+                "ResourcesKeyWords": [token.text for token in NLP(data["Resources"]) if token.pos_ == "NOUN"],
+                "Actors": data["Actors"],
+                "ActorsKeyWords": [token.text for token in NLP(data["Actors"]) if token.pos_ == "NOUN"],
+                "Episodes": data["Episodes"],
+                "EpisodesKeyWords": [{
+                    "subject": [token.text for token in NLP(episode) if token.dep_ == "nsubj"],
+                    "verb": [token.text for token in NLP(episode) if token.pos_ == "VERB"],
+                    "object": [token.text for token in NLP(episode) if token.dep_ == "dobj"]
+            }   for episode in data["episodes"]]
+        }
+            print(scenario_with_keywords)
+            return scenario_with_keywords
+        except Exception as e:
+            print(e)
+            return {}
+    def adaptarListaDeElementosPlanoAArreglo(esc):
+        ep=""
+        arreglo=[]
+        for i in esc:
+            if i == ".":
+                arreglo.append(ep)
+                ep=""
+            else:
+                ep+=i
+        arreglo.append(ep)
+        return arreglo
+
     def convertidor(escenario,request,idP):
         cont=json.loads(escenario.texto)
-        escKW={
+        escenarioAdaptado={
             "nombre":cont["nombre"],
-            "nombreKeyWords":" ",
             "Goal":cont["Goal"],
-            "GoalKeyWords":" ",
             "Context":cont["Context"],
-            "ContextKeyWords":" ",
             "Resources":cont["Resources"],
-            "ResourcesKeyWords":" ",
             "Actors":cont["Actors"],
-            "ActorsKeyWords":" ",
-            "Episodes": cont["Episodes"],
-            "EpisodesKeyWords":" "
+            "Episodes":TransformarAScenariosKeyWords.adaptarListaDeElementosPlanoAArreglo(cont["Episodes"]),
         }
-        nuev=Artefacto(owner=request.user,nombre=escenario.nombre,tipoDeArtefacto=TipoDeArtefacto.objects.get(tipo="ScenariosWithKeyWord"),texto=json.dumps(escKW))
-        nuev.save()
-        p= Proyecto.objects.get(id=idP)
-        p.artefactos.add(nuev)
-        p.save()
+        #print(TransformarAScenariosKeyWords.adaptarListaDeElementosPlanoAArreglo(cont["Episodes"]))
+        #print(escenarioAdaptado)
+        escKW=TransformarAScenariosKeyWords.get_scenario_with_keywords(escenarioAdaptado)
+        #print("ESCENARIO")
+        #print(escKW)
+        if escKW:
+            nuev=Artefacto(owner=request.user,nombre=escenario.nombre,tipoDeArtefacto=TipoDeArtefacto.objects.get(tipo="ScenariosWithKeyWord"),texto=json.dumps(escKW))
+            nuev.save()
+            p= Proyecto.objects.get(id=idP)
+        #comentada linea 138
+            p.artefactos.add(nuev)
+            p.save()
 class ExportarEscenariosKeyWordsATxt:
     def linea(escenario):
         #recibo escenanario y lo convierto en una linea
