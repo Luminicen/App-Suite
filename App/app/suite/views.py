@@ -538,7 +538,7 @@ class UML:
 
     @classmethod
     def identificarMetodosDeClase(self,clases,texto):
-        verbosProhibidos = ["contener", "ser", "es"]
+        verbosProhibidos = ["contener", "ser", "es", "tener"]
         metodosDeClaseIdentificados = []
         for o in texto:
             doc = nlp(o)
@@ -555,7 +555,8 @@ class UML:
                                 }
                                 metodosDeClaseIdentificados.append(aux)
                             else:
-                                repetido["metodos"].append(verbToken.lemma_)
+                                if (verbToken.lemma_ not in repetido["metodos"]):
+                                    repetido["metodos"].append(verbToken.lemma_)
         return metodosDeClaseIdentificados
     def identificarRelaciones(self,clases,texto):
 
