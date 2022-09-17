@@ -560,57 +560,74 @@ class UML:
                                 if (verbToken.lemma_ not in repetido["metodos"]):
                                     repetido["metodos"].append(verbToken.lemma_)
         return metodosDeClaseIdentificados
+
     def identificarRelaciones(self,clases,texto):
 
-        def buscarSiYaExiste(sustantivo,relacionesIdentificados):
+        # evalua si la entidad(sustativo) existe
+        def buscarSiYaExiste(sustantivo, relacionesIdentificados):
             for palabra in relacionesIdentificados:
-                if(palabra["nombre"]==sustantivo): 
+                if palabra["nombre"] == sustantivo:
                     return True
             return False
 
-        def evaluarPalabra(sustantivo,sustantivoRelacion,relaciones,esHerencia):
-            if(not(buscarSiYaExiste(sustantivo,relaciones))):
-                palabra = {
-                            "nombre": sustantivo, 
-                            "relacion":[], 
-                            "subclase": []
-                        }
-                relaciones.append(palabra)
-            for palabra in relaciones:
-                if(palabra["nombre"]==sustantivo): 
-                    if esHerencia:
-                        palabra["subclase"].append(sustantivoRelacion)
-                    else:
-                        palabra["relacion"].append(sustantivoRelacion)
+        # retorna true si ya existe la relacion
+        def existeRelacion(palabra, relacionesIdentificadas):
+            for entidad in relacionesIdentificadas:
+                if palabra in entidad["relacion"] or palabra in entidad["subclase"]:
+                    return True
+            return False
 
-        matcher = Matcher(nlp.vocab)
-        #pattern_subclase = [{'POS': {"IN":['NOUN','ADJ']}}, {"OP": "?"}, {'POS': 'AUX'}, {"OP": "?"},{'POS': {"IN":['NOUN','PROPN']}}]
-        #pattern_conoc = [{'POS': 'NOUN'}, {"OP": "?"}, {'POS': 'VERB'}, {"OP": "?"}, {'POS': 'NOUN'}]
-        pattern_subclase = [{'POS': {"IN":['NOUN','ADJ']}}, {"OP": "?"}, {'POS': 'AUX'}, {"OP": "?"}, {'POS': {"IN":['NOUN','PROPN']}}]
-        pattern_conoc = [{'POS': {"IN":['NOUN','PROPN','ADJ']}}, {"OP": "?"}, {'POS': 'VERB'}, {"OP": "?"}, {'POS': 'NOUN'}] 
-        #PATRON_MEJORADO = [{'POS': {"IN":['NOUN','PROPN','ADJ']}}, {"OP": "?"}, {'POS':{"IN":['VERB','AUX']}}, {"OP": "?"}, {'POS': {"IN":['NOUN','PROPN']}}] 
-        matcher.add("conocimiento", [pattern_conoc])
-        matcher.add("subclase", [pattern_subclase])
-        relacionesIdentificadas=[]
+        # agrega la relacion al sust
+        def evaluarPalabra(sustantivo, sustantivoRelacion, relaciones, esHerencia):
+        # verifico que las realciones o sublcases no se repitan, sino creo o sumo una nueva entidad/relacion
+            if not existeRelacion(sustantivoRelacion, relaciones):
+                if not (buscarSiYaExiste(sustantivo, relaciones)):
+                    palabra = {
+                        "nombre": sustantivo,
+                        "relacion": [],
+                        "subclase": []
+                    }
+                    relaciones.append(palabra)
+                # itero en relaciones hasta encontrar la entidad de sustativo
+                for palabra in relaciones:
+                    if palabra["nombre"] == sustantivo:
+                        if esHerencia:
+                            palabra["subclase"].append(sustantivoRelacion)
+                        else:
+                            palabra["relacion"].append(sustantivoRelacion)
+
+        pattern_one = [{'TEXT': {"IN": clases}}, {"OP": "?"}, {"OP": "?"},
+                       {'POS': {'IN': ['VERB', 'AUX']}}, {"OP": "?"}, {"OP": "?"},
+                       {'TEXT': {"IN": clases}}]
+
+        matcher.add('relaciones', [pattern_one])
+
+        relacionesIdentificadas = []
         for o in texto:
-            doc= nlp(o)
-            texto_2 = "".join([token.lemma_+" " for token in doc])      
-            doc= nlp(texto_2)
-            matches = matcher(doc)
+            doc = nlp(o)
+            texto_2 = "".join([token.lemma_ + " " for token in doc])
+            doc2 = nlp(texto_2)
+            matches = matcher(doc2)
+            # itero por cada match encotrado
             for match_id, start, end in matches:
-                frase = doc[start : end]
+                frase = doc2[start: end]
                 sustantivo = []
+                # itero en la frase del doc para obtener los sust y el verb
                 for tok in frase:
-                    if tok.pos_ == "NOUN" or tok.pos_== "ADJ" or tok.pos_== "PROPN":
+                    if tok.text in clases:
                         sustantivo.append(tok.text)
-                    elif tok.pos_ == "VERB" or tok.pos_=="AUX":
+                    elif tok.pos_ == "VERB" or tok.pos_ == "AUX":
                         verb = tok.text
-                if(sustantivo[0],sustantivo[1] in clases):
-                    if verb == "ser":
-                        evaluarPalabra(sustantivo[1],sustantivo[0],relacionesIdentificadas,True)
-                    else:
-                        evaluarPalabra(sustantivo[0],sustantivo[1],relacionesIdentificadas,False)                       
+                if (sustantivo[0], sustantivo[1] in clases):
+                    # verifico que los sust sean clases ya identificadas
+                    if not existeRelacion(sustantivo[0], relacionesIdentificadas):
+                        if verb == "ser":
+                            evaluarPalabra(sustantivo[1], sustantivo[0], relacionesIdentificadas, True)
+                        else:
+                            evaluarPalabra(sustantivo[0], sustantivo[1], relacionesIdentificadas, False)
+
         return relacionesIdentificadas
+
     def eliminar_tildes(self,texto: str) -> str:
         import unidecode
         return unidecode.unidecode(texto.lower())
