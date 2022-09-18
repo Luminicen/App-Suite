@@ -599,7 +599,7 @@ class UML:
         pattern_one = [{'TEXT': {"IN": clases}}, {"OP": "?"}, {"OP": "?"},
                        {'POS': {'IN': ['VERB', 'AUX']}}, {"OP": "?"}, {"OP": "?"},
                        {'TEXT': {"IN": clases}}]
-
+        matcher = Matcher(nlp.vocab)
         matcher.add('relaciones', [pattern_one])
 
         relacionesIdentificadas = []
@@ -656,7 +656,7 @@ class UML:
         texto=aux
         clases=tranfSetArr(UML.identificarClases(texto))
         metodos=UML.identificarMetodosDeClase(clases,texto)
-        
+        print(metodos)
         relaciones=UML.identificarRelaciones(self,clases,texto)
         data=[]
         #expression_if_true if condition else expression_if_false
