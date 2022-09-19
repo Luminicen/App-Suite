@@ -19,8 +19,8 @@
   <div class="container-fluid h-custom">
     <div class="row d-flex justify-content-center align-items-center fondoFlores py-5"> 
       <div class="col-md-8 col-lg-6 col-xl-4 shadow-lg p-5 my-5 bg-white rounded ">
-        <div class="loginform">
-          <h2 class="pb-3">Iniciar Sesión</h2>
+        <div class=""> <!--saque loginform de class-->
+          <h2 class="pb-3">Log In</h2>
           <form method="post">
             {% csrf_token %}
             {{ form.as_p }}

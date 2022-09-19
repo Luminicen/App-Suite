@@ -40,7 +40,7 @@ devolverLineasAfectadas(res){
     return desc
 }
 ejecutar(){
-
+console.log("Si recibo algo de la api muestro el mensaje caso contrario no hago nada")
 
 axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/one_verb', 
 {
@@ -49,8 +49,11 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/on
 ).then(
 
 res=>{ 
+    console.log("Advertenciaa: One Verb")
+    console.log(res.data)
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
+        
         let para = document.createElement("h5");
         let node = document.createTextNode("Excess of verbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res)+". It is recommended to split the sentence");
         para.appendChild(node);
@@ -66,8 +69,12 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/nu
 ).then(
 
 res=>{ 
+    console.log("Advertencia: Null Subject")
+    console.log(res.data)
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
+        
+        
         let para = document.createElement("h5");
         let node = document.createTextNode("There is no subject in  : "+this.campo.slice(3,-1)+" in line/s :"+this.devolverLineasAfectadas(res));
         para.appendChild(node);
@@ -75,6 +82,7 @@ res=>{
     }
 
 })
+
 axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/adj_and_adv', 
 {
     data:document.getElementById(this.campo).value,
@@ -82,8 +90,12 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/ad
 ).then(
 
 res=>{ 
+    console.log("Advertencia: adjetives and adverbs")
+    console.log(res.data)
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
+        
+        
         let para = document.createElement("h5");
         let node = document.createTextNode("There is a sentence with adjectives or adverbs in the field "+this.campo.slice(3,-1)+", in line/s "+this.devolverLineasAfectadas(res)+". Please consider replace the adjectives and adverbs with new sentences describing them");
         para.appendChild(node);
@@ -92,6 +104,7 @@ res=>{
 
     
 })
+
 axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/passive_voice', 
 {
     data:document.getElementById(this.campo).value,
@@ -99,8 +112,12 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/pa
 ).then(
 
 res=>{ 
+    console.log("Advertencia: Passive Voice")
+    console.log(res.data)
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
+        
+        
         let para = document.createElement("h5");
         let node = document.createTextNode("There is a sentence with passive voice "+this.campo.slice(3,-1)+" in line/s "+this.devolverLineasAfectadas(res));
         para.appendChild(node);

@@ -246,7 +246,7 @@ def modificarArtefacto(request,id,idP):
     for i in all_fields:
         if i != 'nombre':
             fields.append('id_'+i)
-    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":artefacto.tipoDeArtefacto.tipo,"no_escribir":no_escribir})
+    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":artefacto.tipoDeArtefacto.tipo,"no_escribir":no_escribir,"id":id,"idP":idP})
 
 def destruirArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)

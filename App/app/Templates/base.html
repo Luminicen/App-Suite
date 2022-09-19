@@ -38,10 +38,10 @@
                 User: {{ user.username }}
               </button>
               <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li><a class="dropdown-item" href="{% url 'logout' %}">Log off</a></li>
                 <li><a class="dropdown-item" href="{% url 'proyectos' %}">Projects</a></li>
                 {% if request.user.is_staff %}
                 <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Log off</a></li>
                 {% endif %}
               </ul>
             </div>
