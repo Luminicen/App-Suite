@@ -702,24 +702,19 @@ class TransformarAScenariosKeyWords:
     def desarreglar(arr):
         ea=""
         for i in arr:
-            ea+=ea+i+" "
+            ea =ea+i+" "
         return ea
     def desdiccionar(dic):
         #escKW["EpisodesKeyWords"]["subject"]+" "+escKW["EpisodesKeyWords"]["verb"]+" "+escKW["EpisodesKeyWords"]["object"]
-        ea=""
-        print(dic)
-        for z in dic:
-            print(z)
-            for i,y in z.items():
-                for c in y:
-                    ea+=ea+c+" "
-            for i,a in z.items():
-                for c in a:
-                    ea+=ea+c+" "
-            for i,x in z.items():
-                for c in x:
-                    ea+=ea+c+" "
-        return ea
+        ep=""
+        #print("ACA")
+        #print(dic[0])
+        for i,y in dic[0].items():
+            #print(i,y)
+            for x in dic[0][i]:
+                ep = ep + x + " "
+        #print(ep)
+        return ep
     def funcionalidad(sel,request,idP):
         if 'cskw' in request.GET:
             esce=[]
@@ -769,6 +764,7 @@ class TransformarAScenariosKeyWords:
         ep=""
         arreglo=[]
         for i in esc:
+            
             if i == ".":
                 arreglo.append(ep)
                 ep=""
@@ -792,13 +788,15 @@ class TransformarAScenariosKeyWords:
         escKW=TransformarAScenariosKeyWords.get_scenario_with_keywords(escenarioAdaptado)
         escKW["ResourcesKeyWords"]=TransformarAScenariosKeyWords.desarreglar(escKW["ResourcesKeyWords"])
         escKW["ActorsKeyWords"]=TransformarAScenariosKeyWords.desarreglar(escKW["ActorsKeyWords"])
-        escKW["EpisodesKeyWords"]=TransformarAScenariosKeyWords.desdiccionar(escKW["EpisodesKeyWords"])
+        cosas=escKW["EpisodesKeyWords"]
+        escKW["EpisodesKeyWords"]=TransformarAScenariosKeyWords.desdiccionar(cosas)
+        aux=TransformarAScenariosKeyWords.desarreglar(escKW["Episodes"])
+        escKW["Episodes"]=aux
         #print("ESCENARIO")
         #print(escKW)
         nuev=Artefacto(owner=request.user,nombre=escenario.nombre,tipoDeArtefacto=TipoDeArtefacto.objects.get(tipo="ScenariosWithKeyWord"),texto=json.dumps(escKW))
         nuev.save()
         p= Proyecto.objects.get(id=idP)
-        #comentada linea 138
         p.artefactos.add(nuev)
         p.save()
 class ExportarEscenariosKeyWordsATxt:
