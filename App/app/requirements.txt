@@ -18,7 +18,8 @@ django-crispy-forms==1.14.0
 django-js-asset==2.0.0
 editdistance==0.5.3
 es-dep-news-trf @ https://github.com/explosion/spacy-models/releases/download/es_dep_news_trf-3.3.0/es_dep_news_trf-3.3.0-py3-none-any.whl
-en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.3.0/en_core_web_sm-3.3.0-py3-none-any.whl       
+en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.3.0/en_core_web_sm-3.3.0-py3-none-any.whl
+en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en_core_web_trf-3.3.0/en_core_web_trf-3.3.0-py3-none-any.whl       
 filelock==3.7.0
 Flask==2.1.2
 Flask-Cors==3.0.10
