@@ -296,7 +296,7 @@ def crearArtefactoKG(request,idP):
     for i in all_fields:
         if i != 'nombre':
             fields.append('id_'+i)
-    return render(request, "proyecto-crear.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+    return render(request, "proyecto-crear_conParticipantes.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
 
 def crearArtefactoUML(request, idP):
     #aTxt=request.session["UMLDATA"]
