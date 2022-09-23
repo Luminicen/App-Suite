@@ -548,7 +548,7 @@ class UML:
 
         return texto_procesado
     @classmethod
-    def identificarClases(self,texto):
+    def identificarClases(self, texto):
         matcher = Matcher(nlp.vocab)
         pattern = [{"POS": "NOUN"}]
         matcher.add("Class Candidate", [pattern])
@@ -563,10 +563,14 @@ class UML:
                 clasesIdentificadas.add(matched_span.lemma_.lower())
         return clasesIdentificadas
 
-    @classmethod
 
-    def identificarMetodosDeClase(self,clases,texto):
+    def buscarClase(arr, clase):
+        for elem in arr:
+            if (elem["nombre"] == clase):
+                return elem
+        return None
 
+    def identificarMetodosDeClase(self, clases, texto):
         verbosProhibidos = ["contener", "ser", "es", "tener"]
         metodosDeClaseIdentificados = []
         for o in texto:
@@ -684,7 +688,7 @@ class UML:
             aux.append(self.eliminar_tildes(self,i))
         texto=aux
         clases=tranfSetArr(UML.identificarClases(texto))
-        metodos=UML.identificarMetodosDeClase(clases,texto)
+        metodos=UML.identificarMetodosDeClase(self,clases,texto)
         relaciones=UML.identificarRelaciones(self,clases,texto)
         
         data=[]
