@@ -520,6 +520,33 @@ class UML:
     def transformarTexto(texto):
         textoTransformado = texto
         return textoTransformado
+    def separar_oraciones(texto):
+            
+        matcher = Matcher(nlp.vocab)
+        pattern_one = [{'POS': 'CCONJ'}]
+     
+        matcher.add('separar_oraciones', [pattern_one])
+        doc= nlp(texto)
+        matches = matcher(doc)
+
+        oraciones_separadas = []
+        #print(matches)
+        #for o in doc:
+            #print(o.text, o.pos_, o.lemma_)
+        pos = 0
+        for match_id, start, end in matches:
+            frase = doc[pos : start].text
+            pos = end
+            oraciones_separadas.append(frase + '.')
+
+        frase =doc[pos:].text
+        oraciones_separadas.append(frase)
+        sentence=""
+        for oracion in oraciones_separadas: 
+            sentence += oracion + "/n"
+        texto_procesado= [sentence]
+
+        return texto_procesado
     @classmethod
     def identificarClases(self,texto):
         matcher = Matcher(nlp.vocab)
@@ -650,14 +677,16 @@ class UML:
         #texto es un arreglo con los textos que vienen seleccionados
         if not texto:
             return None
+        aux_2=UML.separar_oraciones(texto[0])
+        texto=aux_2
         aux=[]
         for i in texto:
             aux.append(self.eliminar_tildes(self,i))
         texto=aux
         clases=tranfSetArr(UML.identificarClases(texto))
         metodos=UML.identificarMetodosDeClase(clases,texto)
-        print(metodos)
         relaciones=UML.identificarRelaciones(self,clases,texto)
+        
         data=[]
         #expression_if_true if condition else expression_if_false
         #print(clases)
