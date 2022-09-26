@@ -675,21 +675,36 @@ class UML:
         for i in textosId:
             art=Artefacto.objects.get(id=i)
             texto.append(json.loads(art.texto)["texto"])
-        #print(texto)
+        print("TEXTO ORIGINAL")
+        print(texto)
+        
         #texto es un arreglo con los textos que vienen seleccionados
+
         if not texto:
             return None
+        merge=""
+        for i in texto:
+            merge= merge + i + " "
+        texto[0]=merge
         aux_2=UML.separar_oraciones(texto[0])
+        print("TEXTO DESPUES DE SEPARAR ORACIONES")
+        print(aux_2)
         texto=aux_2
         aux=[]
         for i in texto:
             aux.append(self.eliminar_tildes(self,i))
         texto=aux
+        print("TEXTO DESPUES DE SACAR TILDES")
+        print(texto)
         clases=tranfSetArr(UML.identificarClases(texto))
+        print("CLASES")
+        print(clases)
         metodos=UML.identificarMetodosDeClase(self,clases,texto)
+        print("METODOS")
         print(metodos)
         relaciones=UML.identificarRelaciones(self,clases,texto)
-        
+        print("RELACIONES")
+        print(relaciones)
         data=[]
         #expression_if_true if condition else expression_if_false
         #print(clases)
