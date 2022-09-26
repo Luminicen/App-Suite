@@ -530,9 +530,7 @@ class UML:
         matches = matcher(doc)
 
         oraciones_separadas = []
-        #print(matches)
-        #for o in doc:
-            #print(o.text, o.pos_, o.lemma_)
+        
         pos = 0
         for match_id, start, end in matches:
             frase = doc[pos : start].text
@@ -543,7 +541,7 @@ class UML:
         oraciones_separadas.append(frase)
         sentence=""
         for oracion in oraciones_separadas: 
-            sentence += oracion + "/n"
+            sentence += oracion
         texto_procesado= [sentence]
 
         return texto_procesado
@@ -689,6 +687,7 @@ class UML:
         texto=aux
         clases=tranfSetArr(UML.identificarClases(texto))
         metodos=UML.identificarMetodosDeClase(self,clases,texto)
+        print(metodos)
         relaciones=UML.identificarRelaciones(self,clases,texto)
         
         data=[]

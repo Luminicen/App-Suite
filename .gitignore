@@ -28,3 +28,4 @@ App/app/mysql-data/undo_002
 App/app/mysql-data/\#innodb_redo/\#ib_redo10_tmp
 
 *.idea
+*.pyc
