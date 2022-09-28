@@ -553,6 +553,7 @@ class UML:
         pattern = [{"DEP": {"IN": ["nsubj", "dobj", "iobj"]}}]
         matcher.add("Class Candidate", [pattern])
         clasesIdentificadas = set()
+        texto = break_into_sentences(texto)
         for o in texto:
             doc = nlp(o)
             matches = matcher(doc)
@@ -561,6 +562,27 @@ class UML:
                 clasesIdentificadas.add(matched_span.lemma_.lower())
         return clasesIdentificadas
 
+
+    def break_into_sentences(parrafo):
+        parrafo = parrafo.replace("\r", "¥")
+        parrafo = parrafo.replace("\n", "¥")
+        parrafo = parrafo.replace(". ", "¥")
+        parrafo = " ".join(parrafo.split())
+        parrafo += "¥"
+
+        result = []
+        pos_ini = 0
+        pos = 0
+        while pos < len(parrafo):
+            c = parrafo[pos]
+            if c != "¥":
+                pos += 1
+            else:
+                result.append(parrafo[pos_ini:pos])
+                while pos < len(parrafo) and not parrafo[pos].isalnum():
+                    pos += 1
+                pos_ini = pos
+        return result
 
     def buscarClase(arr, clase):
         for elem in arr:
@@ -571,6 +593,7 @@ class UML:
     def identificarMetodosDeClase(self, clases, texto):
         verbosProhibidos = ["contener", "ser", "es", "tener"]
         metodosDeClaseIdentificados = []
+        texto = break_into_sentences(texto)
         for o in texto:
             doc = nlp(o)
             for classToken in doc:
