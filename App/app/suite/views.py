@@ -774,17 +774,14 @@ class TransformarAScenariosKeyWords:
         for i in arr:
             ea =ea+i+" "
         return ea
-    def desdiccionar(dic):
-        #escKW["EpisodesKeyWords"]["subject"]+" "+escKW["EpisodesKeyWords"]["verb"]+" "+escKW["EpisodesKeyWords"]["object"]
-        ep=""
-        #print("ACA")
-        #print(dic[0])
-        for i,y in dic[0].items():
-            #print(i,y)
-            for x in dic[0][i]:
-                ep = ep + x + " "
-        #print(ep)
-        return ep
+    def get_string_episode_keywords(episodes):
+        resultado = ""
+        for episode in episodes:
+            resultado += (episode["subject"][0] + ", ") if len(episode["subject"]) > 0 else ""
+            resultado += (episode["verb"][0] + ", ") if len(episode["verb"]) > 0 else ""
+            resultado += (episode["object"][0]) if len(episode["object"]) > 0 else ""
+            resultado += "\n"
+        return resultado
     def funcionalidad(sel,request,idP):
         if 'cskw' in request.GET:
             esce=[]
@@ -799,6 +796,12 @@ class TransformarAScenariosKeyWords:
             return None
     def get_scenario_with_keywords(data):
         NLP = spacy.load("en_core_web_trf")
+
+        def get_formatted_keywords(list):
+            if len(list) == 0:
+                return ""
+            return ", ".join(list) if len(list) > 1 else list[0]
+
         try:
             nombreKeyWords = [token.text for token in NLP(data["nombre"]) if token.pos_ == "VERB"]
             GoalKeyWords = [token.text for token in NLP(data["Goal"]) if token.pos_ == "VERB"]
@@ -811,11 +814,6 @@ class TransformarAScenariosKeyWords:
                 "object": [token.text for token in NLP(episode) if token.dep_ == "dobj"]
             } for episode in data["Episodes"]]
 
-            def get_formatted_keywords_from_list(list):
-                if len(list) == 0:
-                    return ""
-                return ", ".join(list) if len(list) > 1 else list[0]
-
             scenario_with_keywords = {
                 "nombre": data["nombre"],
                 "nombreKeyWords": nombreKeyWords[0] if len(nombreKeyWords) > 0 else "",
@@ -824,13 +822,12 @@ class TransformarAScenariosKeyWords:
                 "Context": data["Context"],
                 "ContextKeyWords": ContextKeyWords[0] if len(ContextKeyWords) > 0 else "",
                 "Resources": data["Resources"],
-                "ResourcesKeyWords": get_formatted_keywords_from_list(ResourcesKeyWords),
+                "ResourcesKeyWords": get_formatted_keywords(ResourcesKeyWords),
                 "Actors": data["Actors"],
-                "ActorsKeyWords": get_formatted_keywords_from_list(ActorsKeyWords),
+                "ActorsKeyWords": get_formatted_keywords(ActorsKeyWords),
                 "Episodes": data["Episodes"],
                 "EpisodesKeyWords": EpisodesKeyWords
             }
-            #print(scenario_with_keywords)
             return scenario_with_keywords
         except Exception as e:
             print(e)
@@ -861,10 +858,10 @@ class TransformarAScenariosKeyWords:
         #print(TransformarAScenariosKeyWords.adaptarListaDeElementosPlanoAArreglo(cont["Episodes"]))
         #print(escenarioAdaptado)
         escKW=TransformarAScenariosKeyWords.get_scenario_with_keywords(escenarioAdaptado)
-        escKW["ResourcesKeyWords"]=TransformarAScenariosKeyWords.desarreglar(escKW["ResourcesKeyWords"])
-        escKW["ActorsKeyWords"]=TransformarAScenariosKeyWords.desarreglar(escKW["ActorsKeyWords"])
+        escKW["ResourcesKeyWords"]=escKW["ResourcesKeyWords"]
+        escKW["ActorsKeyWords"]=escKW["ActorsKeyWords"]
         cosas=escKW["EpisodesKeyWords"]
-        escKW["EpisodesKeyWords"]=TransformarAScenariosKeyWords.desdiccionar(cosas)
+        escKW["EpisodesKeyWords"]=TransformarAScenariosKeyWords.get_string_episode_keywords(cosas)
         aux=TransformarAScenariosKeyWords.desarreglar(escKW["Episodes"])
         escKW["Episodes"]=aux
         #print("ESCENARIO")
