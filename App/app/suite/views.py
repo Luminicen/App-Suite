@@ -811,6 +811,11 @@ class TransformarAScenariosKeyWords:
                 "object": [token.text for token in NLP(episode) if token.dep_ == "dobj"]
             } for episode in data["Episodes"]]
 
+            def get_formatted_keywords_from_list(list):
+                if len(list) == 0:
+                    return ""
+                return ", ".join(list) if len(list) > 1 else list[0]
+
             scenario_with_keywords = {
                 "nombre": data["nombre"],
                 "nombreKeyWords": nombreKeyWords[0] if len(nombreKeyWords) > 0 else "",
@@ -819,9 +824,9 @@ class TransformarAScenariosKeyWords:
                 "Context": data["Context"],
                 "ContextKeyWords": ContextKeyWords[0] if len(ContextKeyWords) > 0 else "",
                 "Resources": data["Resources"],
-                "ResourcesKeyWords": ResourcesKeyWords,
+                "ResourcesKeyWords": get_formatted_keywords_from_list(ResourcesKeyWords),
                 "Actors": data["Actors"],
-                "ActorsKeyWords": ActorsKeyWords,
+                "ActorsKeyWords": get_formatted_keywords_from_list(ActorsKeyWords),
                 "Episodes": data["Episodes"],
                 "EpisodesKeyWords": EpisodesKeyWords
             }
