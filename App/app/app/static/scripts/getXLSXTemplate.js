@@ -2,13 +2,12 @@
 document.getElementById("botonTemplate").onclick = function() {myFunction()};
 
 function myFunction() {
+    console.log()
     axios({
-        url: 'https://guarded-falls-24810.herokuapp.com/template', 
+        url: 'http://app-requirements-healer.okd.lifia.info.unlp.edu.ar/template', 
         method: 'GET',
         responseType: 'blob', 
     }).then((response) => {
-        console.log("XDD")
-        console.log(response)
         const url = window.URL.createObjectURL(new Blob([response.data]));
         const link = document.createElement('a');
         link.href = url;
