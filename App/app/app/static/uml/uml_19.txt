@@ -1,0 +1,8 @@
+@startuml
+class Cuenta
+Cuenta : abrir()
+Cuenta : depositar()
+Cuenta : extraer()
+class Cliente
+Cliente --> Cuenta
+@enduml

@@ -34,4 +34,5 @@ urlpatterns = [
     path('proyectos/artefactos/crearKg/<str:idP>/',crearArtefactoKG,name="crearKG"),
     path('proyectos/artefactos/crearUML/<str:idP>/',crearArtefactoUML,name="crearUML"),
     path('template',obtenerTemplate,name="obtenerTemplate"),
-]
+    #path('', proyectos, name='home'),
+    # ]

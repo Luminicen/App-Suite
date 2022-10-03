@@ -19,6 +19,7 @@ import requests
 from spacy.matcher import Matcher
 from django.views.decorators.cache import cache_control
 nlp = spacy.load("es_dep_news_trf")
+from django.contrib.auth import authenticate, login
 # Create your views here.
 ############################### Permisos ##########################################
 # Codigos de los permisos
@@ -40,8 +41,12 @@ def eliminarConcurrencia(user):
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
+#para la expo:
+#expoCiencia pass expo1234
 def proyectos(request):
     #obtengo todos los proyectos y filtro por los que son mios
+    #user = authenticate(request, username="expoCiencia", password="expo1234")
+    #login(request, user)
     proyectos=Proyecto.objects.all()
     mio=[]
     ok=False
@@ -91,6 +96,7 @@ def modificarProyecto(request,id):
             infForma=formulario.cleaned_data
             proyecto.titulo=infForma['titulo']
             proyecto.participantes.set(infForma['participantes'])
+            #desactivar para la expo
             proyecto.save()   
             return redirect(reverse('proyectos')) 
     else:
@@ -419,7 +425,7 @@ def listaBotones():
     botones.append(Boton("To UML","uml"))
     botones.append(Boton("Convert to ScenarioKeyWords","cskw"))
     botones.append(Boton("Export Scenario with keywords to txt file","exportSKW"))
-    botones.append(Boton("Validate knowledge graph","shacl4j"))
+    #botones.append(Boton("Validate knowledge graph","shacl4j"))
     return botones
     
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):

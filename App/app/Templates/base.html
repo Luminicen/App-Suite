@@ -41,8 +41,8 @@
                 <li><a class="dropdown-item" href="{% url 'proyectos' %}">Projects</a></li>
                 {% if request.user.is_staff %}
                 <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
-                <li><a class="dropdown-item" href="{% url 'logout' %}">Log off</a></li>
                 {% endif %}
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Log off</a></li>
               </ul>
             </div>
           </li>
