@@ -1,7 +1,12 @@
 @startuml
-class Invento
-class Auto
-class App
-class Perfeccion
-class Programa
+class Empresa
+Empresa --> Travesia
+class Kayakista
+class Travesia
+Travesia : ofrecer()
+Travesia : contratar()
+class Lugar
+class Itinerario
+Itinerario --> Lugar
+class Costo
 @enduml

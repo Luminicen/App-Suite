@@ -2,7 +2,8 @@ version: "3.9"  # optional since v1.27.0
 services:
   app:
     build: .
-    command: bash -c "python wait_for_it.py && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    command: python manage.py migrate
+    command: python manage.py runserver 0.0.0.0:8000
     image: luminicen/app:lastest
     volumes:
       - .:/app
