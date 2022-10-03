@@ -32,4 +32,5 @@ urlpatterns = [
     path('proyectos/artefactos/eliminar/<str:id>/<str:idP>',destruirArtefacto,name="destruirArtefactos"),
     path('proyectos/artefactos/crearKg/<str:idP>/',crearArtefactoKG,name="crearKG"),
     path('proyectos/artefactos/crearUML/<str:idP>/',crearArtefactoUML,name="crearUML"),
+    #path('', proyectos, name='home'),
 ]

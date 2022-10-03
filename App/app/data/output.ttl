@@ -2,35 +2,110 @@
 @prefix ns2: <https://schema.org/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-ns1:actor0 a ns1:Actor ;
-    rdfs:label "graphical user interface",
-        "usuario" ;
-    = <http://www.wikidata.org/entity/Q782543> ;
-    ns2:description "user interface allowing interaction through graphical icons and visual indicators" .
+ns1:action0 a ns1:Action ;
+    rdfs:label "analyzes" .
 
-ns1:actor1 a ns1:Actor ;
-    rdfs:label "cargar usuario" .
+ns1:action1 a ns1:Action ;
+    rdfs:label "to harvest" .
 
 ns1:condition0 a ns1:Condition ;
-    rdfs:label "usuarios sin registrar" .
+    rdfs:label "pickup the tomato" .
 
-ns1:resource0 a ns1:Resource ;
-    rdfs:label "Sistema",
-        "sistema" ;
-    = <http://www.wikidata.org/entity/Q1781702> ;
-    ns2:description "large Russian conglomerate company" .
+ns1:condition1 a ns1:Condition ;
+    rdfs:label "the tomato is ripened." .
 
-ns1:episode0 a ns1:Episode ;
-    rdfs:label "cargar usuarios en portal de tramitess" ;
-    ns1:dependsOn ns1:scenario0 ;
-    ns1:hasActor ns1:actor1 .
+ns1:resource2 a ns1:Resource ;
+    rdfs:label "Ilyushin Il-14",
+        "crate" ;
+    = <http://www.wikidata.org/entity/Q275031> ;
+    ns2:description "1950 airliner family by Ilyushin" .
+
+ns1:resource3 a ns1:Resource ;
+    rdfs:label "Ripe Tomatos - Volume One",
+        "ripe tomato" ;
+    = <http://www.wikidata.org/entity/Q20760222> ;
+    ns2:description "album by Little Feat" .
 
 ns1:scenario0 a ns1:Scenario ;
-    rdfs:label "cargar usuarios en portal de tramites" ;
-    ns1:hasActor ns1:actor0 ;
-    ns1:hasContext ns1:condition0 ;
-    ns1:hasEpisode ns1:episode0 ;
-    ns1:hasGoal ns1:scenario0 ;
-    ns1:hasResource ns1:resource0 ;
+    rdfs:label "harvest the tomato plant" ;
+    ns1:hasActor ns1:actor0,
+        ns1:actor1 ;
+    ns1:hasContext ns1:condition1 ;
+    ns1:hasEpisode ns1:episode0,
+        ns1:episode1,
+        ns1:episode2,
+        ns1:episode3,
+        ns1:episode4,
+        ns1:episode5 ;
+    ns1:hasGoal ns1:condition0 ;
+    ns1:hasResource ns1:resource0,
+        ns1:resource1,
+        ns1:resource2 ;
     ns1:requiredBy ns1:episode0 .
+
+ns1:episode5 a ns1:Episode ;
+    rdfs:label "" ;
+    ns1:dependsOn ns1:episode4 .
+
+ns1:resource0 a ns1:Resource ;
+    rdfs:label "tomato",
+        "tomato plant" ;
+    = <http://www.wikidata.org/entity/Q23501> ;
+    ns2:description "type of plant species with edible, often red, berry fruit" .
+
+ns1:actor1 a ns1:Actor ;
+    rdfs:label "laborer",
+        "manual worker" ;
+    = <http://www.wikidata.org/entity/Q12713481> ;
+    ns2:description "low-skilled or unskilled worker in manual-labour occupations and industrial work; often not salaried or assured of steady work" .
+
+ns1:episode0 a ns1:Episode ;
+    rdfs:label "the farmer analyzes the tomato plant" ;
+    ns1:dependsOn ns1:scenario0 ;
+    ns1:hasAction ns1:action0 ;
+    ns1:hasActor ns1:actor0 ;
+    ns1:hasResource ns1:resource0 ;
+    ns1:requiredBy ns1:episode1 .
+
+ns1:episode1 a ns1:Episode ;
+    rdfs:label """\r
+the farmer determines that the tomato ripened""" ;
+    ns1:dependsOn ns1:episode0 ;
+    ns1:hasActor ns1:actor0 ;
+    ns1:requiredBy ns1:episode2 .
+
+ns1:episode2 a ns1:Episode ;
+    rdfs:label """\r
+the farmer decides to harvest the ripe tomato""" ;
+    ns1:dependsOn ns1:episode1 ;
+    ns1:hasAction ns1:action1 ;
+    ns1:hasActor ns1:actor0 ;
+    ns1:hasResource ns1:resource3 ;
+    ns1:requiredBy ns1:episode3 .
+
+ns1:episode3 a ns1:Episode ;
+    rdfs:label """\r
+the laborer takes the tomato from the tomato plant""" ;
+    ns1:dependsOn ns1:episode2 ;
+    ns1:hasActor ns1:actor1 ;
+    ns1:hasResource ns1:resource1 ;
+    ns1:requiredBy ns1:episode4 .
+
+ns1:episode4 a ns1:Episode ;
+    rdfs:label """\r
+the laborer places the tomato in the crate""" ;
+    ns1:dependsOn ns1:episode3 ;
+    ns1:hasActor ns1:actor1 ;
+    ns1:hasResource ns1:resource1 ;
+    ns1:requiredBy ns1:episode5 .
+
+ns1:resource1 a ns1:Resource ;
+    rdfs:label "tomato" ;
+    = <http://www.wikidata.org/entity/Q23501> ;
+    ns2:description "type of plant species with edible, often red, berry fruit" .
+
+ns1:actor0 a ns1:Actor ;
+    rdfs:label "farmer" ;
+    = <http://www.wikidata.org/entity/Q131512> ;
+    ns2:description "person who works in agriculture" .
 

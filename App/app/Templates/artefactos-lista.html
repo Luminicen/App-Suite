@@ -62,12 +62,14 @@
   <h3>You don't have Artifacts</h3>
   {% endif %}
   <br> 
-  <form method="post">
+
+    <form method="post">
     <div class="d-flex d-inline-block">
     {% csrf_token %}
     {{ form.as_table }}
     <button class="btn btn-primary mt-2" type="submit">Create</button>
   </div>
+
   
 </form>
 {% else %}
