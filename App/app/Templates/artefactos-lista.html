@@ -40,9 +40,9 @@
         <td>{{p.tipoDeArtefacto}}</td>
         <td>
           {% if "ProjectFile" != p.tipoDeArtefacto.tipo %}
-          <a href="{% url 'modificarArtefactos' p.id idP%}">Modify</a> |
+          <a href="{% url 'modificarArtefactos' p.id idP%}">Modify</a> 
           {% endif %}
-          <a href="{% url 'destruirArtefactos' p.id idP%}">Delete</a>
+          <!-- | <a href="{% url 'destruirArtefactos' p.id idP%}">Delete</a> -->
           {% if "ProjectFile" == p.tipoDeArtefacto.tipo %}
           | <a href="{% url 'verArtefactos' p.id%}">Ver</a>
           {% endif %}
@@ -62,14 +62,14 @@
   <h3>You don't have Artifacts</h3>
   {% endif %}
   <br> 
-
+<!--
     <form method="post">
     <div class="d-flex d-inline-block">
     {% csrf_token %}
     {{ form.as_table }}
     <button class="btn btn-primary mt-2" type="submit">Create</button>
   </div>
-
+-->
   
 </form>
 {% else %}

@@ -23,7 +23,7 @@
       <tr>
         <th scope="row">{{ forloop.counter }}</th>
         <td>{{p.titulo}}</td>
-        <td><a href="{% url 'destruirProyecto' p.id%}">Delete</a> | <a href="{% url 'modificarProyecto' p.id%}">Modify project data</a> | <a href="{% url 'artefactos' p.id%}">Project's artifacts list</a></td>
+        <td><!-- <a href="{% url 'destruirProyecto' p.id%}">Delete</a> | <a href="{% url 'modificarProyecto' p.id%}">Modify project data</a> |--> <a href="{% url 'artefactos' p.id%}">Project's artifacts list</a></td>
       </tr>
       {% endfor %}
       
@@ -33,7 +33,9 @@
   {% else %}
   <h3>You don't have projects</h3>
   {% endif %}
+  <!--
   <p><a class="btn btn-primary" href="{% url 'crearProyecto' %}">Create Project</a></p>
+  -->
   <br>
   <h2>Projects I participate in</h2>
   <table class="table">
