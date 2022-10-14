@@ -41,12 +41,8 @@ def eliminarConcurrencia(user):
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
-#para la expo:
-#expoCiencia pass expo1234
 def proyectos(request):
     #obtengo todos los proyectos y filtro por los que son mios
-    user = authenticate(request, username="expoCiencia", password="expo1234")
-    login(request, user)
     proyectos=Proyecto.objects.all()
     mio=[]
     ok=False
@@ -96,8 +92,7 @@ def modificarProyecto(request,id):
             infForma=formulario.cleaned_data
             proyecto.titulo=infForma['titulo']
             proyecto.participantes.set(infForma['participantes'])
-            #desactivar para la expo
-            #proyecto.save()   
+            proyecto.save()   
             return redirect(reverse('proyectos')) 
     else:
         datosAModificar={'titulo': proyecto.titulo,'owner':proyecto.owner,'participantes':proyecto.participantes.all()}
@@ -232,8 +227,7 @@ def modificarArtefacto(request,id,idP):
             if puedeEscribirEnBd(request.user,id):
                 concu=Concurrencia.objects.get(nombre=request.user.username)
                 concu.delete()
-                #desactivar para expo
-                #artefacto.save()
+                artefacto.save()
                 return redirect(reverse('artefactos',kwargs={'id':idP}))
             else:
                 no_escribir=True
@@ -426,7 +420,7 @@ def listaBotones():
     botones.append(Boton("To UML","uml"))
     botones.append(Boton("Convert to ScenarioKeyWords","cskw"))
     botones.append(Boton("Export Scenario with keywords to txt file","exportSKW"))
-    #botones.append(Boton("Validate knowledge graph","shacl4j"))
+    botones.append(Boton("Validate knowledge graph","shacl4j"))
     return botones
     
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):

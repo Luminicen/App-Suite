@@ -21,7 +21,7 @@ from suite.utils import obtenerTemplate
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
-    #path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('', TemplateView.as_view(template_name='home.html'), name='home'),
     path('proyectos/',proyectos,name="proyectos"),
     path('proyectos/crear/',crearProyecto,name='crearProyecto'),
     path('proyectos/eliminar/<str:id>',eliminarProyecto,name="destruirProyecto"),
@@ -34,5 +34,4 @@ urlpatterns = [
     path('proyectos/artefactos/crearKg/<str:idP>/',crearArtefactoKG,name="crearKG"),
     path('proyectos/artefactos/crearUML/<str:idP>/',crearArtefactoUML,name="crearUML"),
     path('template',obtenerTemplate,name="obtenerTemplate"),
-    path('', proyectos, name='home'),
     ]
