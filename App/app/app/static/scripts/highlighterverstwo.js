@@ -81,9 +81,10 @@ export default class CampoV2{
                 let index = 1
                 menu.addSeparator(index = 1)
                 let p=1
+                let palabra=response.data[inicio]["marcar"]
                 while(response.data[inicio]["OP"+p]!= undefined){
                     let reemplazo=response.data[inicio]["OP"+p][1]
-                    menu.addItem( response.data[inicio]["OP"+p][0]+" "+response.data[inicio]["OP"+p][1],console.log("HOLA") )
+                    menu.addItem( response.data[inicio]["OP"+p][0]+" "+response.data[inicio]["OP"+p][1],()=>{this.reemplazarPalabra(palabra,reemplazo)} )
                     p=p+1
                 }
                 this.arrContextualMenu.push(menu)
@@ -149,6 +150,14 @@ export default class CampoV2{
         cerrarMenues(long){
             let q=0 
             while(q<=long){this.arrContextualMenu[q].closeMenu();q= q + 1}
+        }
+        reemplazarPalabra(palabra,reemplazo){
+            let campo = document.getElementById(this.id_campo)
+            let texto = campo.value
+            let textoReemplazado
+            textoReemplazado=texto.replace(palabra,reemplazo)
+            campo.value=textoReemplazado
+            $('#'+this.id_campo).highlightWithinTextarea('update');
         }
 
     //fin de clase
