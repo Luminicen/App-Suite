@@ -1,4 +1,4 @@
-import Campo from './reglasChequeoClasses.js';
+import CampoV2 from './highlighterverstwo.js';
 import Adv from './alertasDeReglas.js';
 //para volver a activar el highlighter, descomentar cam
 document.addEventListener('DOMContentLoaded', function () {
@@ -10,10 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
     var delta=0
     let i = 0
     while(i<fields.length){
-        //cam.push(new Campo(fields[i],delta,tipo,fields))
+        cam.push(new CampoV2(fields[i],delta,tipo,fields))
         adv.push(new Adv(fields[i],tipo))
         delta= delta + 100
-        //cam[i].pedirDatos()
+        cam[i].pedirDatos()
         adv[i].ejecutar()
         i = i+1
     }
@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function actualizar(cam,len,adv){
     let i=0
     while(i<len){
-        //cam[i].pedirDatosActualizar()
+        //cam[i].actualizar()
         adv[i].ejecutarLimpieza()
         i= i+1
         //console.log(i)

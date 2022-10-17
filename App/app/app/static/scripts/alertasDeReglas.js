@@ -40,7 +40,7 @@ devolverLineasAfectadas(res){
     return desc
 }
 ejecutar(){
-console.log("Si recibo algo de la api muestro el mensaje caso contrario no hago nada")
+
 
 axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/one_verb', 
 {
@@ -49,8 +49,7 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/on
 ).then(
 
 res=>{ 
-    console.log("Advertenciaa: One Verb")
-    console.log(res.data)
+
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         
@@ -69,8 +68,7 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/nu
 ).then(
 
 res=>{ 
-    console.log("Advertencia: Null Subject")
-    console.log(res.data)
+
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         
@@ -90,8 +88,7 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/ad
 ).then(
 
 res=>{ 
-    console.log("Advertencia: adjetives and adverbs")
-    console.log(res.data)
+
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         
@@ -112,8 +109,7 @@ axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/pa
 ).then(
 
 res=>{ 
-    console.log("Advertencia: Passive Voice")
-    console.log(res.data)
+
     const element = document.getElementById("advertencias");
     if (res.data.length !=0){
         
@@ -130,7 +126,7 @@ res=>{
 }
 ejecutarLimpieza(){
     const element = document.getElementById("advertencias");
-    console.log("LIMPIEZA")
+
     while(element.firstChild){
         element.removeChild(element.firstChild)
     }
