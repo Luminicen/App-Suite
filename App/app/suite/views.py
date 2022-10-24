@@ -212,6 +212,9 @@ def crearArtefactos(request,idP,idT):
 
 @cache_control(no_cache=True, must_revalidate=True)
 def modificarArtefacto(request,id,idP):
+    proyecto = Proyecto.objects.get(id=idP)
+    if not tienePermiso(request.user,proyecto):
+        return render(request,'ERRORES/403.html',{})
     artefacto= Artefacto.objects.get(id=id)
     texto=json.loads(artefacto.texto)
     no_escribir=False

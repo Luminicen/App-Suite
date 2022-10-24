@@ -8,7 +8,7 @@ export default class AlertasDeReglas{
 ejecutar(){
 
 
-axios.post('http://127.0.0.1:5000/api', 
+axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/api', 
 {
     data:document.getElementById(this.campo).value,
 }

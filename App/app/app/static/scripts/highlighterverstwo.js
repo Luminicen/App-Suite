@@ -23,7 +23,7 @@ export default class CampoV2{
         res=>{
             let aux
             aux=res.data
-            console.log(res);
+            //console.log(res);
             aux=res.data
             this.highlighterConfigurar(aux)
             this.menuContextualConfigurar(aux)
@@ -59,7 +59,7 @@ export default class CampoV2{
             })  
             largoD = largoD + 1
         }
-        console.log(this.arr)
+        //console.log(this.arr)
           $('#'+this.id_campo).highlightWithinTextarea({
             highlight: this.arr
           });
@@ -92,7 +92,7 @@ export default class CampoV2{
                 //catch{console.log("ERROR")}
                 inicio = inicio +1
             }
-            console.log(this.boundaries)
+            //console.log(this.boundaries)
             document.addEventListener('scroll', this.actualizarBoundaries);
             const areaX = document.getElementById(this.id_campo)
             areaX.addEventListener('keydown',(e) => {
@@ -133,16 +133,16 @@ export default class CampoV2{
               console.log('On top of "one"!');
               //this.clickActual=[x,y]
               //this.teVasAEnterarX2(this.long)
-              console.log(x,y)
+              //console.log(x,y)
               this.arrContextualMenu[posicionArreglo].openMenu(x + window.scrollX,y + window.scrollY)
               return true
             }
             else {
               
               this.arrContextualMenu[posicionArreglo].closeMenu()
-              console.log("FALLO")
-              console.log(x,y)
-              console.log(arrbonds[posicionArreglo])
+              //console.log("FALLO")
+              //console.log(x,y)
+              //console.log(arrbonds[posicionArreglo])
               return false
             }
               
