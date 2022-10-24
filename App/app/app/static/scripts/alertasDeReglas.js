@@ -40,7 +40,7 @@ res=>{
         
         
         let para = document.createElement("h5");
-        let node = document.createTextNode("There is a sentence with passive voice "+this.campo.slice(3,-1)+" in line/s "+obtenerOraciones("has_passive_voice",res));
+        let node = document.createTextNode("There is a sentence with passive voice "+this.campo.slice(3,-1)+" in the sentence/s "+obtenerOraciones("has_passive_voice",res));
         para.appendChild(node);
         element.appendChild(para);
     }

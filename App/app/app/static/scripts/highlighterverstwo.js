@@ -11,7 +11,7 @@ export default class CampoV2{
         this.arrContextualMenu=[]
     }
     pedirDatos(){
-        axios.post('http://127.0.0.1:5000/dict', 
+        axios.post('http://apirequesem-requirements-healer.okd.lifia.info.unlp.edu.ar/dict', 
     {   
         //Datos que le mando a la api para procesamiento
         data:document.getElementById(this.id_campo).value,
