@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: rh
+  name: rh
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: rh
+  serviceName: rh
+  template:
+    metadata:      
+      labels:
+        app: rh
+    spec:
+      containers:
+        - name: rh
+          image: 'luminicen/app:lastest'
+          imagePullPolicy: Always          
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /app/backup
+              name: rh
+  volumeClaimTemplates:
+    - metadata:        
+        name: rh
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
