@@ -1,9 +1,9 @@
-apiVersion: batch/v1
+apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: rh-cronjob
 spec:
-  schedule: "* 6 * * *"
+  schedule: "0 */6 * * *"
   jobTemplate:
     spec:
       template:
@@ -13,5 +13,5 @@ spec:
             image: luminicen/app:lastest
             imagePullPolicy: IfNotPresent
             command:
-            - python3 manage.py dumpdata bd --format=json --indent=4 > backup/bd.json
+            - python3 manage.py dumpdata --format=json --indent=4 > backup/bd.json
           restartPolicy: OnFailure
