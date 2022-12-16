@@ -29,3 +29,16 @@ App/app/mysql-data/\#innodb_redo/\#ib_redo10_tmp
 
 *.idea
 *.pyc
+App/app/Modelo_entrenado/config.cfg
+App/app/Modelo_entrenado/meta.json
+App/app/Modelo_entrenado/ner/cfg
+App/app/Modelo_entrenado/ner/model
+App/app/Modelo_entrenado/ner/moves
+App/app/Modelo_entrenado/tok2vec/cfg
+App/app/Modelo_entrenado/tok2vec/model
+App/app/Modelo_entrenado/tokenizer
+App/app/Modelo_entrenado/vocab/key2row
+App/app/Modelo_entrenado/vocab/lookups.bin
+App/app/Modelo_entrenado/vocab/strings.json
+App/app/Modelo_entrenado/vocab/vectors
+App/app/Modelo_entrenado/vocab/vectors.cfg

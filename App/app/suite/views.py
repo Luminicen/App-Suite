@@ -1,7 +1,7 @@
 from io import StringIO
 import mimetypes
 import os
-import webbrowser
+import re
 from cgitb import text
 from MySQLdb import IntegrityError
 from django.http import HttpResponse, JsonResponse
@@ -19,7 +19,9 @@ import requests
 from spacy.matcher import Matcher
 from django.views.decorators.cache import cache_control
 nlp = spacy.load("es_dep_news_trf")
-from django.contrib.auth import authenticate, login
+#from django.contrib.auth import authenticate, login
+from rest_framework import viewsets
+from suite.serializers import ArtefactoSerializer
 # Create your views here.
 ############################### Permisos ##########################################
 # Codigos de los permisos
@@ -892,4 +894,52 @@ class ExportarEscenariosKeyWordsATxt:
             #response['Content-Disposition'] = 'attachment; filename="keyWordsDeLosEscenarios.txt"'
             #response.write('Hello')
             return "OK"
-        
+##########################################################################################################
+#
+# IA - EXPERIMENTAL
+#
+#~#######################################################################################################
+def pantallaDePruebas(request):
+    if request.method == "POST":
+        formulario = Entidades(request.POST)
+        if formulario.is_valid():
+            texto = formulario.cleaned_data["texto"]
+            ner = spacy.load("es_core_news_lg")
+            ner_custom = spacy.load("Modelo_entrenado")
+            request.session["textoAI"] = texto
+            doc = ner_custom(texto)
+            doc2 = ner (texto)
+            lista = set(doc.ents).union(set(doc2.ents))
+            listado = []
+            for i in lista:
+                listado.append(str(i))
+    elif request.method == "GET":
+        prediccionesErroneas(request)
+        formulario = Entidades()
+        listado = []
+    else:
+        listado = []
+        formulario = Entidades()
+    return render(request,'IA/pantallaTexto.html',{"form" : formulario,"tipo":listado, "marcados" : listado})
+
+def prediccionesErroneas(request):
+    if 'textoAI' in request.session:
+        texto = request.session['textoAI']
+        lista = []
+        if 'seleccionados' in request.GET:
+            lista = request.GET.getlist('seleccionados')
+            print(lista)
+        for i in lista:
+            match = (re.search(i, texto))
+            print(i, match.start(), match.end())
+    #{"content":"El Ing. Agrónomo elige las semillas de tomate","entities":[[27,45,"Recurso",1,"rgb(15, 119, 46)"],[3,16,"Actor",0,"rgb(252, 2, 250)"]]}
+
+##########################################################################################################
+#
+# API TEST
+#0
+#~#######################################################################################################
+
+class ArtefactosViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Artefacto.objects.all()
+    serializer_class = ArtefactoSerializer

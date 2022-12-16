@@ -18,6 +18,9 @@ from django.urls import path, include
 from django.views.generic.base import TemplateView # new
 from suite.views import *
 from suite.utils import obtenerTemplate
+from rest_framework.routers import DefaultRouter
+router = DefaultRouter()
+router.register(r'artefactitos', ArtefactosViewSet,basename="artefactitos")
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
@@ -34,4 +37,6 @@ urlpatterns = [
     path('proyectos/artefactos/crearKg/<str:idP>/',crearArtefactoKG,name="crearKG"),
     path('proyectos/artefactos/crearUML/<str:idP>/',crearArtefactoUML,name="crearUML"),
     path('template',obtenerTemplate,name="obtenerTemplate"),
+    path('', include(router.urls)),
+    path('pruebaIA/',pantallaDePruebas,name="IA"),
     ]

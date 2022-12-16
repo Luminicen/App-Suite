@@ -47,6 +47,8 @@ class Busqueda(forms.Form):
     except:
         choices=[]
     buscar=forms.ChoiceField(choices=choices,initial="None",label="Filter")
+class Entidades(forms.Form):
+    texto=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="Text")
 #############################################################################
 #
 #Formularios Personalizados

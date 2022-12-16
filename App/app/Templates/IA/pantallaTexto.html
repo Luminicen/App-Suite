@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Detector de Entidades{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+{{ tipo | json_script:"tipo" }}
+
+<table class="tableA">
+    <tbody>
+
+      <tr>
+        <td class="align-top">
+
+            <form method="post">
+                <div>
+                    {% csrf_token %}
+                    {{ form | crispy }}
+                </div>
+                <button class="btn btn-primary mt-2" type="submit">Save</button>
+            </form>
+        
+        </td>
+        <td>
+
+          <form method="get">
+            <table class="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Palabra Marcada</th>
+                    <th scope="col">Esta mal marcado</th>
+                    <th scope="col"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for p in marcados %}
+                  <tr>
+                    <th scope="row">{{ forloop.counter }}</th>
+                    <td>{{p}}</td>
+                    <td>
+                     <p><input type="checkbox" id="{{p}}" value="{{p}}" name="seleccionados"></p>
+                    </td>
+
+                  </tr>
+                  {% endfor %}
+                  
+                  
+                </tbody>
+              </table>
+
+
+
+
+        </td>
+        <td class="align-top">
+          <button class="btn btn-primary mt-2 "  href="#" type="submit">Enviar</button>
+        </td>
+      </form>
+      </tr>
+      <tr>
+        
+      </tr>
+      
+    </tbody>
+  </table>
+  
+
+
+{% else %}
+<div style="background-color:#1F1D4F; height: 100vh">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center fondoFlores py-5"> 
+      <div class="col-md-8 col-lg-6 col-xl-4 shadow-lg p-5 my-5 bg-white rounded ">
+        <div class="loginform">
+          <div class="d-flex justify-content-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Padlock-lightblue.svg" alt="...">
+          </div>
+          <p>You are not logged in</p>
+          <a class="btn btn-primary form-control" href="{% url 'login' %}">Log In</a>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+{% endif %}
+{% load static %}
+<script type="module" src="{% static 'scripts/marcarEntidades.js' %}"></script>
+{% endblock %}
+
