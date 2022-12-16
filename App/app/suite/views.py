@@ -923,15 +923,24 @@ def pantallaDePruebas(request):
     return render(request,'IA/pantallaTexto.html',{"form" : formulario,"tipo":listado, "marcados" : listado})
 
 def prediccionesErroneas(request):
+    errores=[]
     if 'textoAI' in request.session:
         texto = request.session['textoAI']
         lista = []
         if 'seleccionados' in request.GET:
             lista = request.GET.getlist('seleccionados')
             print(lista)
+            entidades = {
+                "content" : texto,
+                "entities" : []
+            }
         for i in lista:
             match = (re.search(i, texto))
             print(i, match.start(), match.end())
+            entidades["entities"].append([match.start(),match.end(),"Actor"])
+            entidades["entities"].append([match.start(),match.end(),"Recurso"])
+        print(entidades)
+            
     #{"content":"El Ing. Agrónomo elige las semillas de tomate","entities":[[27,45,"Recurso",1,"rgb(15, 119, 46)"],[3,16,"Actor",0,"rgb(252, 2, 250)"]]}
 
 ##########################################################################################################
