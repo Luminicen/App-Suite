@@ -921,6 +921,52 @@ def pantallaDePruebas(request):
         listado = []
         formulario = Entidades()
     return render(request,'IA/pantallaTexto.html',{"form" : formulario,"tipo":listado, "marcados" : listado})
+def extraerErrores(texto,inicio,fin,error):
+    from spacy.tokens import Span
+    from spacy.tokens import DocBin
+    pos = 0
+    poscionPunto = 0
+    noEncontrePuntoAnteriorAlError = True
+    for i in texto:
+        if pos == inicio:
+            noEncontrePuntoAnteriorAlError = False
+            break
+        elif i == "." and noEncontrePuntoAnteriorAlError:
+            poscionPunto = pos
+        pos += 1
+    oracion = ""
+    pos = 0
+    OracionEncontrada = False
+    for i in texto:
+        if pos == poscionPunto:
+            #print("ENCONTRO PUNTO")
+            OracionEncontrada = True
+        if (OracionEncontrada and i != "."):
+            oracion = oracion + i
+        elif (OracionEncontrada and i == "." and pos != poscionPunto):
+            #print("SALIO")
+            break
+        pos +=1
+    nlp = spacy.load("Modelo_entrenado")
+    doc = nlp(oracion)
+    doc.spans
+    error_inicio=-1
+    error_final=-1
+    for i in doc.ents:
+        if i.text == error:
+            #print(i.start,i.end)
+            error_inicio=i.start
+            error_final=i.end
+    #../ConfigTraining/Datos/trainPlantas.spacy
+    dbbin = DocBin().from_disk("app/ConfigTraining/Datos/trainPlantas.spacy")
+    doc.spans["incorrect_spans"] = [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
+    dbbin.add(doc)
+    dbbin.to_disk("app/ConfigTraining/Datos/trainPlantas.spacy")
+    entidades = {
+        "content" : oracion,
+        "incorrect_spans" : [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
+    }
+    return entidades
 
 def prediccionesErroneas(request):
     errores=[]
@@ -935,11 +981,17 @@ def prediccionesErroneas(request):
                 "entities" : []
             }
         for i in lista:
+            #nesesito posicion del token
             match = (re.search(i, texto))
             print(i, match.start(), match.end())
-            entidades["entities"].append([match.start(),match.end(),"Actor"])
-            entidades["entities"].append([match.start(),match.end(),"Recurso"])
-        print(entidades)
+            ent=extraerErrores(texto,match.start(),match.end(),i)
+            errores.append(ent)
+        import subprocess
+        from app.settings import BASE_DIR
+        #python -m spacy init fill-config base_config.cfg config
+        #subprocess.run(["python","-m","spacy", "init","fill-config",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','base_config.cfg') ,os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg') ])
+        #python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy
+        subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy'),'--paths.dev',os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy')])
             
     #{"content":"El Ing. Agrónomo elige las semillas de tomate","entities":[[27,45,"Recurso",1,"rgb(15, 119, 46)"],[3,16,"Actor",0,"rgb(252, 2, 250)"]]}
 
