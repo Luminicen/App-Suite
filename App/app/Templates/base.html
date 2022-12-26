@@ -42,6 +42,7 @@
                 {% if request.user.is_staff %}
                 <li><a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a></li>
                 {% endif %}
+                <li><a class="dropdown-item" href="{% url 'IAIndex' %}">IA (experimental)</a></li>
                 <li><a class="dropdown-item" href="{% url 'logout' %}">Log off</a></li>
               </ul>
             </div>

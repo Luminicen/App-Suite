@@ -38,6 +38,8 @@ urlpatterns = [
     path('proyectos/artefactos/crearUML/<str:idP>/',crearArtefactoUML,name="crearUML"),
     path('template',obtenerTemplate,name="obtenerTemplate"),
     path('', include(router.urls)),
-    path('pruebaIA/',pantallaDePruebas,name="IA"),
+    path('pruebaIA/probar/',pantallaDePruebas,name="IA"),
     path('pruebaIA/taggeo/',pantallaDeTaggeo,name="IATag"),
+    path('pruebaIA/training/',pantallaTraining,name="IATrain"),
+    path('pruebaIA/',pantallaDeIA,name="IAIndex"),
     ]

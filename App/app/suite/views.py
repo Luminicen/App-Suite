@@ -1013,6 +1013,38 @@ def pantallaDeTaggeo(request):
     else:
         formulario = Entidades()
     return render(request,'IA/pantallaDeTaggeo.html',{"form" : formulario})
+def prepararData():
+    from app.settings import BASE_DIR
+    from spacy.tokens import DocBin
+    #import json
+    archivo = open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'), encoding='utf-8').read()
+    TRAIN_DATA  = json.loads(archivo)
+#print(TRAIN_DATA)
+#FALTA DATOS INNCORRECTOS
+    nlp = spacy.load("Modelo_entrenado")
+    db = DocBin()
+    i=1
+    for text, annotations in TRAIN_DATA:
+        doc = nlp(text)
+        ents = []
+        i+=1
+        for start, end, label in annotations:
+            span = doc.char_span(start, end, label=label)
+            if span == None:
+                print(text)
+            print(span,i)
+            ents.append(span)
+        doc.ents = ents
+        db.add(doc)
+    db.to_disk("./trainUser.spacy")
+def pantallaTraining(request):
+    import subprocess
+    from app.settings import BASE_DIR
+    prepararData()
+    subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainUser.spacy'),'--paths.dev',os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy')])
+    return render(request,'IA/consolaTraining.html',{"ok":False})
+def pantallaDeIA(request):
+    return render(request,'IA/pantallaDeTraining.html',{})
 ##########################################################################################################
 #
 # API TEST
