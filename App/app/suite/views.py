@@ -994,7 +994,25 @@ def prediccionesErroneas(request):
         subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy'),'--paths.dev',os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy')])
             
     #{"content":"El Ing. Agrónomo elige las semillas de tomate","entities":[[27,45,"Recurso",1,"rgb(15, 119, 46)"],[3,16,"Actor",0,"rgb(252, 2, 250)"]]}
+def pantallaDeTaggeo(request):
+    if request.method == "POST":
+        formulario = Entidades(request.POST)
+        if formulario.is_valid():
+            print(formulario.cleaned_data["texto"])
+            from app.settings import BASE_DIR
+            f = open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'r', encoding = 'utf-8')
+            archivo = f.read()
+            f.close()
+            archivoDesj=json.loads(archivo)
+            archivoDesj.append(json.loads(formulario.cleaned_data["texto"]))
+            print(archivoDesj)
+            with open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'w',encoding = 'utf-8') as f:
+                f.write(json.dumps(archivoDesj))
 
+        formulario = Entidades()
+    else:
+        formulario = Entidades()
+    return render(request,'IA/pantallaDeTaggeo.html',{"form" : formulario})
 ##########################################################################################################
 #
 # API TEST

@@ -39,4 +39,5 @@ urlpatterns = [
     path('template',obtenerTemplate,name="obtenerTemplate"),
     path('', include(router.urls)),
     path('pruebaIA/',pantallaDePruebas,name="IA"),
+    path('pruebaIA/taggeo/',pantallaDeTaggeo,name="IATag"),
     ]
