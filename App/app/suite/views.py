@@ -1021,7 +1021,7 @@ def prepararData():
     TRAIN_DATA  = json.loads(archivo)
 #print(TRAIN_DATA)
 #FALTA DATOS INNCORRECTOS
-    nlp = spacy.load("Modelo_entrenado")
+    nlp = spacy.load(os.path.join(os.path.dirname(BASE_DIR), 'app', 'suite','Modelo_entrenado'))
     db = DocBin()
     i=1
     for text, annotations in TRAIN_DATA:
