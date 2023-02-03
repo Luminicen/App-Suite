@@ -900,20 +900,21 @@ class ExportarEscenariosKeyWordsATxt:
 #
 #~#######################################################################################################
 def pantallaDePruebas(request):
+    listado = request.GET.getlist('seleccionados')
     if request.method == "POST":
         formulario = Entidades(request.POST)
         if formulario.is_valid():
             texto = formulario.cleaned_data["texto"]
             ner = spacy.load("es_core_news_lg")
-            ner_custom = spacy.load("Modelo_entrenado")
+            ner_custom = spacy.load("output/model-best")
             request.session["textoAI"] = texto
             doc = ner_custom(texto)
             doc2 = ner (texto)
-            lista = set(doc.ents).union(set(doc2.ents))
+            lista = set(doc.ents)#.union(set(doc2.ents))
             listado = []
             for i in lista:
                 listado.append(str(i))
-    elif request.method == "GET":
+    elif (request.method == "GET") and listado:
         prediccionesErroneas(request)
         formulario = Entidades()
         listado = []
@@ -947,7 +948,7 @@ def extraerErrores(texto,inicio,fin,error):
             #print("SALIO")
             break
         pos +=1
-    nlp = spacy.load("Modelo_entrenado")
+    nlp = spacy.load("output/model-best")
     doc = nlp(oracion)
     doc.spans
     error_inicio=-1
@@ -958,10 +959,10 @@ def extraerErrores(texto,inicio,fin,error):
             error_inicio=i.start
             error_final=i.end
     #../ConfigTraining/Datos/trainPlantas.spacy
-    dbbin = DocBin().from_disk("app/ConfigTraining/Datos/trainPlantas.spacy")
+    dbbin = DocBin().from_disk("app/ConfigTraining/Datos/trainUser.spacy")
     doc.spans["incorrect_spans"] = [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
     dbbin.add(doc)
-    dbbin.to_disk("app/ConfigTraining/Datos/trainPlantas.spacy")
+    dbbin.to_disk("app/ConfigTraining/Datos/trainUser.spacy")
     entidades = {
         "content" : oracion,
         "incorrect_spans" : [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
@@ -991,7 +992,7 @@ def prediccionesErroneas(request):
         #python -m spacy init fill-config base_config.cfg config
         #subprocess.run(["python","-m","spacy", "init","fill-config",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','base_config.cfg') ,os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg') ])
         #python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy
-        subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy'),'--paths.dev',os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy')])
+        subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainUser.spacy'),'--paths.dev',os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy')])
             
     #{"content":"El Ing. Agrónomo elige las semillas de tomate","entities":[[27,45,"Recurso",1,"rgb(15, 119, 46)"],[3,16,"Actor",0,"rgb(252, 2, 250)"]]}
 def pantallaDeTaggeo(request):
@@ -1021,7 +1022,7 @@ def prepararData():
     TRAIN_DATA  = json.loads(archivo)
 #print(TRAIN_DATA)
 #FALTA DATOS INNCORRECTOS
-    nlp = spacy.load(os.path.join(os.path.dirname(BASE_DIR), 'app', 'suite','Modelo_entrenado'))
+    nlp = spacy.load(os.path.join(os.path.dirname(BASE_DIR), 'app', 'output/model-best'))
     db = DocBin()
     i=1
     for text, annotations in TRAIN_DATA:
@@ -1036,7 +1037,7 @@ def prepararData():
             ents.append(span)
         doc.ents = ents
         db.add(doc)
-    db.to_disk("./trainUser.spacy")
+    db.to_disk("app/ConfigTraining/Datos/trainUser.spacy")
 def pantallaTraining(request):
     import subprocess
     from app.settings import BASE_DIR
