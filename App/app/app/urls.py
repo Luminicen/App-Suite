@@ -42,4 +42,5 @@ urlpatterns = [
     path('pruebaIA/taggeo/',pantallaDeTaggeo,name="IATag"),
     path('pruebaIA/training/',pantallaTraining,name="IATrain"),
     path('pruebaIA/',pantallaDeIA,name="IAIndex"),
+    path('pruebaIA/topic',pruebaAlgoritmoTopic,name="IATopic"),
     ]

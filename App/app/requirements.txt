@@ -23,6 +23,7 @@ en-core-web-trf @ https://github.com/explosion/spacy-models/releases/download/en
 filelock==3.7.0
 Flask==2.1.2
 Flask-Cors==3.0.10
+gensim==4.3.0
 huggingface-hub==0.6.0
 idna==3.3
 importlib-metadata==4.12.0
