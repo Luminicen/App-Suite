@@ -1082,11 +1082,7 @@ def format_topics_sentences(ldamodel,corpus):
     sent_topics_df.columns = ['Dominant_Topic', 'Perc_Contribution', 'Topic_Keywords']
     return sent_topics_df
 
-def pruebaAlgoritmoTopic(request) :
-    doc1 = "I am learning NLP, it is very interesting and exciting. it includes machine learning and deep learning"
-    doc2 = "My father is a data scientist and he is nlp expert"
-    doc3 = "My sister has good exposure into android development"
-    doc_complete = [doc1, doc2, doc3]
+def identificarTopicos(doc_complete) :
     stop = set(stopwords.words('english'))
     exclude = set(string.punctuation)
     lemma = WordNetLemmatizer()
@@ -1109,10 +1105,71 @@ def pruebaAlgoritmoTopic(request) :
     #topicos_ordenados = topicos[0][1].sort(key=lambda a: a[1],reverse=True)
     #print(topicos_ordenados)
     result = format_topics_sentences(ldamodel,doc_term_matrix)
-    print(result)
-    print(result['Topic_Keywords'][0])
+    #print(result)
+    #print(result['Topic_Keywords'][0])
+    return result
+def separarEnLineas(texto):
+    arr = []
+    oracion = ""
+    for i in texto:
+        oracion += i
+        if i ==".":
+            arr.append(oracion)
+            oracion = ""
+    return arr
+def preparar_texto(seleccionados):
+    artef = []
+    textos = []
+    for i in seleccionados:
+        artef.append(Artefacto.objects.get(id = i))
+    for i in artef:
+        texto= json.loads(i.texto)
+        textos.append(texto["texto"])
+    arreglo_texto_Oracion = []
+    for i in textos:
+        arreglo_texto_Oracion.append(separarEnLineas(i))
+    #print(arreglo_texto_Oracion)
+    resultados = []
+    for i in arreglo_texto_Oracion:
+        rusul = identificarTopicos(i)
+        resultados.append(rusul)
+    return resultados
+    
+        
 
-    return render(request,'IA/consolaTraining.html',{"ok":False})
+def pruebaAlgoritmoTopic(request) :
+    topicos = False
+    if request.method == "GET":
+        seleccionados = request.GET.getlist('seleccionados')
+        resul = preparar_texto(seleccionados)
+        #print(resul)
+        re_topico = []
+        l = 0
+        for j in resul:
+            re_topico.append((j["Topic_Keywords"][0],seleccionados[l]))
+            l += 1
+        #print(re_topico)
+        topicos = True
+    artefactos = Artefacto.objects.all()
+    usuario=request.user
+    ok = False
+    artefactos_usuario = []
+    for p in artefactos:
+        if p.owner==usuario:
+            u = {
+                "titulo" : p.nombre,
+                 "tipoDeArtefacto": p.tipoDeArtefacto,
+                 "topic" : None,
+                 "id" : p.id
+                }
+            artefactos_usuario.append(p)
+            ok=True
+    if topicos:
+        for i in artefactos_usuario:
+            for j in re_topico:
+                if str(i.id) == str(j[1]):
+                    i.topic = j[0]
+    return render(request,'IA/clasificador.html',{"ok":ok,"artifacts":artefactos_usuario,"topicos":topicos})
 ##########################################################################################################
 #
 # API TEST

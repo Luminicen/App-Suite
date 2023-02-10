@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}IA - CLASIFICADOR{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+{{ tipo | json_script:"tipo" }}
+
+
+
+{% if ok %}
+<form method="get">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Artifact Name</th>
+        <th scope="col">Type</th>
+        {% if topicos %}
+        <th scope="col">Topics</th>
+        {% endif %}
+        <th scope="col">Selected</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in artifacts %}
+      <tr>
+        <th scope="row">{{ forloop.counter }}</th>
+        <td>{{p.nombre}}</td>
+        <td>{{p.tipoDeArtefacto}}</td>
+        {% if topicos %}
+        <td>{{p.topic  }}</td>
+        {% endif %}
+        <td><input type="checkbox" id="{{p.id}}" value="{{p.id}}" name="seleccionados"></td>
+      </tr>
+      {% endfor %}
+      
+    </tbody>
+  </table>
+
+  <button class="btn btn-primary mt-2" name="obtenerTopicos" href="#" type="submit">Obtener Topicos</button>
+
+ </form>
+  </table>
+{% else %}
+<h3>NO INFO</h3>
+{% endif %}
+
+
+
+{% else %}
+<div style="background-color:#1F1D4F; height: 100vh">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center fondoFlores py-5"> 
+      <div class="col-md-8 col-lg-6 col-xl-4 shadow-lg p-5 my-5 bg-white rounded ">
+        <div class="loginform">
+          <div class="d-flex justify-content-center">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Padlock-lightblue.svg" alt="...">
+          </div>
+          <p>You are not logged in</p>
+          <a class="btn btn-primary form-control" href="{% url 'login' %}">Log In</a>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+{% endif %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cargando.scss' %}">
+{% endblock %}
+
