@@ -1223,6 +1223,103 @@ def desambiguacion(request):
     return render(request,'IA/pantallaDeDesambiguar.html',{"form" : formulario,"def":mostrar})
 ##########################################################################################################
 #
+# IA - EXPERIMENTAL - Clustering 
+#
+#~#######################################################################################################
+def tokenize_and_stem(text):
+    import nltk
+    from nltk.stem.snowball import SnowballStemmer
+    stemmer = SnowballStemmer("english")
+    tokens = [word for sent in nltk.sent_tokenize(text) for
+    word in nltk.word_tokenize(sent)]
+    filtered_tokens = []
+    for token in tokens:
+        if re.search('[a-zA-Z]', token):
+            filtered_tokens.append(token)
+    stems = [stemmer.stem(t) for t in filtered_tokens]
+    return stems
+def tokenize_only(text):
+    import nltk
+    tokens = [word.lower() for sent in nltk.sent_tokenize(text)
+    for word in nltk.word_tokenize(sent)]
+    filtered_tokens = []
+    for token in tokens:
+        if re.search('[a-zA-Z]', token):
+            filtered_tokens.append(token)
+    return filtered_tokens
+
+def clustering(request):
+    import numpy as np
+    import pandas as pd
+    import nltk
+    
+    from bs4 import BeautifulSoup
+    import re
+    import os
+    import codecs
+    from sklearn import feature_extraction
+    import mpld3
+    from sklearn.metrics.pairwise import cosine_similarity
+    import os
+    import matplotlib.pyplot as plt
+    import matplotlib as mpl
+    from sklearn.manifold import MDS
+    artefactos = Artefacto.objects.all()
+    textos = []
+    usuario=request.user
+    for i in artefactos:
+        if i.owner == usuario:
+            textos.append(json.loads(i.texto)["texto"])
+    ranks = []
+    for i in range(1, len(textos)+1):
+        ranks.append(i)
+    # Stop Words
+    stopwords = nltk.corpus.stopwords.words('english')
+    # Load 'stemmer'
+    
+    from sklearn.feature_extraction.text import TfidfVectorizer
+# tfidf vectorizer
+    tfidf_vectorizer = TfidfVectorizer(max_df=0.8, max_features=200000,min_df=0.2, stop_words=stopwords,
+    use_idf=True, tokenizer=tokenize_and_stem, ngram_range=(1,3))
+    #fit the vectorizer to data
+    tfidf_matrix = tfidf_vectorizer.fit_transform(textos)
+    terms = tfidf_vectorizer.get_feature_names_out()
+    #print(tfidf_matrix.shape)
+    #Import Kmeans
+    from sklearn.cluster import KMeans
+    # Define number of clusters
+    num_clusters = 3
+    #Running clustering algorithm
+    km = KMeans(n_clusters=num_clusters)
+    km.fit(tfidf_matrix)
+    #final clusters
+    clusters = km.labels_.tolist()
+    complaints_data = { 'rank': ranks, 'complaints': textos,
+    'cluster': clusters }
+    frame = pd.DataFrame(complaints_data, index = [clusters] ,
+    columns = ['rank', 'cluster'])
+    #number of docs per cluster
+    #print(frame['cluster'].value_counts())
+    totalvocab_stemmed = []
+    totalvocab_tokenized = []
+    for i in textos:
+        allwords_stemmed = tokenize_and_stem(i)
+        totalvocab_stemmed.extend(allwords_stemmed)
+        allwords_tokenized = tokenize_only(i)
+        totalvocab_tokenized.extend(allwords_tokenized)
+    vocab_frame = pd.DataFrame({'words': totalvocab_tokenized}, index = totalvocab_stemmed)
+    #sort cluster centers by proximity to centroid
+    order_centroids = km.cluster_centers_.argsort()[:, ::-1]
+    for i in range(num_clusters):
+        print("Cluster %d words:" % i, end='')
+        for ind in order_centroids[i, :6]:
+            print(' %s' % vocab_frame.loc[terms[ind].split(' ')].
+            values.tolist()[0][0].encode('utf-8', 'ignore'), end=',')
+        print('\n')
+    return render(request,'IA/consolaTraining.html',{})
+
+##########################################################################################################
+#
 # API TEST
 #0
 #~#######################################################################################################

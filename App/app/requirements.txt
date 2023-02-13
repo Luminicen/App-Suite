@@ -3,6 +3,7 @@ asgiref==3.5.1
 autocorrect==2.6.1
 backports.zoneinfo==0.2.1
 blis==0.7.7
+bs4==0.0.1
 catalogue==2.0.7
 certifi==2021.10.8
 charset-normalizer==2.0.12
@@ -34,6 +35,7 @@ joblib==1.1.0
 langcodes==3.3.0
 MarkupSafe==2.1.1
 murmurhash==1.0.7
+mpld3==0.5.9
 mysqlclient==2.1.0
 nltk==3.7
 numpy==1.22.3
@@ -60,6 +62,7 @@ spacy-alignments==0.8.5
 spacy-legacy==3.0.9
 spacy-loggers==1.0.2
 spacy-transformers==1.1.5
+scikit-learn==1.2.1
 sqlparse==0.4.2
 srsly==2.4.3
 thinc==8.0.15
