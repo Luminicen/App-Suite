@@ -68,3 +68,4 @@ App/app/output/model-last/vocab/lookups.bin
 App/app/output/model-last/vocab/strings.json
 App/app/output/model-last/vocab/vectors
 App/app/output/model-last/vocab/vectors.cfg
+App/app/Modelo_entrenado/meta.json
