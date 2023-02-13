@@ -47,6 +47,7 @@ pydantic==1.8.2
 pyparsing==3.0.9
 pyspellchecker==0.6.3
 PyYAML==6.0
+pywsd==1.2.5
 rdflib==6.0.0
 regex==2022.4.24
 requests==2.27.1

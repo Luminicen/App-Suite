@@ -1055,7 +1055,7 @@ def pantallaDeIA(request):
     return render(request,'IA/pantallaDeTraining.html',{})
 ##########################################################################################################
 #
-# IA - EXPERIMENTAL - Extracion de informacion - Clasificacion
+# IA - EXPERIMENTAL - TOPICOS - 
 #
 #~#######################################################################################################
 def clean(doc,stop,exclude,lemma):
@@ -1109,6 +1109,7 @@ def identificarTopicos(doc_complete) :
     #print(result['Topic_Keywords'][0])
     return result
 def separarEnLineas(texto):
+    #se usa en desambiguar tb
     arr = []
     oracion = ""
     for i in texto:
@@ -1170,6 +1171,56 @@ def pruebaAlgoritmoTopic(request) :
                 if str(i.id) == str(j[1]):
                     i.topic = j[0]
     return render(request,'IA/clasificador.html',{"ok":ok,"artifacts":artefactos_usuario,"topicos":topicos})
+##########################################################################################################
+#
+# IA - EXPERIMENTAL - Desambiguar 
+#
+#~#######################################################################################################
+def prepararDatosParaDesambiguar(texto):
+    result = separarEnLineas(texto)
+    return result
+def desambiguacion(request):
+    from nltk.corpus import wordnet as wn
+    from nltk.stem import PorterStemmer
+    from itertools import chain
+    from pywsd.lesk import simple_lesk
+    # Sentences
+    #bank_sents = ['I went to the bank to deposit my money',
+    #'The river bank was full of dead fishes']
+    # calling the lesk function and printing results for both the 
+    # sentences
+    #print ("Context-1:", bank_sents[0])
+    #answer = simple_lesk(bank_sents[0],'bank')
+    #print ("Sense:", answer)
+    #print ("Definition : ", answer.definition())
+    #print ("Context-2:", bank_sents[1])
+    #answer = simple_lesk(bank_sents[1],'bank','n')
+    #print ("Sense:", answer)
+    #print ("Definition : ", answer.definition())
+    mostrar=[]
+    if request.method == "POST":
+        formulario = Entidades(request.POST)
+        mostrar = []
+        if formulario.is_valid():
+            data = formulario.cleaned_data["texto"]
+            datos = json.loads(data)
+            oraciones = separarEnLineas(datos[0])
+            seleccion = datos[1]
+            respuesta = []
+            datass={"texto": datos[0]}
+            formulario=Entidades(datass,initial=datass)
+            for i in oraciones:
+                for j in seleccion:
+                    if j in i:
+                        answer = simple_lesk(i,j)
+                        respuesta.append(answer)
+            
+            for i in respuesta:
+                #print(i.definition())
+                mostrar.append(i.definition())
+    else:
+        formulario = Entidades()
+    return render(request,'IA/pantallaDeDesambiguar.html',{"form" : formulario,"def":mostrar})
 ##########################################################################################################
 #
 # API TEST
