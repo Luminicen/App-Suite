@@ -1320,7 +1320,7 @@ def clustering(request):
     return render(request,'IA/consolaTraining.html',{})
 ##########################################################################################################
 #
-# IA - EXPERIMENTAL - Clustering 
+# IA - EXPERIMENTAL - Clasificador 
 #
 #~#######################################################################################################
 def classificador(request):
@@ -1413,6 +1413,54 @@ def classificador(request):
     print(result(labels_test,predicted_lstm.round()))
     
     return render(request,'IA/consolaTraining.html',{})
+##########################################################################################################
+#
+# IA - EXPERIMENTAL - Similaridad
+#0
+#~#######################################################################################################
+def simility(request):
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    respuesta = None
+    if request.method == "GET":
+        seleccionados = request.GET.getlist('seleccionados')
+        #print(seleccionados)
+        if len(seleccionados) > 1:
+            documents = [json.loads(Artefacto.objects.get(id = seleccionados[0]).texto)['texto'],json.loads(Artefacto.objects.get(id = seleccionados[1]).texto)['texto']]
+            #print(documents)
+            tfidf_vectorizer = TfidfVectorizer()
+            tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+            resultados = cosine_similarity(tfidf_matrix[0:1],tfidf_matrix)
+            #print(resultados[0][1])
+            respuesta = "Simility: "+ str(resultados[0][1])
+
+    artefactos = Artefacto.objects.all()
+    usuario=request.user
+    ok = False
+    artefactos_usuario = []
+    for p in artefactos:
+        if p.owner==usuario:
+            u = {
+                "titulo" : p.nombre,
+                 "tipoDeArtefacto": p.tipoDeArtefacto,
+                 "id" : p.id
+                }
+            artefactos_usuario.append(p)
+            ok=True
+    
+    #documents = (
+    #"I like NLP",
+    #"I am exploring NLP",
+    #"I am a beginner in NLP",
+    #"I want to learn NLP",
+    #"I like advanced NLP"
+    #)
+    #tfidf_vectorizer = TfidfVectorizer()
+    #tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+    #print(tfidf_matrix.shape)
+    #resultados = cosine_similarity(tfidf_matrix[0:1],tfidf_matrix)
+    #print(resultados[0])
+    return render(request,'IA/similaridad.html',{"ok":ok,"artifacts":artefactos_usuario,"resp":respuesta})
 
 ##########################################################################################################
 #
