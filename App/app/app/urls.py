@@ -45,4 +45,5 @@ urlpatterns = [
     path('pruebaIA/topic',pruebaAlgoritmoTopic,name="IATopic"),
     path('pruebaIA/desambiguar',desambiguacion,name="IADesambiguar"),
     path('pruebaIA/cluster',clustering,name="IACluster"),
+    path('pruebaIA/clasificador',classificador,name="IAClasificador"),
     ]
