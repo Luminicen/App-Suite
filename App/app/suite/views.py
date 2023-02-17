@@ -1461,7 +1461,30 @@ def simility(request):
     #resultados = cosine_similarity(tfidf_matrix[0:1],tfidf_matrix)
     #print(resultados[0])
     return render(request,'IA/similaridad.html',{"ok":ok,"artifacts":artefactos_usuario,"resp":respuesta})
-
+##########################################################################################################
+#
+# IA - EXPERIMENTAL - Resumen
+#0
+#~#######################################################################################################
+def resumen(request):
+    from sumy.parsers.html import HtmlParser
+    from sumy.parsers.plaintext import PlaintextParser
+    from sumy.nlp.tokenizers import Tokenizer
+    from sumy.summarizers.lsa import LsaSummarizer
+    from sumy.nlp.stemmers import Stemmer
+    from sumy.utils import get_stop_words
+    from sumy.summarizers.luhn import LuhnSummarizer
+    # Extracting and summarizing
+    LANGUAGE = "english"
+    SENTENCES_COUNT = 10
+    url="https://en.wikipedia.org/wiki/Natural_language_processing"
+    parser = HtmlParser.from_url(url, Tokenizer(LANGUAGE))
+    summarizer = LsaSummarizer()
+    summarizer = LsaSummarizer(Stemmer(LANGUAGE))
+    summarizer.stop_words = get_stop_words(LANGUAGE)
+    for sentence in summarizer(parser.document, SENTENCES_COUNT):
+        print(sentence)
+    return render(request,'IA/consolaTraining.html',{})
 ##########################################################################################################
 #
 # API TEST
