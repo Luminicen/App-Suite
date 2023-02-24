@@ -1262,14 +1262,14 @@ def clustering(request):
     import mpld3
     from sklearn.metrics.pairwise import cosine_similarity
     import os
-    import matplotlib.pyplot as plt
-    import matplotlib as mpl
     from sklearn.manifold import MDS
     artefactos = Artefacto.objects.all()
     textos = []
     usuario=request.user
     for i in artefactos:
-        if i.owner == usuario:
+        if i.owner == usuario and i.tipoDeArtefacto.tipo=="textoplano":
+            print("ARTEFACTO")
+            print(i)
             textos.append(json.loads(i.texto)["texto"])
     ranks = []
     for i in range(1, len(textos)+1):
