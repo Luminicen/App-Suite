@@ -1248,7 +1248,6 @@ def tokenize_only(text):
         if re.search('[a-zA-Z]', token):
             filtered_tokens.append(token)
     return filtered_tokens
-
 def clustering(request):
     import numpy as np
     import pandas as pd
@@ -1266,16 +1265,18 @@ def clustering(request):
     artefactos = Artefacto.objects.all()
     textos = []
     usuario=request.user
+    texto_art=[]
     for i in artefactos:
         if i.owner == usuario and i.tipoDeArtefacto.tipo=="textoplano":
-            print("ARTEFACTO")
-            print(i)
+            texto_art.append(i)
             textos.append(json.loads(i.texto)["texto"])
     ranks = []
     for i in range(1, len(textos)+1):
         ranks.append(i)
     # Stop Words
-    stopwords = nltk.corpus.stopwords.words('english')
+    otro = ["'d", "'s", 'abov', 'ani', 'becaus', 'befor', 'could', 'doe', 'dure', 'might', 'must', "n't", 'need', 'onc', 'onli', 'ourselv', 'sha', 'themselv', 'veri', 'whi', 'wo', 'would', 'yourselv','used','also'] 
+    stopwords = nltk.corpus.stopwords.words('english') + otro
+    
     # Load 'stemmer'
     
     from sklearn.feature_extraction.text import TfidfVectorizer
@@ -1289,7 +1290,7 @@ def clustering(request):
     #Import Kmeans
     from sklearn.cluster import KMeans
     # Define number of clusters
-    num_clusters = 3
+    num_clusters = 6
     #Running clustering algorithm
     km = KMeans(n_clusters=num_clusters)
     km.fit(tfidf_matrix)
@@ -1297,7 +1298,7 @@ def clustering(request):
     clusters = km.labels_.tolist()
     complaints_data = { 'rank': ranks, 'complaints': textos,
     'cluster': clusters }
-    frame = pd.DataFrame(complaints_data, index = [clusters] ,
+    frame = pd.DataFrame(complaints_data, index = [clusters,ranks] ,
     columns = ['rank', 'cluster'])
     #number of docs per cluster
     #print(frame['cluster'].value_counts())
@@ -1310,14 +1311,27 @@ def clustering(request):
         totalvocab_tokenized.extend(allwords_tokenized)
     vocab_frame = pd.DataFrame({'words': totalvocab_tokenized}, index = totalvocab_stemmed)
     #sort cluster centers by proximity to centroid
+    clusterEncontrados=""
+    clasificacion = []
     order_centroids = km.cluster_centers_.argsort()[:, ::-1]
     for i in range(num_clusters):
+        clusterEncontrados+= "Cluster "+str(i)+". Clasificado por: "
         print("Cluster %d words:" % i, end='')
         for ind in order_centroids[i, :6]:
             print(' %s' % vocab_frame.loc[terms[ind].split(' ')].
             values.tolist()[0][0].encode('utf-8', 'ignore'), end=',')
+            clusterEncontrados+=str(vocab_frame.loc[terms[ind].split(' ')].values.tolist()[0][0].encode('utf-8', 'ignore'))+", "
         print('\n')
-    return render(request,'IA/consolaTraining.html',{})
+        clasificacion.append(clusterEncontrados)
+        clusterEncontrados = ""
+    #print(frame)
+    artef = []
+    for i in frame.index:
+        artef.append((i[0],texto_art[i[1]-1]))
+    #print(artef)
+    ordenado = sorted(artef, key=lambda a: a[0])
+    #print(ordenado)
+    return render(request,'IA/Clustering.html',{"cluster":clasificacion,"arte":ordenado})
 ##########################################################################################################
 #
 # IA - EXPERIMENTAL - Clasificador 
