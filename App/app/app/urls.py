@@ -48,4 +48,5 @@ urlpatterns = [
     path('pruebaIA/clasificador',classificador,name="IAClasificador"),
     path('pruebaIA/similarity',simility,name="IAsimilitud"),
     path('pruebaIA/resumen',resumen,name="IAResumen"),
+    path('pruebaIA/similarityScenario',compararEscenario,name="IAsimilitudScenario"),
     ]

@@ -1501,6 +1501,69 @@ def resumen(request):
     return render(request,'IA/consolaTraining.html',{})
 ##########################################################################################################
 #
+# Similaridad de escenarios
+#0
+#~#######################################################################################################
+def sinonimos(lista1,lista2):
+    from nltk.corpus import wordnet
+    li1 = lista1.split()
+    li2 = lista2.split()
+    #print("lista del escenario seleccionado ",li1)
+    #print("antes : ",li2)
+    for i in li2:
+        #print(i)
+        for sin in wordnet.synsets(i):
+            #print("-------------PALABERAAA-------------")
+            #print(sin.lemma_names())
+            if sin.lemma_names() in li1:
+                i = sin
+    res= ""
+    #print("despues : ",li2)
+    for i in li2:
+        res= res + i + " "
+    return res
+def scenarioSimilarity(escenario,escenariosDelUsuario):
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    #comparo actores
+    #comparo recursos
+    print(escenario)
+    for i in escenariosDelUsuario:
+        esc_a = json.loads(i.texto)
+        stop = set(stopwords.words('english'))
+        exclude = set(string.punctuation)
+        lemma = WordNetLemmatizer()
+        lista1=clean(escenario['Resources']+" "+escenario['Actors'],stop,exclude,lemma)
+        lista2=clean(esc_a['Resources']+" "+esc_a['Actors'],stop,exclude,lemma)
+        #print(lista1)
+        documents = [lista1,sinonimos(lista1,lista2)]
+        tfidf_vectorizer = TfidfVectorizer()
+        tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+        resultados = cosine_similarity(tfidf_matrix[0:1],tfidf_matrix)
+        print("escenario "+esc_a['nombre'],resultados[0][1])
+    # respuesta = "Simility: "+ str(resultados[0][1])
+def compararEscenario(request):
+    artefactos = Artefacto.objects.all()
+    usuario=request.user
+    #Filtro los escenarios / escenarios con keywords del usuario
+    escenariosDelUsuario=[]
+    for i in artefactos:
+        if i.owner == usuario and (i.tipoDeArtefacto.tipo == "Scenario" or i.tipoDeArtefacto.tipo == "ScenariosWithKeyWord"):
+            escenariosDelUsuario.append(i)
+    if request.method == "GET":
+        seleccionados = request.GET.getlist('seleccionados')
+        print(seleccionados)
+        if len(seleccionados) >= 1:
+            id = seleccionados[0]
+            escenario = Artefacto.objects.get(id = id)
+            scenarioSimilarity(json.loads(escenario.texto),escenariosDelUsuario)
+    if escenariosDelUsuario:
+        ok = True
+    return render(request,'IA/similaridad.html',{"ok":ok,"artifacts":escenariosDelUsuario})
+
+
+##########################################################################################################
+#
 # API TEST
 #0
 #~#######################################################################################################
