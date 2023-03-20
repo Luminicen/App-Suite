@@ -1504,20 +1504,33 @@ def resumen(request):
 # Similaridad de escenarios
 #0
 #~#######################################################################################################
+def algunSinonimoMatchea(listaOriginal,lista):
+    for sin in lista:
+        for word in listaOriginal:
+            if word == sin:
+                #print("Encontro match", sin)
+                return sin
+    return None
 def sinonimos(lista1,lista2):
     from nltk.corpus import wordnet 
     li1 = lista1.split()
     li2 = lista2.split()
     #print("lista del escenario seleccionado ",li1)
-    #print("antes : ",li2)
+    print("antes : ",li2)
     for i in li2:
         for sin in wordnet.synsets(i):
             #print("-------------PALABERAAA-------------")
+            #print(i)
             #print(sin.lemma_names())
-            if sin.lemma_names() in li1:
-                i = sin
+            #aca esta el tema sin.lemma_names() es una lista debo programar algo para identificar!
+            
+            palabrita = algunSinonimoMatchea(li1,sin.lemma_names())
+            #print(palabrita)
+            if palabrita != None:
+                #print(i, " es sinonimo de  ",palabrita)
+                i = palabrita
     res= ""
-    #print("despues : ",li2)
+    print("despues : ",li2)
     for i in li2:
         res= res + i + " "
     return res
@@ -1531,10 +1544,10 @@ def compararEpisodeos(esc_a,esc_b,nlp):
     verbos_b = ''
     for token in doc_a:
         if token.pos_ == "VERB":
-            verbos_a= verbos_a + token.text + " "
+            verbos_a= verbos_a + token.lemma_ + " "
     for token in doc_b:
         if token.pos_ == "VERB":
-            verbos_b= verbos_b + token.text + " "
+            verbos_b= verbos_b + token.lemma_ + " "
     print("LISTA DE VERBOS!")
     print(verbos_a)
     print(verbos_b)
@@ -1561,8 +1574,8 @@ def scenarioSimilarity(escenario,escenariosDelUsuario):
     #comparo recursos
     print(escenario)
     nlp = spacy.load('en_core_web_trf')
-    for i in escenariosDelUsuario:
-        esc_a = json.loads(i.texto)
+    for escUser in escenariosDelUsuario:
+        esc_a = json.loads(escUser.texto)
         stop = set(stopwords.words('english'))
         exclude = set(string.punctuation)
         lemma = WordNetLemmatizer()
