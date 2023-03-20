@@ -1522,9 +1522,23 @@ def sinonimos(lista1,lista2):
     for i in li2:
         res= res + i + " "
     return res
-def scenarioSimilarity(escenario,escenariosDelUsuario):
+def compararRecursosYActores(lista1,lista2):
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.metrics.pairwise import cosine_similarity
+    documents = [lista1,sinonimos(lista1,lista2)]
+    tfidf_vectorizer = TfidfVectorizer()
+    tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+    resultados = cosine_similarity(tfidf_matrix[0:1],tfidf_matrix)
+    return resultados[0][1]
+def compararFields(context1,context2):
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    documents = [context1,context2]
+    tfidf_vectorizer = TfidfVectorizer()
+    tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
+    resultados = cosine_similarity(tfidf_matrix[0:1],tfidf_matrix)
+    return resultados[0][1]
+def scenarioSimilarity(escenario,escenariosDelUsuario):
     #comparo actores
     #comparo recursos
     print(escenario)
@@ -1533,14 +1547,16 @@ def scenarioSimilarity(escenario,escenariosDelUsuario):
         stop = set(stopwords.words('english'))
         exclude = set(string.punctuation)
         lemma = WordNetLemmatizer()
-        lista1=clean(escenario['Resources']+" "+escenario['Actors'],stop,exclude,lemma)
-        lista2=clean(esc_a['Resources']+" "+esc_a['Actors'],stop,exclude,lemma)
+        recursos_actores_esc1=clean(escenario['Resources']+" "+escenario['Actors'],stop,exclude,lemma)
+        recursos_actores_esc2=clean(esc_a['Resources']+" "+esc_a['Actors'],stop,exclude,lemma)
+        goal_esc1 = clean(escenario['Goal'],stop,exclude,lemma)
+        goal_esca = clean(esc_a['Goal'],stop,exclude,lemma)
+        resultados_contexto = compararFields(goal_esc1,goal_esca)
         #print(lista1)
-        documents = [lista1,sinonimos(lista1,lista2)]
-        tfidf_vectorizer = TfidfVectorizer()
-        tfidf_matrix = tfidf_vectorizer.fit_transform(documents)
-        resultados = cosine_similarity(tfidf_matrix[0:1],tfidf_matrix)
-        print("escenario "+esc_a['nombre'],resultados[0][1])
+        resultados_actores_escenarios= compararRecursosYActores(recursos_actores_esc1,recursos_actores_esc2)
+        print("escenario actores y recursos "+esc_a['nombre'],resultados_actores_escenarios)
+        print("escenario objetivo "+esc_a['nombre'],resultados_contexto)
+        print("promedio: ",(resultados_contexto + resultados_actores_escenarios)/2)
     # respuesta = "Simility: "+ str(resultados[0][1])
 def compararEscenario(request):
     artefactos = Artefacto.objects.all()
