@@ -1505,13 +1505,12 @@ def resumen(request):
 #0
 #~#######################################################################################################
 def sinonimos(lista1,lista2):
-    from nltk.corpus import wordnet
+    from nltk.corpus import wordnet 
     li1 = lista1.split()
     li2 = lista2.split()
     #print("lista del escenario seleccionado ",li1)
     #print("antes : ",li2)
     for i in li2:
-        #print(i)
         for sin in wordnet.synsets(i):
             #print("-------------PALABERAAA-------------")
             #print(sin.lemma_names())
@@ -1522,6 +1521,25 @@ def sinonimos(lista1,lista2):
     for i in li2:
         res= res + i + " "
     return res
+def compararEpisodeos(esc_a,esc_b,nlp):
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.metrics.pairwise import cosine_similarity
+    nlp = spacy.load('en_core_web_trf')
+    doc_a = nlp(esc_a)
+    doc_b = nlp(esc_b)
+    verbos_a = ''
+    verbos_b = ''
+    for token in doc_a:
+        if token.pos_ == "VERB":
+            verbos_a= verbos_a + token.text + " "
+    for token in doc_b:
+        if token.pos_ == "VERB":
+            verbos_b= verbos_b + token.text + " "
+    print("LISTA DE VERBOS!")
+    print(verbos_a)
+    print(verbos_b)
+    resultado = compararRecursosYActores(verbos_a,verbos_b)
+    return resultado
 def compararRecursosYActores(lista1,lista2):
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.metrics.pairwise import cosine_similarity
@@ -1542,6 +1560,7 @@ def scenarioSimilarity(escenario,escenariosDelUsuario):
     #comparo actores
     #comparo recursos
     print(escenario)
+    nlp = spacy.load('en_core_web_trf')
     for i in escenariosDelUsuario:
         esc_a = json.loads(i.texto)
         stop = set(stopwords.words('english'))
@@ -1552,11 +1571,13 @@ def scenarioSimilarity(escenario,escenariosDelUsuario):
         goal_esc1 = clean(escenario['Goal'],stop,exclude,lemma)
         goal_esca = clean(esc_a['Goal'],stop,exclude,lemma)
         resultados_contexto = compararFields(goal_esc1,goal_esca)
+        resultados_episodeos = compararEpisodeos(escenario['Episodes'],esc_a['Episodes'],nlp)
         #print(lista1)
         resultados_actores_escenarios= compararRecursosYActores(recursos_actores_esc1,recursos_actores_esc2)
-        print("escenario actores y recursos "+esc_a['nombre'],resultados_actores_escenarios)
-        print("escenario objetivo "+esc_a['nombre'],resultados_contexto)
-        print("promedio: ",(resultados_contexto + resultados_actores_escenarios)/2)
+        print("Actores y recursos, similaridad: "+esc_a['nombre'],resultados_actores_escenarios)
+        print("Objetivo, similaridad: "+esc_a['nombre'],resultados_contexto)
+        print("Episodeos, similaridad: ",resultados_episodeos)
+        print("Promedio: ",(resultados_contexto + resultados_actores_escenarios+ resultados_episodeos)/3)
     # respuesta = "Simility: "+ str(resultados[0][1])
 def compararEscenario(request):
     artefactos = Artefacto.objects.all()
