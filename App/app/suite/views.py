@@ -1517,6 +1517,7 @@ def sinonimos(lista1,lista2):
     li2 = lista2.split()
     #print("lista del escenario seleccionado ",li1)
     print("antes : ",li2)
+    cambio = set()
     for i in li2:
         for sin in wordnet.synsets(i):
             #print("-------------PALABERAAA-------------")
@@ -1529,8 +1530,12 @@ def sinonimos(lista1,lista2):
             if palabrita != None:
                 #print(i, " es sinonimo de  ",palabrita)
                 i = palabrita
+                cambio.add(palabrita)
+            else:
+                if i not in cambio:
+                    cambio.add(i)
     res= ""
-    print("despues : ",li2)
+    print("despues : ",cambio)
     for i in li2:
         res= res + i + " "
     return res
