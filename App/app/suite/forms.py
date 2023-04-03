@@ -49,6 +49,8 @@ class Busqueda(forms.Form):
     buscar=forms.ChoiceField(choices=choices,initial="None",label="Filter")
 class Entidades(forms.Form):
     texto=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="Text")
+class UrlForm(forms.Form):
+    url=forms.CharField(max_length=255,label="url")
 #############################################################################
 #
 #Formularios Personalizados

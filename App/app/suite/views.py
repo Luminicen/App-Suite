@@ -1489,16 +1489,27 @@ def resumen(request):
     from sumy.utils import get_stop_words
     from sumy.summarizers.luhn import LuhnSummarizer
     # Extracting and summarizing
-    LANGUAGE = "english"
-    SENTENCES_COUNT = 10
-    url="https://en.wikipedia.org/wiki/Natural_language_processing"
-    parser = HtmlParser.from_url(url, Tokenizer(LANGUAGE))
-    summarizer = LsaSummarizer()
-    summarizer = LsaSummarizer(Stemmer(LANGUAGE))
-    summarizer.stop_words = get_stop_words(LANGUAGE)
-    for sentence in summarizer(parser.document, SENTENCES_COUNT):
-        print(sentence)
-    return render(request,'IA/consolaTraining.html',{})
+    
+    #for sentence in summarizer(parser.document, SENTENCES_COUNT):
+        #print(sentence)
+    if request.method == "POST":
+        formulario = UrlForm(request.POST)
+        if formulario.is_valid():
+            #print(formulario.cleaned_data["url"])
+            url = formulario.cleaned_data["url"]
+            LANGUAGE = "english"
+            SENTENCES_COUNT = 10
+            #url="https://en.wikipedia.org/wiki/Natural_language_processing"
+            parser = HtmlParser.from_url(url, Tokenizer(LANGUAGE))
+            summarizer = LsaSummarizer()
+            summarizer = LsaSummarizer(Stemmer(LANGUAGE))
+            summarizer.stop_words = get_stop_words(LANGUAGE)
+            formulario=None
+            resum= summarizer(parser.document, SENTENCES_COUNT)
+        formulario = UrlForm()
+    else:
+        formulario = UrlForm()
+    return render(request,'IA/resumen.html',{"form":formulario,"resumen":resum})
 ##########################################################################################################
 #
 # Similaridad de escenarios
