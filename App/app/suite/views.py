@@ -967,14 +967,16 @@ def extraerErrores(texto,inicio,fin,error):
             error_inicio=i.start
             error_final=i.end
     #../ConfigTraining/Datos/trainPlantas.spacy
+    entidades = None
     dbbin = DocBin().from_disk("app/ConfigTraining/Datos/trainUser.spacy")
-    doc.spans["incorrect_spans"] = [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
-    dbbin.add(doc)
-    dbbin.to_disk("app/ConfigTraining/Datos/trainUser.spacy")
-    entidades = {
-        "content" : oracion,
-        "incorrect_spans" : [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
-    }
+    if (error_inicio != -1 or error_final != -1):
+        doc.spans["incorrect_spans"] = [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
+        dbbin.add(doc)
+        dbbin.to_disk("app/ConfigTraining/Datos/trainUser.spacy")
+        entidades = {
+            "content" : oracion,
+            "incorrect_spans" : [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
+        }
     return entidades
 
 def prediccionesErroneas(request):

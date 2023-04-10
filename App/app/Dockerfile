@@ -13,5 +13,6 @@ RUN apt-get update && \
 apt-get install -y --no-install-recommends \
         openjdk-11-jre
 RUN apt install -y graphviz
+RUN python3 pysett.py
 EXPOSE 8000
 ENTRYPOINT [ "python","manage.py", "runserver", "0.0.0.0:8000"]

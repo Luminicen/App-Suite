@@ -2,23 +2,23 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   labels:
-    app: rh
-  name: rh
+    app: rhvtres
+  name: rhvtres
 spec:
   podManagementPolicy: Parallel
   replicas: 1
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      app: rh
-  serviceName: rh
+      app: rhvtres
+  serviceName: rhvtres
   template:
     metadata:      
       labels:
-        app: rh
+        app: rhvtres
     spec:
       containers:
-        - name: rh
+        - name: rhvtres
           image: 'luminicen/app:lastest'
           imagePullPolicy: Always          
           ports:
@@ -26,13 +26,13 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /app/backup
-              name: rh
+              name: rhvtres
   volumeClaimTemplates:
     - metadata:        
-        name: rh
+        name: rhvtres
       spec:
         accessModes:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 1Gi
+            storage: 50Gi

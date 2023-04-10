@@ -8,4 +8,4 @@ spec:
       port: 8000
       targetPort: 8000
   selector:
-    app: rh
+    app: rhvtres
