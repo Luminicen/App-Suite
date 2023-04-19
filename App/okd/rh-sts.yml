@@ -27,6 +27,8 @@ spec:
           volumeMounts:
             - mountPath: /app/backup
               name: rhvtres
+            - mountPath: /app/app/output
+              name: modelsrh
   volumeClaimTemplates:
     - metadata:        
         name: rhvtres
@@ -35,4 +37,12 @@ spec:
           - ReadWriteOnce
         resources:
           requests:
-            storage: 50Gi
+            storage: 5Gi
+    - metadata:        
+        name: modelsrh
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi

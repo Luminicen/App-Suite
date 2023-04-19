@@ -3,6 +3,7 @@ COPY . /app/
 WORKDIR /app/
 RUN chmod -R 777 data
 RUN chmod -R 777 app/static/uml
+RUN chmod -R 777 app/ConfigTraining
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 ENV DEBIAN_FRONTEND=noninteractive

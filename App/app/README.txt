@@ -5,7 +5,7 @@ python -m spacy download en_core_web_sm
 pip install rdflib
 pip install wikibase_api
 Paso 2: Instalar una base de datos
-Recomiendo usar xampp porque es mas sencillo iniciar o detener la bd
+Recomiendo usar xampp porque es mas sencillo iniciar o detener la bd --> crear con myphpmyadmin una bd llamada "req"
 Paso 3: Migrar la bd
 python manage.py migrate
 Paso 4: Correr el servidor
@@ -26,7 +26,12 @@ ScenariosWithKeyWord
 UML
 ProjectFile
 En un futuro este paso va a desaparecer!
-ERRORES POSIBLES:
+Siguiente paso ia:
+Descargar el modelo del siguiente enlace: https://lifiainfounlpeduar-my.sharepoint.com/:u:/g/personal/jdelleville_lifia_info_unlp_edu_ar/ES4YsnwYaLZMpxzOcY2XzgABuKowWocJv9wDVtcrlH_nng?e=V4tppM
+descomprimir en la carpeta donde aparece manage.py
+ejecutar el script de python pysett.py
+y luego ejecutar el siguiente comando:
+python -m spacy train app/ConfigTraining/config.cfg --output ./output --paths.train app/ConfigTraining/Datos/trainUser.spacy --paths.dev app/ConfigTraining/Datos/trainUser.spacy
 En Linux:
 -si por alguna razon no te deja entrar con mysql y te salta un error de ese tipo con xampp:
 ir a configuracion cambiar user name = mysql por root
