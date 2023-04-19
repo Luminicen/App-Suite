@@ -1397,7 +1397,7 @@ def resumen(request):
     from sumy.utils import get_stop_words
     from sumy.summarizers.luhn import LuhnSummarizer
     # Extracting and summarizing
-    
+    resum = None
     #for sentence in summarizer(parser.document, SENTENCES_COUNT):
         #print(sentence)
     if request.method == "POST":
