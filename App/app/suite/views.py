@@ -913,15 +913,18 @@ def pantallaDePruebas(request):
         formulario = Entidades(request.POST)
         if formulario.is_valid():
             texto = formulario.cleaned_data["texto"]
-            ner = spacy.load("es_core_news_lg")
-            ner_custom = spacy.load("output/model-best")
-            request.session["textoAI"] = texto
-            doc = ner_custom(texto)
-            doc2 = ner (texto)
-            lista = set(doc.ents)#.union(set(doc2.ents))
-            listado = []
-            for i in lista:
-                listado.append(str(i))
+            url = "http://127.0.0.1:8000/ia/"
+            data ={
+                "nombre": "Funcionalidad de prueba de IA",
+                "texto": texto
+            }
+
+            post_response = requests.post(url, json=data)
+            post_response_json = post_response.json()
+            #print(post_response_json)
+            listado = post_response_json
+
+
     elif (request.method == "GET") and listado:
         prediccionesErroneas(request)
         formulario = Entidades()

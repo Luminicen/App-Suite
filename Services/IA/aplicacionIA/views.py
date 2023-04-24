@@ -12,37 +12,46 @@ import re
 ##########################################################################################################
 #
 # IA - EXPERIMENTAL - Extraccion de entidades
+# Enviar un "form" con clave data para y en datos codigicado en json los textos!
 #
 #~#######################################################################################################
 @csrf_exempt
-def pantallaDePruebas(request):
-    #listado = request.GET.getlist('seleccionados')
-    print(request.POST["data"])
+def procesarTexto(request):
+    """ 
+        Recibe algo del tipo "nombre" y "texto", lo procesa y devuelve entidades
+        Si no encuentra el texto devuelve 409
+    """
     data = "hola mundo"
-    #return HttpResponse(json.dumps(data, indent=4, sort_keys=True), content_type="application/json")
     if request.method == "POST":
         #formulario = Entidades(request.POST)
-        formulario = json.loads(request.POST["data"])
+        #print("DATOS RECIBIDOS")
+        #print(json.loads(request.body))
+        formulario = request.body
+        
         if formulario:
-            texto = formulario["texto"]
-            #ner = spacy.load("es_core_news_lg")
+            texto = json.loads(formulario)["texto"]
             ner_custom = spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","output","model-best" ))
             request.session["textoAI"] = texto
             doc = ner_custom(texto)
-            #doc2 = ner (texto)
-            lista = set(doc.ents)#.union(set(doc2.ents))
+            lista = set(doc.ents)
             listado = []
             for i in lista:
                 listado.append(str(i))
             data = listado
-    elif (request.method == "GET") and listado:
-        #prediccionesErroneas(request)
-        #formulario = Entidades()
-        listado = []
+        else:
+            data = "No respeta el formato"
+            return HttpResponse(json.dumps(data, indent=4, sort_keys=True), status=409)
     else:
         listado = []
         #formulario = Entidades()
     return HttpResponse(json.dumps(data, indent=4, sort_keys=True), content_type="application/json")
+def correccionDeErrores(request):
+    """
+    Recibe una serie de palabras y el texto para reentrenar a la ia y corregir las predicciones erroneas
+    """
+    #if (request.method == "GET") and listado:
+    pass
+    #prediccionesErroneas(request)
 def extraerErrores(texto,inicio,fin,error):
     from spacy.tokens import Span
     from spacy.tokens import DocBin
