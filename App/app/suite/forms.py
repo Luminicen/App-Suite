@@ -36,7 +36,7 @@ class ProyectoForm(forms.ModelForm):
 class ElejirArtefactoAcrear(forms.Form):
     try:
         choices = [(tipo.id,tipo.tipo) 
-                   for tipo in TipoDeArtefacto.objects.all()]
+                   for tipo in (TipoDeArtefacto.objects.all().exclude(tipo = "UML"))]
     except:
         choices=[]
     eleccion=forms.ChoiceField(choices=choices,initial="None",label="Choose")

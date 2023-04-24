@@ -45,6 +45,7 @@ def procesarTexto(request):
         listado = []
         #formulario = Entidades()
     return HttpResponse(json.dumps(data, indent=4, sort_keys=True), content_type="application/json")
+
 def correccionDeErrores(request):
     """
     Recibe una serie de palabras y el texto para reentrenar a la ia y corregir las predicciones erroneas
