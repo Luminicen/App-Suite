@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from aplicacionIA.models import *
 from aplicacionIA.serializers import *
+from moduloIa.settings import BASE_DIR as direccion_base
 import json
 import spacy
 import os
@@ -13,31 +14,35 @@ import re
 # IA - EXPERIMENTAL - Extraccion de entidades
 #
 #~#######################################################################################################
+@csrf_exempt
 def pantallaDePruebas(request):
-    listado = request.GET.getlist('seleccionados')
+    #listado = request.GET.getlist('seleccionados')
+    print(request.POST["data"])
+    data = "hola mundo"
+    #return HttpResponse(json.dumps(data, indent=4, sort_keys=True), content_type="application/json")
     if request.method == "POST":
         #formulario = Entidades(request.POST)
-        formulario = json.loads(request.POST)
-        print(formulario)
-        if formulario.is_valid():
-            texto = formulario.cleaned_data["texto"]
-            ner = spacy.load("es_core_news_lg")
-            ner_custom = spacy.load("output/model-best")
+        formulario = json.loads(request.POST["data"])
+        if formulario:
+            texto = formulario["texto"]
+            #ner = spacy.load("es_core_news_lg")
+            ner_custom = spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","output","model-best" ))
             request.session["textoAI"] = texto
             doc = ner_custom(texto)
-            doc2 = ner (texto)
+            #doc2 = ner (texto)
             lista = set(doc.ents)#.union(set(doc2.ents))
             listado = []
             for i in lista:
                 listado.append(str(i))
+            data = listado
     elif (request.method == "GET") and listado:
-        prediccionesErroneas(request)
-        formulario = Entidades()
+        #prediccionesErroneas(request)
+        #formulario = Entidades()
         listado = []
     else:
         listado = []
-        formulario = Entidades()
-    return render(request,'IA/pantallaTexto.html',{"form" : formulario,"tipo":listado, "marcados" : listado})
+        #formulario = Entidades()
+    return HttpResponse(json.dumps(data, indent=4, sort_keys=True), content_type="application/json")
 def extraerErrores(texto,inicio,fin,error):
     from spacy.tokens import Span
     from spacy.tokens import DocBin
@@ -64,7 +69,7 @@ def extraerErrores(texto,inicio,fin,error):
             #print("SALIO")
             break
         pos +=1
-    nlp = spacy.load("output/model-best")
+    nlp = spacy.load("./output/model-best")
     doc = nlp(oracion)
     doc.spans
     error_inicio=-1
