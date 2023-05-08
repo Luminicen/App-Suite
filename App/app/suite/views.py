@@ -913,7 +913,8 @@ def pantallaDePruebas(request):
         formulario = Entidades(request.POST)
         if formulario.is_valid():
             texto = formulario.cleaned_data["texto"]
-            url = "http://127.0.0.1:8000/ia/"
+            request.session['textoAI'] = texto
+            url = "http://127.0.0.1:5000/ia/"
             data ={
                 "nombre": "Funcionalidad de prueba de IA",
                 "texto": texto
@@ -926,7 +927,20 @@ def pantallaDePruebas(request):
 
 
     elif (request.method == "GET") and listado:
-        prediccionesErroneas(request)
+        sel = request.GET.getlist('seleccionados')
+        texto = request.session['textoAI']
+        print("ENTRO")
+        url = "http://127.0.0.1:5000/iaErrores/"
+        data ={
+                "nombre": "Funcionalidad de prueba de IA",
+                "texto": texto,
+                "sel" : sel
+            }
+        post_response = requests.post(url, json=data)
+        post_response_json = post_response.json()
+        #print(post_response_json)
+        listado = post_response_json
+        #prediccionesErroneas(request)
         formulario = Entidades()
         listado = []
     else:

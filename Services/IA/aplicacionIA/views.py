@@ -12,7 +12,7 @@ import re
 ##########################################################################################################
 #
 # IA - EXPERIMENTAL - Extraccion de entidades
-# Enviar un "form" con clave data para y en datos codigicado en json los textos!
+# Debe tener texto en el campo!
 #
 #~#######################################################################################################
 @csrf_exempt
@@ -46,19 +46,16 @@ def procesarTexto(request):
         #formulario = Entidades()
     return HttpResponse(json.dumps(data, indent=4, sort_keys=True), content_type="application/json")
 
-def correccionDeErrores(request):
-    """
-    Recibe una serie de palabras y el texto para reentrenar a la ia y corregir las predicciones erroneas
-    """
-    #if (request.method == "GET") and listado:
-    pass
-    #prediccionesErroneas(request)
 def extraerErrores(texto,inicio,fin,error):
+    """
+    Encuentra los errores y los carga en el bin del modelo para dar feedback negativo
+    """
     from spacy.tokens import Span
     from spacy.tokens import DocBin
     pos = 0
     poscionPunto = 0
     noEncontrePuntoAnteriorAlError = True
+    #busco la oracion conflictiva
     for i in texto:
         if pos == inicio:
             noEncontrePuntoAnteriorAlError = False
@@ -71,62 +68,62 @@ def extraerErrores(texto,inicio,fin,error):
     OracionEncontrada = False
     for i in texto:
         if pos == poscionPunto:
-            #print("ENCONTRO PUNTO")
             OracionEncontrada = True
         if (OracionEncontrada and i != "."):
             oracion = oracion + i
         elif (OracionEncontrada and i == "." and pos != poscionPunto):
-            #print("SALIO")
             break
         pos +=1
-    nlp = spacy.load("./output/model-best")
+    #proceso el error para dar feedback negativo al modelo
+    nlp = spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","output","model-best"))
     doc = nlp(oracion)
     doc.spans
     error_inicio=-1
     error_final=-1
     for i in doc.ents:
         if i.text == error:
-            #print(i.start,i.end)
             error_inicio=i.start
             error_final=i.end
-    #../ConfigTraining/Datos/trainPlantas.spacy
     entidades = None
-    dbbin = DocBin().from_disk("app/ConfigTraining/Datos/trainUser.spacy")
+    dbbin = DocBin().from_disk(spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainUser.spacy")))
     if (error_inicio != -1 or error_final != -1):
         doc.spans["incorrect_spans"] = [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
         dbbin.add(doc)
-        dbbin.to_disk("app/ConfigTraining/Datos/trainUser.spacy")
+        dbbin.to_disk(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainUser.spacy"))
         entidades = {
             "content" : oracion,
             "incorrect_spans" : [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
         }
     return entidades
-
+@csrf_exempt
 def prediccionesErroneas(request):
+    """
+    Recibe una serie de palabras y el texto para reentrenar a la ia y corregir las predicciones erroneas
+    """
     errores=[]
-    if 'textoAI' in request.session:
-        texto = request.session['textoAI']
-        lista = []
-        if 'seleccionados' in request.GET:
-            lista = request.GET.getlist('seleccionados')
-            print(lista)
-            entidades = {
+    print(request.body)
+    resp = json.loads(request.body)
+    texto = resp["texto"]
+    lista = resp["sel"]
+    lista = []
+    if lista:
+        print(lista)
+        entidades = {
                 "content" : texto,
                 "entities" : []
-            }
-        for i in lista:
-            #nesesito posicion del token
-            match = (re.search(i, texto))
-            print(i, match.start(), match.end())
-            ent=extraerErrores(texto,match.start(),match.end(),i)
-            errores.append(ent)
-        import subprocess
-        from moduloIa.settings import BASE_DIR
-        #python -m spacy init fill-config base_config.cfg config
-        #subprocess.run(["python","-m","spacy", "init","fill-config",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','base_config.cfg') ,os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg') ])
-        #python -m spacy train config.cfg --output ./output --paths.train ./train.spacy --paths.dev ./dev.spacy
-        subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainUser.spacy'),'--paths.dev',os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','trainPlantas.spacy')])
-            
+        }
+    for i in lista:
+        #nesesito posicion del token
+        match = (re.search(i, texto))
+        print(i, match.start(), match.end())
+        ent=extraerErrores(texto,match.start(),match.end(),i)
+        errores.append(ent)
+        #Arranco un entrenamiento
+    import subprocess
+    from moduloIa.settings import BASE_DIR
+                #os.path.dirname(direccion_base),"IA","aplicacionIA","output","model-best"
+    subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA",'config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainUser.spacy"),'--paths.dev',os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainPlantas.spacy"),'--paths.modelos',os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA",'Modelo_entrenado')])
+    return HttpResponse(json.dumps("OK"), status=200) 
     #{"content":"El Ing. Agrónomo elige las semillas de tomate","entities":[[27,45,"Recurso",1,"rgb(15, 119, 46)"],[3,16,"Actor",0,"rgb(252, 2, 250)"]]}
 def pantallaDeTaggeo(request):
     if request.method == "POST":
