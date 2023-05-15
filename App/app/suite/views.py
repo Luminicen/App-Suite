@@ -120,6 +120,7 @@ def artefactos(request,id):
         return render(request,'ERRORES/403.html',{})
     eliminarConcurrencia(request.user)
     ok=False
+    similaritySC = ""
     form=ElejirArtefactoAcrear()
     form2=Busqueda()
     if escen:
@@ -163,8 +164,11 @@ def artefactos(request,id):
             response['Content-Disposition'] = 'attachment; filename="reporte.txt"'
             response.write(aTxt)
             return response
+        elif funcionalidad=="ScSimil":
+            similaritySC = request.session["similaridad_scenarios"]
+            #print("ACAAAAAA, ",similaritySC)
     botones=listaBotones()
-    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones})
+    return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones,"similaridad":similaritySC})
 def tipoForm(tipo,val):
     #elegirTipo
     #debe estar tal cual esta cargado en la BD
@@ -434,11 +438,11 @@ def listaBotones():
     botones.append(Boton("Convert to ScenarioKeyWords","cskw"))
     botones.append(Boton("Export Scenario with keywords to txt file","exportSKW"))
     botones.append(Boton("Validate knowledge graph","shacl4j"))
+    botones.append(Boton("SimilarScenarios","ScSimil"))
     return botones
     
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
     #REGISTRE ACA SU FUNCIONALIDAD
-    #paradigma por broadcast event based
     if KG.knowledgeGraph(entidadesSeleccionadas,request):
         return 'kg'
     if UML.funcionalidad(entidadesSeleccionadas,request,idP):
@@ -449,6 +453,8 @@ def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
         return 'exportSKW'
     if SHACL4J.funcionalidad(entidadesSeleccionadas,request):
         return 'shacl4j'
+    if SimilaridadScenario.funcionalidad(entidadesSeleccionadas,request):
+        return 'ScSimil'
 
 class SHACL4J:
     def funcionalidad(sel,request):
@@ -1551,8 +1557,123 @@ def compararEscenario(request):
     if escenariosDelUsuario:
         ok = True
     return render(request,'IA/similaridad.html',{"ok":ok,"artifacts":escenariosDelUsuario})
+##########################################################################################################
+#
+# SCENARIO SIMILARITY
+#
+#~#######################################################################################################
+class SimilaridadScenario:
+    def process_jaccardMethod(i,j):
+        """
+        Jaccard Similarity Method
+        """
+        if i == None or i == None:
+            return 0
+        set_i = set(i)
+        set_j = set(j)
+        intersection = set_i.intersection(set_j)
+        union = set_i.union(set_j)
+        if len(union) ==0:
+            return 0 
+        return (len(intersection) / len(union))
 
+    def extract_verbs_noun_subject(text,nlp):
+        """
+        This method processes a generic field and return a list of words
+        """
+        
+        doc = nlp(text)
+        list_of_words=[]
+        for i in doc:
+            if i.pos_ =="VERB" or i.pos_=="NOUN":
+                list_of_words.append(i.lemma_.lower())
+        return list_of_words
+    def separate_sentence(text):
+        array = []
+        sentence = ""
+        for i in text:
+            sentence+=i
+            if i ==".":
+                array.append(sentence)
+                sentence =""
+        return array
+    def process_episodes(episodes,nlp):
+        """
+        this function processes a secuence of episodes and return a list of words
+        """
+        list_of_words = set()
+        for i in episodes:
+            list_of_words.update(SimilaridadScenario.extract_verbs_noun_subject(i,nlp))
+        return list(list_of_words)
+    
+    def similarity(i,j,nlp):
+        """
+        This method processes two scenarios and return a rank
+        """
+        stop = set(stopwords.words('english'))
+        exclude = set(string.punctuation)
+        lemma = WordNetLemmatizer()
+        rank_group=0
+        contenido_i=json.loads(i.texto)
+        contenido_j=json.loads(j.texto)
+        #preprocess
+        actor_i=clean(contenido_i["Actors"],stop,exclude,lemma).split()
+        actor_j=clean(contenido_j["Actors"],stop,exclude,lemma).split()
+        name_i = clean(i.nombre,stop,exclude,lemma).split()
+        name_j = clean(j.nombre,stop,exclude,lemma).split()
+        context_i = SimilaridadScenario.extract_verbs_noun_subject(contenido_i["Context"],nlp)
+        context_j = SimilaridadScenario.extract_verbs_noun_subject(contenido_j["Context"],nlp)
+        goal_i = SimilaridadScenario.extract_verbs_noun_subject(contenido_i["Goal"],nlp)
+        goal_j = SimilaridadScenario.extract_verbs_noun_subject(contenido_j["Goal"],nlp)
+        #print(contenido_i["Goal"],goal_i)
+        #print(contenido_j["Goal"],goal_j)
+        resources_i=clean(contenido_i["Resources"],stop,exclude,lemma).split()
+        resources_j=clean(contenido_j["Resources"],stop,exclude,lemma).split()
+        episodes_i = SimilaridadScenario.process_episodes(SimilaridadScenario.separate_sentence(contenido_i["Episodes"]),nlp)
+        episodes_j = SimilaridadScenario.process_episodes(SimilaridadScenario.separate_sentence(contenido_j["Episodes"]),nlp)
+        #process jaccard
+        rank_group += SimilaridadScenario.process_jaccardMethod(actor_i,actor_j)
+        rank_group += SimilaridadScenario.process_jaccardMethod(name_i,name_j)
+        rank_group += SimilaridadScenario.process_jaccardMethod(context_i,context_j)
+        rank_group += SimilaridadScenario.process_jaccardMethod(goal_i,goal_j)
+        rank_group += SimilaridadScenario.process_jaccardMethod(resources_i,resources_j)
+        rank_group += SimilaridadScenario.process_jaccardMethod(episodes_i,episodes_j)
+        return (rank_group/5)
+    def funcionalidad(sel,request):
+        if "ScSimil" not in request.GET:
+            return None
+        esce=[]
+        nlp = spacy.load("en_core_web_trf") 
+        for i in sel:
+            if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
+                esce.append(Artefacto.objects.get(id=i))
+        def sortear(e):
+            return e[0]
+        filtro = set(esce)
+        Scenario_set = list(filtro)
+        procesados = []
+        group = []
+        for i in range(len(Scenario_set)):
+            scenario = Scenario_set[i]
+            #print(scenario)
+            for j in Scenario_set:
+                if j != scenario and ((scenario.nombre + j.nombre) not in procesados or (j.nombre + scenario.nombre) not in procesados):
+                    rank = SimilaridadScenario.similarity(scenario,j,nlp)
+                    procesados.append(scenario.nombre + j.nombre)
+                    procesados.append(j.nombre + scenario.nombre)
+                    group.append((rank,scenario,j))
 
+        group.sort(key=sortear,reverse=True)
+        string_resultado = []
+        for i in group:
+            numero = i[0]
+            scena = i[1].nombre
+            scenb = i[2].nombre
+            string_resultado.append (f"group: {numero} scenario: {scena} {scenb}\n")
+        #print(string_resultado)
+        request.session["similaridad_scenarios"] = string_resultado
+        return "OK"
+        
 ##########################################################################################################
 #
 # API TEST

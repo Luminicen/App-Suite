@@ -69,8 +69,9 @@
     {{ form.as_table }}
     <button class="btn btn-primary mt-2" type="submit">Create</button>
   </div>
-
-  
+  {% for s in similaridad %}
+<p>{{s}}</p>
+{% endfor %}
 </form>
 {% else %}
 <div style="background-color:#1F1D4F; height: 100vh">
