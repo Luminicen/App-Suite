@@ -21,5 +21,6 @@ from aplicacionIA.views import *
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ia/', procesarTexto,name='procesarTexto'),
-    path('iaErrores/',prediccionesErroneas,name='prediccionesErroneas')
+    path('iaErrores/',prediccionesErroneas,name='prediccionesErroneas'),
+    path('recibirInputUsuario/',guardarDatosDeUsuario,name='inputUsuario'),
 ]

@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: moduloneria
+  name: moduloneria
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+     app: moduloneria        
+  template:
+    metadata:            
+      labels:
+        app: moduloneria        
+    spec:
+      containers:
+        - name: moduloneria
+          image: luminicen/moduloneria:lastest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 6000
+              protocol: TCP     

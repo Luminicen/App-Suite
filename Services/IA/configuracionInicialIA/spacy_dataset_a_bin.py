@@ -4,7 +4,7 @@ import json
 import os
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
-archivo = open(os.path.join(os.path.dirname(BASE_DIR),'IA','configuracionInicialIA','datasetInicial.json'), encoding='utf-8').read()
+archivo = open(os.path.join(os.path.dirname(BASE_DIR),'IA','configuracionInicialIA','datasetParaEntrenamiento.json'), encoding='utf-8').read()
 TRAIN_DATA  = json.loads(archivo)
 #print(TRAIN_DATA)
 #FALTA DATOS INNCORRECTOS

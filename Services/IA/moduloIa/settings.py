@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-efweis$ghvuc=u(wb2el!z4#dr)1b31mw4uczm)ucdp_j^3wqk
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['moduloneria-requirements-healer.okd.lifia.info.unlp.edu.ar','127.0.0.1','localhost']
 
 
 # Application definition
@@ -81,8 +81,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'req',
         'USER': 'root',
-        'PASSWORD': '', # poner password para produccion
-        'HOST': 'localhost',   # para produccion dejar db
+        'PASSWORD': 'password', # poner password para produccion
+        'HOST': 'db',   # para produccion dejar db
         'PORT': '3306',
 
     }

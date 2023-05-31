@@ -30,7 +30,7 @@ def procesarTexto(request):
         
         if formulario:
             texto = json.loads(formulario)["texto"]
-            ner_custom = spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","output","model-best" ))
+            ner_custom = spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","output","model-best" ))
             request.session["textoAI"] = texto
             doc = ner_custom(texto)
             lista = set(doc.ents)
@@ -75,7 +75,7 @@ def extraerErrores(texto,inicio,fin,error):
             break
         pos +=1
     #proceso el error para dar feedback negativo al modelo
-    nlp = spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","output","model-best"))
+    nlp = spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","output","model-best"))
     doc = nlp(oracion)
     doc.spans
     error_inicio=-1
@@ -85,11 +85,11 @@ def extraerErrores(texto,inicio,fin,error):
             error_inicio=i.start
             error_final=i.end
     entidades = None
-    dbbin = DocBin().from_disk(spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainUser.spacy")))
+    dbbin = DocBin().from_disk(spacy.load(os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","trainUser.spacy")))
     if (error_inicio != -1 or error_final != -1):
         doc.spans["incorrect_spans"] = [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
         dbbin.add(doc)
-        dbbin.to_disk(os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainUser.spacy"))
+        dbbin.to_disk(os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","trainUser.spacy"))
         entidades = {
             "content" : oracion,
             "incorrect_spans" : [Span(doc,error_inicio,error_final,label = "Actor"),Span(doc,error_inicio,error_final,label = "Recurso")]
@@ -122,25 +122,20 @@ def prediccionesErroneas(request):
     import subprocess
     from moduloIa.settings import BASE_DIR
                 #os.path.dirname(direccion_base),"IA","aplicacionIA","output","model-best"
-    subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA",'config.cfg'),"--output","./output","--paths.train",os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainUser.spacy"),'--paths.dev',os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA","DatosYConfiguracionDeEntrenamiento","Datos","trainPlantas.spacy"),'--paths.modelos',os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA",'Modelo_entrenado')])
+    subprocess.run(["python","-m","spacy","train",os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA",'config.cfg'),"--output",os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","output"),"--paths.train",os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","trainData.spacy"),'--paths.dev',os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","testData.spacy"),'--paths.modelos',os.path.join(os.path.dirname(direccion_base),"IA","aplicacionIA",'Modelo_entrenado')])
     return HttpResponse(json.dumps("OK"), status=200) 
     #{"content":"El Ing. Agrónomo elige las semillas de tomate","entities":[[27,45,"Recurso",1,"rgb(15, 119, 46)"],[3,16,"Actor",0,"rgb(252, 2, 250)"]]}
-def pantallaDeTaggeo(request):
-    if request.method == "POST":
-        formulario = Entidades(request.POST)
-        if formulario.is_valid():
-            print(formulario.cleaned_data["texto"])
-            from moduloIa.settings import BASE_DIR
-            f = open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'r', encoding = 'utf-8')
-            archivo = f.read()
-            f.close()
-            archivoDesj=json.loads(archivo)
-            archivoDesj.append(json.loads(formulario.cleaned_data["texto"]))
-            print(archivoDesj)
-            with open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'w',encoding = 'utf-8') as f:
-                f.write(json.dumps(archivoDesj))
-
-        formulario = Entidades()
-    else:
-        formulario = Entidades()
-    return render(request,'IA/pantallaDeTaggeo.html',{"form" : formulario})
+@csrf_exempt
+def guardarDatosDeUsuario(request):
+    formulario = request.body
+    datos = json.loads(formulario)
+    print(datos['texto'])
+    from moduloIa.settings import BASE_DIR
+    f = open(os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","datasetParaEntrenamiento.json"),'r', encoding = 'utf-8')
+    archivo = f.read()
+    f.close()
+    archivoDesj=json.loads(archivo)
+    archivoDesj.append(json.loads(datos["texto"]))
+    with open(os.path.join(os.path.dirname(direccion_base),"IA","configuracionInicialIA","datasetParaEntrenamiento.json"),'w',encoding = 'utf-8') as f:
+        f.write(json.dumps(archivoDesj))
+    return HttpResponse(json.dumps("OK"), status=200)
