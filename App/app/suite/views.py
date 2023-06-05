@@ -48,9 +48,15 @@ def puedeEscribirEnBd(user,id):
 def eliminarConcurrencia(user):
     for i in Concurrencia.objects.filter(nombre=user.username):
         i.delete()
+############################### Api URL ##########################################
+# Url de los modulos
+####################################################################################
+moduloneria = "http://moduloneria-requirements-healer.okd.lifia.info.unlp.edu.ar"
+
 ############################### Proyectos ##########################################
 # En este lugar estaran todos los codigos del modulo de proyectos
 ####################################################################################
+
 def proyectos(request):
     #obtengo todos los proyectos y filtro por los que son mios
     proyectos=Proyecto.objects.all()
@@ -374,6 +380,13 @@ def crearArtefactoUML(request, idP):
 #PARA APROBECHAR POLIMORFISMO
 #DEFINIR LOS FORMULARIOS VACIOS Y CON VALORES PLS
 ##########################################################################################
+class Lel:
+    def formulario(self,val):
+        if val!=None:
+            formulario = LEL(val)
+        else:
+            formulario = LEL()
+        return formulario
 class textoplano:
 
     def formulario(self,val):
@@ -920,7 +933,7 @@ def pantallaDePruebas(request):
         if formulario.is_valid():
             texto = formulario.cleaned_data["texto"]
             request.session['textoAI'] = texto
-            url = "http://127.0.0.1:5000/ia/"
+            url = moduloneria+"/ia/"
             data ={
                 "nombre": "Funcionalidad de prueba de IA",
                 "texto": texto
@@ -935,8 +948,7 @@ def pantallaDePruebas(request):
     elif (request.method == "GET") and listado:
         sel = request.GET.getlist('seleccionados')
         texto = request.session['textoAI']
-        print("ENTRO")
-        url = "http://127.0.0.1:5000/iaErrores/"
+        url = moduloneria+"/iaErrores/"
         data ={
                 "nombre": "Funcionalidad de prueba de IA",
                 "texto": texto,
@@ -1033,15 +1045,24 @@ def pantallaDeTaggeo(request):
         formulario = Entidades(request.POST)
         if formulario.is_valid():
             print(formulario.cleaned_data["texto"])
+            datos = formulario.cleaned_data["texto"]
+            url = moduloneria+"/recibirInputUsuario/"
+            data ={
+                "nombre": "Funcionalidad de prueba de IA",
+                "texto": datos
+            }
+            post_response = requests.post(url, json=data)
+            post_response_json = post_response.json()
+
             from app.settings import BASE_DIR
-            f = open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'r', encoding = 'utf-8')
-            archivo = f.read()
-            f.close()
-            archivoDesj=json.loads(archivo)
-            archivoDesj.append(json.loads(formulario.cleaned_data["texto"]))
-            print(archivoDesj)
-            with open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'w',encoding = 'utf-8') as f:
-                f.write(json.dumps(archivoDesj))
+            #f = open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'r', encoding = 'utf-8')
+            #archivo = f.read()
+            #f.close()
+            #archivoDesj=json.loads(archivo)
+            #archivoDesj.append(json.loads(formulario.cleaned_data["texto"]))
+            #print(archivoDesj)
+            #with open(os.path.join(os.path.dirname(BASE_DIR), 'app', 'app','ConfigTraining','Datos','datasetUsuario.json'),'w',encoding = 'utf-8') as f:
+            #    f.write(json.dumps(archivoDesj))
 
         formulario = Entidades()
     else:

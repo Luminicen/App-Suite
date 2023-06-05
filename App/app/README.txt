@@ -25,6 +25,7 @@ KnowledgeGraph
 ScenariosWithKeyWord
 UML
 ProjectFile
+Lel
 En un futuro este paso va a desaparecer!
 Siguiente paso ia:
 Descargar el modelo del siguiente enlace: https://lifiainfounlpeduar-my.sharepoint.com/:u:/g/personal/jdelleville_lifia_info_unlp_edu_ar/ES4YsnwYaLZMpxzOcY2XzgABuKowWocJv9wDVtcrlH_nng?e=V4tppM
