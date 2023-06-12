@@ -452,6 +452,7 @@ def listaBotones():
     botones.append(Boton("Export Scenario with keywords to txt file","exportSKW"))
     botones.append(Boton("Validate knowledge graph","shacl4j"))
     botones.append(Boton("SimilarScenarios","ScSimil"))
+    #botones.append(Boton("LelDetectoranstractor","lelDT"))
     return botones
     
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
@@ -468,6 +469,8 @@ def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
         return 'shacl4j'
     if SimilaridadScenario.funcionalidad(entidadesSeleccionadas,request):
         return 'ScSimil'
+    if LelDetector.funcionalidad(entidadesSeleccionadas,request):
+        return 'lelDT'
 
 class SHACL4J:
     def funcionalidad(sel,request):
@@ -1694,7 +1697,147 @@ class SimilaridadScenario:
         #print(string_resultado)
         request.session["similaridad_scenarios"] = string_resultado
         return "OK"
-        
+##########################################################################################################
+#
+# LEL
+#
+#~#######################################################################################################
+class LelDetector:
+    def is_sentence_passive(sentence,nlp):
+        matcher = Matcher(nlp.vocab)
+        # Definir patrón para voz pasiva
+        passive_pattern = [
+            {"DEP": {"IN": ["nsubjpass", "nsubjpass:xsubj"]}},
+            {"DEP": "aux", "OP": "*"},
+            {"DEP": "auxpass"},
+            {"TAG": "VBN"}
+        ]
+        matcher.add("PassivePattern", [passive_pattern])
+        doc = nlp(sentence)
+        matches = matcher(doc)
+        return bool(matches)
+    def detect_null_subject(sentence,nlp):
+        doc = nlp(sentence)
+        verbos = []
+        for token in doc:
+            if token.dep_ == "nsubj":
+                verbos.append(token.text)
+        if verbos:
+            return False
+        return True
+    def detect_adjectives_and_adverbs(sentence,nlp):
+        doc = nlp(sentence)
+        adjectives = []
+        adverbs = []
+
+        for token in doc:
+            if token.pos_ == "ADJ":
+                adjectives.append(token.text)
+            elif token.pos_ == "ADV":
+                adverbs.append(token.text)
+        if adjectives or adverbs:
+            return True
+        return False
+    def detect_multiple_verbs(sentence,nlp):
+        matcher = Matcher(nlp.vocab)
+        # Definir patrón para múltiples verbos
+        multiple_verbs_pattern = [
+            {"POS": "VERB"},
+            {"POS": "VERB", "OP": "*"}
+        ]
+
+        matcher.add("MultipleVerbsPattern", [multiple_verbs_pattern])
+        doc = nlp(sentence)
+        matches = matcher(doc)
+        if len(matches) > 1:
+            return True
+        return False
+    def detectar_kernel_sentence(lel,nlp):
+        #print(lel)
+        pasivo = LelDetector.is_sentence_passive(lel,nlp)
+        #print("Pasivo: ",pasivo)
+        sujeto_nulo = LelDetector.detect_null_subject(lel,nlp)
+        #print("Nulo: ",sujeto_nulo)
+        adjetivos_verbos = LelDetector.detect_adjectives_and_adverbs(lel,nlp)
+        #print("Adjetivos y adverbios: ",adjetivos_verbos)
+        multiples_verbos = LelDetector.detect_multiple_verbs(lel,nlp)
+        #print("Multiples Verbos: ",multiples_verbos)
+        return not (pasivo or sujeto_nulo or adjetivos_verbos or multiples_verbos)
+    def procesar_oraciones(lista,nlp):
+        sentences = []
+        s = ""
+        saltear = False
+        for i in lista:
+            s +=i
+            if s.lower() == "if":
+                saltear =True
+            if i ==".":
+                if saltear:
+                    sentences.append(s)
+                    saltear = False
+                s =""
+        kernel = True
+        for i in sentences:
+            if "if" in i or "If" in i:
+                continue
+            kernel = LelDetector.detectar_kernel_sentence(i,nlp)
+            if kernel == False:
+                return False
+        return True
+                
+    def detectar_kernel_artefactos(lista,nlp):
+        artefactos_kernel = []
+        for i in lista:
+            art = json.loads(i.texto)
+            #print(art)
+            nocion = LelDetector.detectar_kernel_sentence(art["notion"],nlp)
+            impacto = LelDetector.procesar_oraciones(art["Behavioral_responses"],nlp)
+            if nocion and impacto:
+                artefactos_kernel.append((i,""))
+            else:
+                artefactos_kernel.append((i,"tiene un campo que no es kernel"))
+        return artefactos_kernel
+    def chequear_behavioral_responses(responses,nlp,bd_lel):
+        doc = nlp(responses)
+        definition = []
+        # busco lo que debo chequear
+        for i in doc:
+            if i.pos_ == "VERB" or i.pos_ == "NOUN":
+                definition.append(i.lemma_.lower())
+        faltan = []
+        simbolos = []
+        for i in bd_lel:
+            simbolos.append(json.loads(i.texto)["nombre"].lower())
+        for i in definition:
+            #print(i)
+            if not (i in simbolos):
+                print("NO esta definido: ",i)
+    def etapa_dos(lista, nlp,lel_bd):
+        for i in lista:
+            LelDetector.chequear_behavioral_responses(json.loads(i[0].texto)["Behavioral_responses"],nlp,lel_bd)
+    def funcionalidad(sel,request):
+
+        if 'lelDT' in request.GET:
+            lel=[]
+            for i in sel:
+                art = Artefacto.objects.get(id=i)
+                if art.tipoDeArtefacto.tipo=="Lel":
+                    lel.append(art)
+        else: return None
+        nlp = spacy.load("en_core_web_sm")
+        artefactos_kernel = LelDetector.detectar_kernel_artefactos(lel,nlp)
+        print(artefactos_kernel)
+        lel_bd= []
+        objetos = Artefacto.objects.all()
+        for i in objetos:
+            if i.tipoDeArtefacto.tipo=="Lel":
+                lel_bd.append(i)
+        LelDetector.etapa_dos(artefactos_kernel,nlp,lel_bd)
+        return "OK"
+
+
+
+
 ##########################################################################################################
 #
 # API TEST
