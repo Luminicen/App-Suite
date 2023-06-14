@@ -99,7 +99,8 @@ class ScenariosWithKeyWords(forms.Form):
     EpisodesKeyWords=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="Episodes's KeyWords",required=False)
 
 class LEL(forms.Form):
-   nombre = forms.CharField(label="Category")
+   nombre = forms.CharField(label="Name")
+   category = forms.CharField(label="Category")
    notion = forms.CharField(label="Notion")
    Behavioral_responses =  forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="Behavioral responses",required=False)
 

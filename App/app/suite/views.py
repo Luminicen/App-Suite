@@ -452,7 +452,7 @@ def listaBotones():
     botones.append(Boton("Export Scenario with keywords to txt file","exportSKW"))
     botones.append(Boton("Validate knowledge graph","shacl4j"))
     botones.append(Boton("SimilarScenarios","ScSimil"))
-    #botones.append(Boton("LelDetectoranstractor","lelDT"))
+    botones.append(Boton("LelDetectoranstractor","lelDT"))
     return botones
     
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
@@ -1763,19 +1763,18 @@ class LelDetector:
         multiples_verbos = LelDetector.detect_multiple_verbs(lel,nlp)
         #print("Multiples Verbos: ",multiples_verbos)
         return not (pasivo or sujeto_nulo or adjetivos_verbos or multiples_verbos)
-    def procesar_oraciones(lista,nlp):
-        sentences = []
+    def separar_oraciones(lista):
         s = ""
+        sentences = []
         saltear = False
         for i in lista:
             s +=i
-            if s.lower() == "if":
-                saltear =True
             if i ==".":
-                if saltear:
-                    sentences.append(s)
-                    saltear = False
+                sentences.append(s)
                 s =""
+        return sentences
+    def procesar_oraciones(lista,nlp):
+        sentences = LelDetector.separar_oraciones(lista)
         kernel = True
         for i in sentences:
             if "if" in i or "If" in i:
@@ -1815,6 +1814,53 @@ class LelDetector:
     def etapa_dos(lista, nlp,lel_bd):
         for i in lista:
             LelDetector.chequear_behavioral_responses(json.loads(i[0].texto)["Behavioral_responses"],nlp,lel_bd)
+    def etapa_tres(lista,nlp):
+        relaciones = []
+        conceptos = []
+        concept = {}
+        data = []
+        matcher = Matcher(nlp.vocab)
+        pattern = [{'POS': 'VERB'},
+           {'DEP': 'pobj', 'OP': '?'}]
+        matcher.add("MultipleVerbsPattern", [pattern])
+        for i in lista:
+            art = json.loads(i.texto)
+            if art["category"] == "Subject" or art["category"] == "Object":
+                conceptos.append(art["nombre"].lower())
+                concept[json.loads(i.texto)["nombre"]] = []
+            elif art["category"] == "Verb":
+                relaciones.append(art["nombre"].lower())
+                concept[json.loads(i.texto)["nombre"]] =[]
+            # concept ["nombre"] = [relacion(verbo),relacionado con (concepto)]
+        for i in lista:
+            sentences = LelDetector.separar_oraciones(json.loads(i.texto)["Behavioral_responses"])
+            for oracion in sentences:
+                print(oracion)
+                doc = nlp(oracion)
+                print("ORACION")
+                palabritas_matcheadas = []
+                mat = matcher(doc)
+                for k in mat:
+                    palabritas_matcheadas.append(doc[k[1]:k[2]])
+                if palabritas_matcheadas:
+                    esta =palabritas_matcheadas[0].lemma_.lower() in relaciones
+                    if esta:
+                        concept[json.loads(i.texto)["nombre"]].append(palabritas_matcheadas[0].lemma_.lower())
+                    if len(palabritas_matcheadas)>1 and palabritas_matcheadas[1].lemma_.lower() in conceptos: #and palabritas_matcheadas[1].dep_ == "pobj":
+                        concept[palabritas_matcheadas[0]].append(palabritas_matcheadas[1].lemma_.lower())
+        print(concept)
+
+        c={
+                "nombre" : json.loads(i.texto)["nombre"],
+                "metodos":[],
+                "subclases": [],
+                "atributos":[],
+                "relaciones": []
+            }
+            #data.append(c)
+        print(data)
+                    
+
     def funcionalidad(sel,request):
 
         if 'lelDT' in request.GET:
@@ -1833,6 +1879,7 @@ class LelDetector:
             if i.tipoDeArtefacto.tipo=="Lel":
                 lel_bd.append(i)
         LelDetector.etapa_dos(artefactos_kernel,nlp,lel_bd)
+        LelDetector.etapa_tres(lel_bd,nlp)
         return "OK"
 
 
