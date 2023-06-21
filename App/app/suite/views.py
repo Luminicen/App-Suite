@@ -1823,7 +1823,6 @@ class LelDetector:
         for i in lista:
            c = LelDetector.chequear_behavioral_responses(json.loads(i[0].texto)["Behavioral_responses"],nlp,lel_bd)
            comentarios.append([json.loads(i[0].texto)["nombre"],c])
-        print(comentarios)
         return comentarios
     def etapa_tres(lista,nlp):
         relaciones = []
@@ -1831,34 +1830,43 @@ class LelDetector:
         concept = {}
         data = []
         matcher = Matcher(nlp.vocab)
-        pattern = [{'POS': 'VERB'},
+        pattern = [{'POS': 'VERB', 'OP': '?'},
            {'DEP': 'pobj', 'OP': '?'}]
         matcher.add("MultipleVerbsPattern", [pattern])
         for i in lista:
             art = json.loads(i.texto)
             if art["category"] == "Subject" or art["category"] == "Object":
-                conceptos.append(art["nombre"].lower())
-                concept[json.loads(i.texto)["nombre"]] = []
+                n = nlp(art["nombre"].lower())
+                conceptos.append(n[0].lemma_)
+                concept[n[0].lemma_] = []
             elif art["category"] == "Verb":
-                relaciones.append(art["nombre"].lower())
-                concept[json.loads(i.texto)["nombre"]] =[]
+                n = nlp(art["nombre"].lower())
+                relaciones.append(n[0].lemma_)
+                concept[n[0].lemma_] =[]
             # concept ["nombre"] = [relacion(verbo),relacionado con (concepto)]
         for i in lista:
             sentences = LelDetector.separar_oraciones(json.loads(i.texto)["Behavioral_responses"])
             for oracion in sentences:
+                #print("ORACION")
                 #print(oracion)
                 doc = nlp(oracion)
-                #print("ORACION")
                 palabritas_matcheadas = []
                 mat = matcher(doc)
+                #print("MATCHER")
                 for k in mat:
+                    #print(doc[k[1]:k[2]])
                     palabritas_matcheadas.append(doc[k[1]:k[2]])
                 if palabritas_matcheadas:
+                    art = nlp(json.loads(i.texto)["nombre"])
                     esta =palabritas_matcheadas[0].lemma_.lower() in relaciones
                     if esta:
-                        concept[json.loads(i.texto)["nombre"]].append(palabritas_matcheadas[0].lemma_.lower())
+                        concept[art[0].lemma_].append(palabritas_matcheadas[0].lemma_.lower())
                     if len(palabritas_matcheadas)>1 and palabritas_matcheadas[1].lemma_.lower() in conceptos: #and palabritas_matcheadas[1].dep_ == "pobj":
-                        concept[palabritas_matcheadas[0]].append(palabritas_matcheadas[1].lemma_.lower())
+                        try:
+                            concept[palabritas_matcheadas[0].lemma_.lower()].append(palabritas_matcheadas[1].lemma_.lower())
+                        except:
+                            if palabritas_matcheadas[0].lemma_.lower() in conceptos:
+                                concept[palabritas_matcheadas[0].lemma_.lower()]=[palabritas_matcheadas[1].lemma_.lower()]
         print(concept)
         for i in lista:
             try:
@@ -1867,12 +1875,12 @@ class LelDetector:
                     "metodos":[],
                     "subclases": [],
                     "atributos":[],
-                    "relaciones": concept[json.loads(i.texto)["nombre"]],
+                    "relaciones": concept[nlp(json.loads(i.texto)["nombre"])[0].lemma_.lower()],
                 }
                 data.append(c)
             except:
                 pass
-        print(data)
+        #print(data)
         return data
 
     def funcionalidad(sel,request):
@@ -1886,7 +1894,7 @@ class LelDetector:
         else: return None
         nlp = spacy.load("en_core_web_sm")
         artefactos_kernel = LelDetector.detectar_kernel_artefactos(lel,nlp)
-        print(artefactos_kernel)
+        #print(artefactos_kernel)
         lel_bd= []
         objetos = Artefacto.objects.all()
         for i in objetos:
