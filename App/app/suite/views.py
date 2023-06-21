@@ -172,6 +172,8 @@ def artefactos(request,id):
             return response
         elif funcionalidad=="ScSimil":
             similaritySC = request.session["similaridad_scenarios"]
+        elif funcionalidad=="lelDT":
+            return redirect(reverse('crearUML',kwargs={'idP':id}))
             #print("ACAAAAAA, ",similaritySC)
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones,"similaridad":similaritySC})
@@ -369,6 +371,9 @@ def crearArtefactoUML(request, idP):
         print(e)
 
     context["img_name"] = f"uml_{idP}.png"
+    #request.session["LELCOMENTARIOS"] = comentarios
+    if "LELCOMENTARIOS" in request.session:
+        context["comentarios"] = request.session["LELCOMENTARIOS"]
     return render(request, 'uml-visualizer.html', context=context)
 
 ############################### TESTE ##########################################
@@ -1799,6 +1804,7 @@ class LelDetector:
     def chequear_behavioral_responses(responses,nlp,bd_lel):
         doc = nlp(responses)
         definition = []
+        comentarios =set()
         # busco lo que debo chequear
         for i in doc:
             if i.pos_ == "VERB" or i.pos_ == "NOUN":
@@ -1810,10 +1816,15 @@ class LelDetector:
         for i in definition:
             #print(i)
             if not (i in simbolos):
-                print("NO esta definido: ",i)
+                comentarios.add("NO esta definido: "+i+"\n")
+        return list(comentarios)
     def etapa_dos(lista, nlp,lel_bd):
+        comentarios = []
         for i in lista:
-            LelDetector.chequear_behavioral_responses(json.loads(i[0].texto)["Behavioral_responses"],nlp,lel_bd)
+           c = LelDetector.chequear_behavioral_responses(json.loads(i[0].texto)["Behavioral_responses"],nlp,lel_bd)
+           comentarios.append([json.loads(i[0].texto)["nombre"],c])
+        print(comentarios)
+        return comentarios
     def etapa_tres(lista,nlp):
         relaciones = []
         conceptos = []
@@ -1835,9 +1846,9 @@ class LelDetector:
         for i in lista:
             sentences = LelDetector.separar_oraciones(json.loads(i.texto)["Behavioral_responses"])
             for oracion in sentences:
-                print(oracion)
+                #print(oracion)
                 doc = nlp(oracion)
-                print("ORACION")
+                #print("ORACION")
                 palabritas_matcheadas = []
                 mat = matcher(doc)
                 for k in mat:
@@ -1849,17 +1860,20 @@ class LelDetector:
                     if len(palabritas_matcheadas)>1 and palabritas_matcheadas[1].lemma_.lower() in conceptos: #and palabritas_matcheadas[1].dep_ == "pobj":
                         concept[palabritas_matcheadas[0]].append(palabritas_matcheadas[1].lemma_.lower())
         print(concept)
-
-        c={
-                "nombre" : json.loads(i.texto)["nombre"],
-                "metodos":[],
-                "subclases": [],
-                "atributos":[],
-                "relaciones": []
-            }
-            #data.append(c)
+        for i in lista:
+            try:
+                c={
+                    "nombre" : json.loads(i.texto)["nombre"],
+                    "metodos":[],
+                    "subclases": [],
+                    "atributos":[],
+                    "relaciones": concept[json.loads(i.texto)["nombre"]],
+                }
+                data.append(c)
+            except:
+                pass
         print(data)
-                    
+        return data
 
     def funcionalidad(sel,request):
 
@@ -1878,8 +1892,10 @@ class LelDetector:
         for i in objetos:
             if i.tipoDeArtefacto.tipo=="Lel":
                 lel_bd.append(i)
-        LelDetector.etapa_dos(artefactos_kernel,nlp,lel_bd)
-        LelDetector.etapa_tres(lel_bd,nlp)
+        comentarios = LelDetector.etapa_dos(artefactos_kernel,nlp,lel_bd)
+        data = LelDetector.etapa_tres(lel_bd,nlp)
+        request.session["UMLDATA"] = data
+        request.session["LELCOMENTARIOS"] = comentarios
         return "OK"
 
 

@@ -21,6 +21,12 @@
   <div style="text-align: center;">
     <img class="img-fluid" alt="Diagrama UML" src="{% static 'uml/'%}{{ img_name }}">
   </div>
+  {% for s in comentarios %}
+  <p>{{s.0}}</p>
+  {% for p in s.1 %}
+  <ul>{{p}}</ul>
+  {% endfor %}
+  {% endfor %}
 </div>
 
 {% else %}
