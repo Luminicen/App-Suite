@@ -48,4 +48,5 @@ urlpatterns = [
     #path('pruebaIA/similarity',simility,name="IAsimilitud"),
     #path('pruebaIA/resumen',resumen,name="IAResumen"),
     #path('pruebaIA/similarityScenario',compararEscenario,name="IAsimilitudScenario"),
+    path('procesarNgramas/<str:idP>',preprocesamiento_ngramas,name="ngram"),
     ]

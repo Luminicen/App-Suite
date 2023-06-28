@@ -157,7 +157,8 @@ def artefactos(request,id):
         elif funcionalidad=="cskw":
             return redirect(reverse('artefactos',kwargs={'id':id}))
         elif funcionalidad=="uml":
-            return redirect(reverse('crearUML',kwargs={'idP':id}))
+            return redirect(reverse('ngram',kwargs={'idP':id}))
+            #return redirect(reverse('crearUML',kwargs={'idP':id}))
         elif funcionalidad=="exportSKW" :
             aTxt=request.session["textoTxt"]
             response = HttpResponse(content_type='text/plain')  
@@ -375,6 +376,30 @@ def crearArtefactoUML(request, idP):
     if "LELCOMENTARIOS" in request.session:
         context["comentarios"] = request.session["LELCOMENTARIOS"]
     return render(request, 'uml-visualizer.html', context=context)
+def detectar_ngramas(lista):
+    """
+        Detecta ngramas y devuelve un arreglo de ngramas 
+        con referencia a alguna clase para poder reemplazar.
+        formato de lista/diccionario:
+        {'nombre': nombre_clase,
+         'metodos': metodos_clase,
+         'relaciones': relacion_entre_clases }
+         output: los ngramas de la siguiente forma:
+         arreglo: ('clase_detectada_de_lista', [lista de ngramas asociados])
+    """
+    return [('cuenta',['cuenta bancaria','cuenta en','cuenta la','la cuenta']),('transferencia',['transferencia bancaria','tranferencia en la','transferencia x']),('deposito',['deposito bancario','deposito en'])]
+def sort_by(e):
+    return e[0]
+def preprocesamiento_ngramas(request,idP):
+    data = request.session["UMLDATA"]
+    print(data)
+    if request.method == "GET":
+        sel = request.GET.getlist('seleccionados')
+        print(sel)
+    ngramas = detectar_ngramas(data)
+    
+    #print(ngramas)
+    return render(request, 'ngramas.html', {'ngramas':ngramas})
 
 ############################### TESTE ##########################################
 # TEST API# os.system("java -jar plantuml.jar test.txt")

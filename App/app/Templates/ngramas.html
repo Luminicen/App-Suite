@@ -1,0 +1,61 @@
+<!-- templates/home.html-->
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ngrmas{% endblock %}
+{% block head %}
+    {{ super }}
+    <link rel="stylesheet" href="./css/botton.css" />
+    {% endblock %}
+{% block content %}
+{% if user.is_authenticated %}
+
+<form method="get">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Clase</th>
+          <th scope="col">Ngramas detectados</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for n in ngramas %}
+        <tr>
+          <th scope="row">{{ forloop.counter }}</th>
+          <td>{{n.0}}</td>
+          <td>
+            {% for op in n.1 %}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="{{n.0}}" id = "{{ forloop.counter }}" value="{{op}}">
+                <label class="form-check-label" for="{{ forloop.counter }}">{{op}}</label>
+              </div>
+              {% endfor %}
+          </td>
+        </tr>
+        {% endfor %}
+        
+      </tbody>
+    </table>
+
+
+{% else %}
+<div style="background-color:#1F1D4F; height: 100vh">
+  <div class="container-fluid h-custom">
+    <div class="row d-flex justify-content-center align-items-center fondoFlores py-5"> 
+      <div class="col-md-8 col-lg-6 col-xl-4 shadow-lg p-5 my-5 bg-white rounded ">
+        <div class="loginform ">
+          <div class="d-flex justify-content-center">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Padlock-lightblue.svg" alt="...">
+        </div>
+          <p>You are not logged in</p>
+          <a class="btn btn-primary form-control" href="{% url 'login' %}">Log In</a>
+        </div>
+      </div>
+    </div>
+</div>
+</div>
+
+  
+{% endif %}
+{% endblock %}
