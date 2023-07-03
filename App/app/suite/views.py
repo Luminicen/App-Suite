@@ -329,9 +329,11 @@ def crearArtefactoUML(request, idP):
     #aTxt=request.session["UMLDATA"]
     data = request.session["UMLDATA"]
     #print(data)
+    from app.settings import BASE_DIR
+    
     context = {}
     try:
-        static_url = STATICFILES_DIRS[0]
+        static_url =  os.path.join(BASE_DIR,"app","static")
         filename = os.path.join(static_url, "uml", f"uml_{idP}.txt")
         file = open(filename, "w")
         file.write("@startuml\n")
@@ -364,13 +366,20 @@ def crearArtefactoUML(request, idP):
 
         file.write("@enduml")
         file.close()
-
-        os.system(f"java -jar {static_url}/plantuml.jar {static_url}/uml/uml_{idP}.txt")
+        import subprocess
+        archivo = f"uml_{idP}.txt"
+        #print(os.path.join(static_url,"plantuml.jar"))
+        #print(os.path.join(static_url,"uml",archivo))
+        #print(static_url)
+        #os.system("dir "+ static_url)
+        #subprocess.run("java","-jar", os.path.join(static_url,"plantuml.jar",os.path.join(static_url,"uml",archivo)) )
+        #os.system("java -jar"+" "+ os.path.join(static_url,"plantuml.jar")+" "+ os.path.join(static_url,"uml",archivo))
 
     except Exception as e:
         context["error"] = str(e)
         print(e)
-
+    subprocess.run(["java","-jar", os.path.join(static_url,"plantuml.jar"),os.path.join(static_url,"uml",archivo)])
+    
     context["img_name"] = f"uml_{idP}.png"
     #request.session["LELCOMENTARIOS"] = comentarios
     if "LELCOMENTARIOS" in request.session:
@@ -392,12 +401,41 @@ def sort_by(e):
     return e[0]
 def preprocesamiento_ngramas(request,idP):
     data = request.session["UMLDATA"]
-    print(data)
-    if request.method == "GET":
-        sel = request.GET.getlist('seleccionados')
-        print(sel)
     ngramas = detectar_ngramas(data)
-    
+    #print("NGRAMAS")
+    #print(data)
+    if request.method == "GET":
+        reemplazo = []
+        for i in ngramas:
+            sel = request.GET.getlist(i[0])
+            if not sel:
+                reemplazo.append((i[0],None))
+            else:
+                reemplazo.append((i[0],sel[0].replace(" ","")))
+        #print(reemplazo)
+        print("ANTES DEL REEMPLAZO")
+        print(data)
+        for i in reemplazo:
+            for key in data:
+                if i[1] == None:
+                    break
+                if key['nombre'].lower() == i[0].lower():
+                    key['nombre'] = i[1]
+                for relacion in range(len(key['relaciones'])):
+                    print(key['relaciones'][relacion],i[0])
+                    if key['relaciones'][relacion].lower() == i[0].lower():
+                        print("SON IGUALES")
+                        key['relaciones'][relacion] = i[1]
+
+        print("DESPUES DEL REEMPLAZO")
+        print(data)
+        request.session["UMLDATA"] = data
+        actualizar = False
+        for i in reemplazo:
+            if i[1] != None:
+                actualizar = True
+        if actualizar:
+            return redirect(reverse('crearUML',kwargs={'idP':idP}))
     #print(ngramas)
     return render(request, 'ngramas.html', {'ngramas':ngramas})
 
