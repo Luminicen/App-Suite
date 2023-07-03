@@ -9,7 +9,7 @@
     {% endblock %}
 {% block content %}
 {% if user.is_authenticated %}
-
+{{ ngramas | json_script:"ngram" }}
 <form method="get">
     <table class="table">
       <thead>
@@ -26,11 +26,13 @@
           <td>{{n.0}}</td>
           <td>
             {% for op in n.1 %}
-            <div class="form-check form-check-inline">
+            <div class="form-check form-check-inline" id="{{n.0}}">
                 <input class="form-check-input" type="radio" name="{{n.0}}" id = "{{ forloop.counter }}" value="{{op}}">
                 <label class="form-check-label" for="{{ forloop.counter }}">{{op}}</label>
+                
               </div>
               {% endfor %}
+              <button class="btn btn-primary mt-2" id="add_{{n.0}}" onclick="agregarData('{{n.0}}')" href="#" type="button">Agregar Opcion</button>
           </td>
         </tr>
         {% endfor %}
@@ -61,4 +63,8 @@
 
   
 {% endif %}
+<script type="module" src="{% static 'scripts/ngramas.js' %}"></script>
+<script type="module">
+  import {agregarData} from './ngramas.js';
+</script>
 {% endblock %}
