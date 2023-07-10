@@ -403,18 +403,20 @@ def preprocesamiento_ngramas(request,idP):
     data = request.session["UMLDATA"]
     ngramas = detectar_ngramas(data)
     #print("NGRAMAS")
-    #print(data)
+    
     if request.method == "GET":
+        
         reemplazo = []
         for i in ngramas:
             sel = request.GET.getlist(i[0])
+            #print(request.GET.getlist(i[0]))
             if not sel:
                 reemplazo.append((i[0],None))
             else:
                 reemplazo.append((i[0],sel[0].replace(" ","")))
         #print(reemplazo)
-        print("ANTES DEL REEMPLAZO")
-        print(data)
+        #print("ANTES DEL REEMPLAZO")
+        #print(data)
         for i in reemplazo:
             for key in data:
                 if i[1] == None:
@@ -427,8 +429,8 @@ def preprocesamiento_ngramas(request,idP):
                         print("SON IGUALES")
                         key['relaciones'][relacion] = i[1]
 
-        print("DESPUES DEL REEMPLAZO")
-        print(data)
+        #print("DESPUES DEL REEMPLAZO")
+        #print(data)
         request.session["UMLDATA"] = data
         actualizar = False
         for i in reemplazo:

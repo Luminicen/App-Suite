@@ -71,25 +71,24 @@
     var datos = JSON.parse(document.getElementById('ngram').textContent);
     //console.log(datos)
     let input = prompt("Por favor inserte su opcion", "Opcion");
-    console.log(input)
-    //<div class="form-check form-check-inline">
-    //<input class="form-check-input" type="radio" name="cuenta" id="4" value="la cuenta">
-    //<label class="form-check-label" for="4">la cuenta</label>
     optiones = document.getElementById(label)
     div = document.createElement("div");
     div.className="form-check form-check-inline"
     optiones.removeChild(optiones.lastChild)
+    optiones.removeChild(optiones.lastChild)
     optiones.appendChild(div)
-    ratio = document.createElement("option");
+    ratio = document.createElement("input");
     ratio.className="form-check-input"
     ratio.type = "radio"
+    ratio.setAttribute('type','radio')
     ratio.name = label
     ratio.value = input
-    div.appendChild(ratio)
     lab = document.createElement("label");
     lab.className = "form-check-label"
     lab.value = input
+    lab.innerHTML = input
     div.appendChild(lab)
+    div.appendChild(ratio)
 }
 </script>
 {% endblock %}
