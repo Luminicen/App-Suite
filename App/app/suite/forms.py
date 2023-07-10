@@ -106,4 +106,14 @@ class LEL(forms.Form):
 
 class ProjectFileForm(forms.Form):
     nombre = forms.CharField(max_length=50)
-    file = forms.FileField() 
+    file = forms.FileField()
+
+class SecurityScenario(forms.Form):
+    nombre=forms.CharField(max_length=255,label="Identification")#<---
+    SourceOfStimulus=forms.CharField(max_length=255,label="Source of stimulus")
+    Stimulus=forms.CharField(max_length=255,label="Stimulus")
+    Environment=forms.CharField(max_length=255,label="Environment")
+    Artifact=forms.CharField(max_length=255,label="Artifact")
+    Response=forms.CharField(max_length=255,label="Response",required=False)
+    ResponseMeasure=forms.CharField(max_length=255,label="Response Measure",required=False)
+    

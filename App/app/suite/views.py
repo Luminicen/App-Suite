@@ -496,6 +496,13 @@ class KnowledgeGraph:
         else:
             formulario = KnowledgeGraphs()
         return formulario
+class Securityscenario:
+    def formulario(self,val):
+        if val!=None:
+            formulario = SecurityScenario(val)
+        else:
+            formulario = SecurityScenario()
+        return formulario
  
 class Boton():
     def __init__(self,nom,clave):
