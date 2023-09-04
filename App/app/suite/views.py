@@ -636,7 +636,7 @@ class UML:
     ################################################################
     # En uml_clases la idea es que la usen para almacenar  nombres clases
     # En uml_metodos, la idea es que almacenen diccionarios de tipo [{uml_clase: nombre_clase, uml_metodo: nombre_metodo}]
-    # En uml_relaciones, la idea es que nuevamente almacenen diccionarios del tipo [{uml_clase: nombre_clase, uml_relacion: relacion}]
+    # En uml_relaciones, la idea es que nuevamente almacenen diccionarios del tipo [{uml_clase: nombre_clase, uml_relacion: relacion(caso que no sea herencia)}, uml_subclase: relacion(caso que sea herencia)}]
     # Estas son variables de clase que seria como una "variable global" dentro de esta clase
     ################################################################
     def transformarTexto(texto):
