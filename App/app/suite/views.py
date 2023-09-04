@@ -856,6 +856,11 @@ class UML:
                 "subclases":z["subclase"] if z!=None else [],
                 "atributos":[],
                 "relaciones":z["relacion"] if z!=None else []
+                #"nombre" : clase,
+                #"metodos":x["uml_metodos"] if x!=None else [],
+                #"subclases":z["uml_subclase"] if z!=None else [],
+                #"atributos":[],
+                #"relaciones":z["uml_relacion"] if z!=None else []
                 }
             x=[]
             z=[]
