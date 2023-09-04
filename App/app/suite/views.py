@@ -630,6 +630,15 @@ def tranfSetArr(set):
         arr.append(i)
     return arr
 class UML:
+    uml_clases = []
+    uml_metodos = []
+    uml_relaciones = []
+    ################################################################
+    # En uml_clases la idea es que la usen para almacenar  nombres clases
+    # En uml_metodos, la idea es que almacenen diccionarios de tipo [{uml_clase: nombre_clase, uml_metodo: nombre_metodo}]
+    # En uml_relaciones, la idea es que nuevamente almacenen diccionarios del tipo [{uml_clase: nombre_clase, uml_relacion: relacion}]
+    # Estas son variables de clase que seria como una "variable global" dentro de esta clase
+    ################################################################
     def transformarTexto(texto):
         textoTransformado = texto
         return textoTransformado
@@ -829,6 +838,9 @@ class UML:
         for i in texto:
             aux.append(self.eliminar_tildes(self,i))
         texto=aux
+        #clases = UML.uml_clases
+        #metodos = UML.uml_metodos
+        #relaciones = UML.uml_relaciones
         clases=tranfSetArr(UML.identificarClases(texto[0]))
         metodos=UML.identificarMetodosDeClase(self,clases,texto[0])
         relaciones=UML.identificarRelaciones(self,clases,texto)
