@@ -1,13 +1,13 @@
 @startuml
-class Banco
-class Depositobancario
-Depositobancario : realizar()
 class Cliente
-Cliente --> Cuentabancaria
-Cliente --> Transferenciabancaria
-Cliente --> Depositobancario
-class Cuentabancaria
-Cuentabancaria : creer()
-class Transferenciabancaria
-Transferenciabancaria : realizar()
+Cliente --> Cuenta
+Cliente --> Transferencia
+Cliente --> Deposito
+class Transferencia
+Transferencia : realizar()
+class Cuenta
+Cuenta : creer()
+class Banco
+class Deposito
+Deposito : realizar()
 @enduml

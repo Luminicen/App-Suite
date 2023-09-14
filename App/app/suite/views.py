@@ -157,8 +157,8 @@ def artefactos(request,id):
         elif funcionalidad=="cskw":
             return redirect(reverse('artefactos',kwargs={'id':id}))
         elif funcionalidad=="uml":
-            return redirect(reverse('ngram',kwargs={'idP':id}))
-            #return redirect(reverse('crearUML',kwargs={'idP':id}))
+            #return redirect(reverse('ngram',kwargs={'idP':id}))
+            return redirect(reverse('crearUML',kwargs={'idP':id}))
         elif funcionalidad=="exportSKW" :
             aTxt=request.session["textoTxt"]
             response = HttpResponse(content_type='text/plain')  
@@ -401,7 +401,8 @@ def sort_by(e):
     return e[0]
 def preprocesamiento_ngramas(request,idP):
     data = request.session["UMLDATA"]
-    ngramas = detectar_ngramas(data)
+    #ngramas = detectar_ngramas(data)
+    ngramas = []
     #print("NGRAMAS")
     
     if request.method == "GET":
@@ -678,9 +679,11 @@ class UML:
         print("-----------------------------------------------")
         print(texto)
         texto = UML.break_into_sentences(texto)
+        detectar_ngramas(texto)
         for o in texto:
             doc = nlp(o)
             matches = matcher(doc)
+            
             for match_id, start, end in matches:
                 matched_span = doc[start:end]
                 clasesIdentificadas.add(matched_span.lemma_.lower())
