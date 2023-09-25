@@ -340,27 +340,27 @@ def crearArtefactoUML(request, idP):
 
         for clase in data:
             nombre_clase = str(clase["nombre"]).capitalize()
-            file.write("class " + nombre_clase + "\n")
+            file.write("class \"" + nombre_clase + "\"\n")
             try:
                 for atributo in clase["atributos"]:
-                    file.write(f"{nombre_clase} : {atributo}" + "\n")
+                    file.write(f"\"{nombre_clase}\" : {atributo}" + "\n")
             except:
                 pass
             try:
                 for relacion in clase["relaciones"]:
                     relacion = str(relacion).capitalize()
-                    file.write(f"{nombre_clase} --> {relacion}" + "\n")
+                    file.write(f"\"{nombre_clase}\" --> \"{relacion}\"" + "\n")
             except:
                 pass
             try:
                 for metodo in clase["metodos"]:
-                    file.write(f"{nombre_clase} : {metodo}()" + "\n")
+                    file.write(f"\"{nombre_clase}\" : {metodo}()" + "\n")
             except:
                 pass
             try:
                 for subclase in clase["subclases"]:
                     subclase = str(subclase).capitalize()
-                    file.write(f"{nombre_clase} <|-- {subclase}" + "\n")
+                    file.write(f"\"{nombre_clase}\" <|-- \"{subclase}\"" + "\n")
             except:
                 pass
 
