@@ -422,7 +422,8 @@ def detectar_ngramas(lista):
     matcher = Matcher(nlp.vocab)
     matcher.add("bigramas", [pattern_esp_1, pattern_esp_2])
     
-    doc = nlp(lista)
+    lista2= "".join(lista)
+    doc = nlp(lista2)
     matches = matcher(doc)
 
     estrucutra_final = armar_estructura(doc, matches);
@@ -436,6 +437,8 @@ def detectar_ngramas(lista):
          'relaciones': relacion_entre_clases }
          output: los ngramas de la siguiente forma:
          arreglo: ('clase_detectada_de_lista', [lista de ngramas asociados])
+    
+    return [('cuenta',['cuenta bancaria','cuenta en','cuenta la','la cuenta']),('transferencia',['transferencia bancaria','tranferencia en la','transferencia x']),('deposito',['deposito bancario','deposito en'])]
     """
     return estrucutra_final;
 def sort_by(e):

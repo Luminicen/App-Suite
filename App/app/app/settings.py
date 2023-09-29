@@ -91,8 +91,8 @@ DATABASES = {
         'NAME': 'req',
         'USER': 'root',
         'PASSWORD': '', # poner password para produccion
-        'HOST': 'localhost',   # para produccion dejar db
-        'PORT': '3306',
+        'HOST': '127.0.0.1',   # para produccion dejar db
+        'PORT': '3307',
 
     }
 }
