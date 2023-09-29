@@ -30,6 +30,10 @@ import gensim
 from gensim import corpora
 import pandas as pd
 from nltk import *
+
+from spacy.matcher import DependencyMatcher
+nlp_spanish = spacy.load("es_dep_news_trf")
+
 # Create your views here.
 ############################### Permisos ##########################################
 # Codigos de los permisos
@@ -340,27 +344,27 @@ def crearArtefactoUML(request, idP):
 
         for clase in data:
             nombre_clase = str(clase["nombre"]).capitalize()
-            file.write("class \"" + nombre_clase + "\"\n")
+            file.write("class " + nombre_clase + "\n")
             try:
                 for atributo in clase["atributos"]:
-                    file.write(f"\"{nombre_clase}\" : {atributo}" + "\n")
+                    file.write(f"{nombre_clase} : {atributo}" + "\n")
             except:
                 pass
             try:
                 for relacion in clase["relaciones"]:
                     relacion = str(relacion).capitalize()
-                    file.write(f"\"{nombre_clase}\" --> \"{relacion}\"" + "\n")
+                    file.write(f"{nombre_clase} --> {relacion}" + "\n")
             except:
                 pass
             try:
                 for metodo in clase["metodos"]:
-                    file.write(f"\"{nombre_clase}\" : {metodo}()" + "\n")
+                    file.write(f"{nombre_clase} : {metodo}()" + "\n")
             except:
                 pass
             try:
                 for subclase in clase["subclases"]:
                     subclase = str(subclase).capitalize()
-                    file.write(f"\"{nombre_clase}\" <|-- \"{subclase}\"" + "\n")
+                    file.write(f"{nombre_clase} <|-- {subclase}" + "\n")
             except:
                 pass
 
@@ -691,8 +695,8 @@ class UML:
 
 
     def break_into_sentences(parrafo):
-        parrafo = parrafo.replace("\r", "¥")
-        parrafo = parrafo.replace("\n", "¥")
+        parrafo = parrafo.replace("\\r", "¥")
+        parrafo = parrafo.replace("\\n", "¥")
         parrafo = parrafo.replace(". ", "¥")
         parrafo = " ".join(parrafo.split())
         parrafo += "¥"
@@ -717,99 +721,318 @@ class UML:
                 return elem
         return None
 
-    def identificarMetodosDeClase(self, clases, texto):
-        verbosProhibidos = ["contener", "ser", "es", "tener"]
-        metodosDeClaseIdentificados = []
-        texto = UML.break_into_sentences(texto)
-        for o in texto:
-            doc = nlp(o)
-            for classToken in doc:
-                if (classToken.dep_ == "obj") & (classToken.lemma_.lower() in clases):
-                    claseLeida = classToken.lemma_.lower()
-                    for verbToken in doc:
-                        if (verbToken.pos_ == "VERB") & (verbToken.lemma_ not in verbosProhibidos):
-                            repetido = buscarClase(metodosDeClaseIdentificados, claseLeida)
-                            if (repetido == None):
-                                aux = {
-                                    "nombre" : claseLeida,
-                                    "metodos" : [verbToken.lemma_]
-                                }
-                                metodosDeClaseIdentificados.append(aux)
-                            else:
-                                if (verbToken.lemma_ not in repetido["metodos"]):
-                                    repetido["metodos"].append(verbToken.lemma_)
-        return metodosDeClaseIdentificados
-
-    def identificarRelaciones(self,clases,texto):
-
-        # evalua si la entidad(sustativo) existe
-        def buscarSiYaExiste(sustantivo, relacionesIdentificados):
-            for palabra in relacionesIdentificados:
-                if palabra["nombre"] == sustantivo:
-                    return True
-            return False
-
-        # retorna true si ya existe la relacion
-        def existeRelacion(palabra, relacionesIdentificadas):
-            for entidad in relacionesIdentificadas:
-                if palabra in entidad["relacion"] or palabra in entidad["subclase"]:
-                    return True
-            return False
-
-        # agrega la relacion al sust
-        def evaluarPalabra(sustantivo, sustantivoRelacion, relaciones, esHerencia):
-        # verifico que las realciones o sublcases no se repitan, sino creo o sumo una nueva entidad/relacion
-            if not existeRelacion(sustantivoRelacion, relaciones):
-                if not (buscarSiYaExiste(sustantivo, relaciones)):
-                    palabra = {
-                        "nombre": sustantivo,
-                        "relacion": [],
-                        "subclase": []
-                    }
-                    relaciones.append(palabra)
-                # itero en relaciones hasta encontrar la entidad de sustativo
-                for palabra in relaciones:
-                    if palabra["nombre"] == sustantivo:
-                        if esHerencia:
-                            palabra["subclase"].append(sustantivoRelacion)
-                        else:
-                            palabra["relacion"].append(sustantivoRelacion)
-
-        pattern_one = [{'TEXT': {"IN": clases}}, {"OP": "?"}, {"OP": "?"},
-                       {'POS': {'IN': ['VERB', 'AUX']}}, {"OP": "?"}, {"OP": "?"},
-                       {'TEXT': {"IN": clases}}]
-        matcher = Matcher(nlp.vocab)
-        matcher.add('relaciones', [pattern_one])
-
-        relacionesIdentificadas = []
-        for o in texto:
-            doc = nlp(o)
-            texto_2 = "".join([token.lemma_ + " " for token in doc])
-            doc2 = nlp(texto_2)
-            matches = matcher(doc2)
-            # itero por cada match encotrado
-            for match_id, start, end in matches:
-                frase = doc2[start: end]
-                sustantivo = []
-                # itero en la frase del doc para obtener los sust y el verb
-                for tok in frase:
-                    if tok.text in clases:
-                        sustantivo.append(tok.text)
-                    elif tok.pos_ == "VERB" or tok.pos_ == "AUX":
-                        verb = tok.text
-                if (sustantivo[0], sustantivo[1] in clases):
-                    # verifico que los sust sean clases ya identificadas
-                    if not existeRelacion(sustantivo[0], relacionesIdentificadas):
-                        if verb == "ser":
-                            evaluarPalabra(sustantivo[1], sustantivo[0], relacionesIdentificadas, True)
-                        else:
-                            evaluarPalabra(sustantivo[0], sustantivo[1], relacionesIdentificadas, False)
-
-        return relacionesIdentificadas
-
     def eliminar_tildes(self,texto: str) -> str:
         import unidecode
         return unidecode.unidecode(texto.lower())
+
+    class Method():
+        def __init__(self, className, method, originator):
+            self.className = className
+            self.method = method
+            self.originator = originator
+
+        def getClassName(self):
+            return self.className
+        
+        def getName(self):
+            return self.method
+        
+        def getOriginator(self):
+            return self.originator
+    
+    class HierarchicalRelation():
+        def __init__(self, superClass, subClass):
+            self.superClass = superClass
+            self.subClass = subClass
+
+        def getClassName(self):
+            return self.superClass
+        
+        def getSubclass(self):
+            return self.subClass
+
+    class ClassClass():
+        def __init__(self, className):
+            self.className = className
+            self.methods = set()
+            self.atributos = set()
+            self.relations = set() #Relaciones no jerárquicas
+            self.subclasses = set()
+
+        def getClassName(self):
+            return self.className
+
+        def toJSON(self):
+            m = set()
+            for mtd in self.methods:
+                m.add(mtd.getName())
+                
+            return {
+                "nombre": self.className,
+                "metodos": list(m),
+                "relaciones": list(self.relations) if len(self.relations)>0 else [],
+                "atributos": list(self.atributos) if len(self.atributos)>0 else [],
+                "subclases": list(self.subclasses) if len(self.subclasses)>0 else []
+            }
+
+    def matchRoots(self, doc):
+        matcher = DependencyMatcher(nlp_spanish.vocab)
+        roots = ["ROOT", "advcl", "conj"]
+        possessives = ["tener", "poseer", "haber"]
+        pattern = [
+            {
+                "RIGHT_ID": "copula",
+                "RIGHT_ATTRS": {
+                    "DEP": "cop",
+                    "LEMMA": {"IN": ["ser", "estar"]}
+                }
+            },
+            {
+                "LEFT_ID": "copula",
+                "REL_OP": "<",
+                "RIGHT_ID": "root",
+                "RIGHT_ATTRS": {
+                    "DEP": { "IN": roots },
+                    "POS": { "IN": [ "NOUN", "ADJ" ]}
+                }
+            }
+        ]
+        matcher.add("copulative", [pattern])
+        pattern = [
+            {
+                "RIGHT_ID": "root",
+                "RIGHT_ATTRS": {
+                    "DEP": {"IN": roots},
+                    "POS": "VERB",
+                    "LEMMA": {"IN": possessives}
+                }
+            }
+        ]
+        matcher.add("possessive", [pattern])
+        pattern = [
+            {
+                "RIGHT_ID": "root",
+                "RIGHT_ATTRS": {
+                    "DEP": {"IN": roots},
+                    "POS": "VERB",
+                    "LEMMA": {"NOT_IN": possessives}
+                }
+            }
+        ]
+        matcher.add("action", [pattern])
+        return matcher(doc)
+
+    def isActive(self, doc):
+        # IMPLEMENTAR
+        return True
+
+    def getSubjects(self, doc, matched_root):
+        matcher = DependencyMatcher(nlp_spanish.vocab)
+        pattern_root = {
+            "RIGHT_ID": "root",
+            "RIGHT_ATTRS": {
+                "DEP": matched_root.dep_,
+                "LEMMA": matched_root.lemma_
+            }
+        }
+        first_subject_simple_sentence = {
+                "LEFT_ID": "root",
+                "REL_OP": ">",
+                "RIGHT_ID": "subject",
+                "RIGHT_ATTRS": {
+                    "DEP": "nsubj"
+                }
+        }
+        first_verb_complex_sentence = {
+            "LEFT_ID": "root",
+            "REL_OP": "<",
+            "RIGHT_ID": "first verb",
+            "RIGHT_ATTRS": {
+                "DEP": "ROOT",
+                "POS": "VERB"
+            }
+        }
+        further_subject = {
+            "LEFT_ID": "subject",
+            "REL_OP": ">",
+            "RIGHT_ID": "compound subject",
+            "RIGHT_ATTRS": {
+                "DEP": {"IN": ["conj", "appos"]},
+                "POS": "NOUN"
+            }
+        }
+        first_subject_complex_sentence = {
+            "LEFT_ID": "first verb",
+            "REL_OP": ">",
+            "RIGHT_ID": "subject",
+            "RIGHT_ATTRS": {
+                "DEP": "nsubj"
+            }
+        }
+        pattern = [
+            pattern_root,
+            first_subject_simple_sentence
+        ]
+        matcher.add("first subject simple sentence", [pattern])
+        pattern = [
+            pattern_root,
+            first_subject_simple_sentence,
+            further_subject
+        ]
+        matcher.add("compound subject simple sentence", [pattern])
+        pattern = [
+            pattern_root,
+            first_verb_complex_sentence,
+            first_subject_complex_sentence
+        ]
+        matcher.add("first subject complex sentence", [pattern])
+        pattern = [
+            pattern_root,
+            first_verb_complex_sentence,
+            first_subject_complex_sentence,
+            further_subject
+        ]
+        matcher.add("compound subject complex sentence", [pattern])
+
+        subjects = []
+        matches = matcher(doc)
+        for m in range(len(matches)):
+            match_id, token_ids = matches[m]
+            match nlp_spanish.vocab.strings[match_id]:
+                case "compound subject complex sentence":
+                    subjects.append(doc[token_ids[3]].lemma_)
+                case "first subject complex sentence":
+                    subjects.append(doc[token_ids[2]].lemma_)
+                case "compound subject simple sentence":
+                    subjects.append(doc[token_ids[2]].lemma_)
+                case "first subject simple sentence":
+                    subjects.append(doc[token_ids[1]].lemma_)
+        return subjects
+
+    def getDirectObjects(self, doc, matched_root):
+        matcher = DependencyMatcher(nlp_spanish.vocab)
+        root = {
+            "RIGHT_ID": "root",
+            "RIGHT_ATTRS": {
+                "DEP": matched_root.dep_,
+                "LEMMA": matched_root.lemma_
+            }
+        }
+        first_object = {
+                "LEFT_ID": "root",
+                "REL_OP": ">",
+                "RIGHT_ID": "object",
+                "RIGHT_ATTRS": {
+                    "DEP": "obj"
+                }
+        }
+        pattern = [
+            root,
+            first_object
+        ]
+        matcher.add("first object", [pattern])
+        pattern = [
+            root,
+            first_object,
+            {
+                "LEFT_ID": "object",
+                "REL_OP": ">",
+                "RIGHT_ID": "compound object",
+                "RIGHT_ATTRS": {
+                    "DEP": {"IN": ["conj", "appos"]},
+                    "POS": "NOUN"
+                }
+            }
+        ]
+        matcher.add("compound object", [pattern])
+        
+        objects = []
+        matches = matcher(doc)
+        for m in range(len(matches)):
+            match_id, token_ids = matches[m]
+            if nlp_spanish.vocab.strings[match_id] == "compound object":
+                objects.append(doc[token_ids[2]].lemma_)
+            else:
+                objects.append(doc[token_ids[1]].lemma_)
+        return objects
+
+    def findAgents(self, doc, matched_root):
+        if self.isActive(self, doc):
+            return self.getSubjects(self, doc, matched_root)
+        """ 
+        else #buscar agentes de voz pasiva
+        matcher = DependencyMatcher(nlp.vocab)
+        root = {
+            "RIGHT_ID": "root",
+            "RIGHT_ATTRS": {
+                "DEP": matched_root.dep_,
+                "LEMMA": matched_root.lemma_
+            }
+        }
+        """
+        return ["IS PASSIVE"]
+
+    def findPatients(self, doc, matched_root):
+        if self.isActive(self, doc):
+            return self.getDirectObjects(self, doc, matched_root)
+        return self.getSubjects(self, doc, matched_root)
+
+    def identificarMetodosDeClase(self, doc):
+        metodos = []
+        roots = self.matchRoots(self, doc)
+        for r in range(len(roots)):
+            match_id, token_ids = roots[r]
+            if nlp_spanish.vocab.strings[match_id] == "action":
+                method_name = doc[token_ids[0]].lemma_
+                agents = self.findAgents(self, doc, doc[token_ids[0]])
+                patients = self.findPatients(self, doc, doc[token_ids[0]])
+                for a in range(len(agents)):
+                    for p in range(len(patients)):
+                        metodos.append(self.Method(patients[p], method_name, agents[a]))
+                    if len(patients) == 0: #Verbo intransitivo
+                        metodos.append(self.Method(agents[a], method_name, None))
+        return metodos
+
+    def findOtherPredicatives(self, doc, first_subclass):
+        matcher = DependencyMatcher(nlp_spanish.vocab)
+        #Implementar
+        pattern = [
+            
+        ]
+        return None
+
+    def identificarRelaciones(self, doc):
+        relaciones = []
+        roots = self.matchRoots(self, doc)
+        for r in range(len(roots)):
+            match_id, token_ids = roots[r]
+            if nlp_spanish.vocab.strings[match_id] == "copulative":
+                subjects = self.getSubjects(self, doc, doc[token_ids[1]])
+                predicatives = [doc[token_ids[1]]]
+                #predicatives.append(findOtherPredicatives(self, doc, doc[token_ids[1]]))
+                for sbj in range(len(subjects)):
+                    for pred in range(len(predicatives)):
+                        if predicatives[pred].pos_ == "NOUN":
+                            superClass = predicatives[pred].lemma_
+                            subClass = subjects[sbj]
+                        else:
+                            superClass = subjects[sbj]
+                            subClass = subjects[sbj] + "_" + predicatives[pred].lemma_
+                        relaciones.append(self.HierarchicalRelation(superClass, subClass))
+            elif nlp_spanish.vocab.strings[match_id] == "possession":
+                #TO DO!
+                pass
+            
+        return relaciones
+    
+    def getClassIndex(self, existingClasses: [ClassClass], className):
+        #Recupera la clase o la crea si no existe
+        for i in range(len(existingClasses)):
+            if existingClasses[i].getClassName() == className:
+                return i
+        existingClasses.append(self.ClassClass(className))
+        return len(existingClasses) - 1
+
     @classmethod
     def funcionalidad(self,sel,request,idP):
 
@@ -831,65 +1054,45 @@ class UML:
 
         if not texto:
             return None
-        merge=""
-        for i in texto:
-            merge= merge + i + " "
-        texto[0]=merge
-        aux_2=UML.separar_oraciones(texto[0])
-        texto=aux_2
-        aux=[]
-        for i in texto:
-            aux.append(self.eliminar_tildes(self,i))
-        texto=aux
-        #clases = UML.uml_clases
-        #metodos = UML.uml_metodos
-        #relaciones = UML.uml_relaciones
-        clases=tranfSetArr(UML.identificarClases(texto[0]))
-        metodos=UML.identificarMetodosDeClase(self,clases,texto[0])
-        relaciones=UML.identificarRelaciones(self,clases,texto)
-        data=[]
-        #expression_if_true if condition else expression_if_false
-        for clase in clases:
-            z=buscarClase(relaciones,clase)
-            x=buscarClase(metodos,clase)
-            #print(buscarClase(metodos,clase))
-            c={
-                "nombre" : clase,
-                "metodos":x["metodos"] if x!=None else [],
-                "subclases":z["subclase"] if z!=None else [],
-                "atributos":[],
-                "relaciones":z["relacion"] if z!=None else []
-                #"nombre" : clase,
-                #"metodos":x["uml_metodos"] if x!=None else [],
-                #"subclases":z["uml_subclase"] if z!=None else [],
-                #"atributos":[],
-                #"relaciones":z["uml_relacion"] if z!=None else []
-                }
-            x=[]
-            z=[]
-            data.append(c)
-        #data es lo que devolveria luego del procesamiento
-        #print(data)
+        
+        print("ESTE ES EL TEXTO QUE ENTRA:\n", texto)
+        oraciones = []
+        for t in texto:
+            oraciones = UML.break_into_sentences(t)
+        texto = oraciones
+        #print("ESTE ES EL TEXTO QUE PROCESA:\n", texto)
+        
+        data = []
+        for t in texto:
+            doc = nlp_spanish(t)
+            metodos = self.identificarMetodosDeClase(self, doc)
+            relaciones = self.identificarRelaciones(self, doc)
+            
+            # Mapea clases a partir de métodos y relaciones
+            classes = []
+            for m in metodos:
+                currentClass = self.getClassIndex(self, classes, m.getClassName())
+                classes[currentClass].methods.add(m)
+                classes[currentClass].relations.add(m.getOriginator())
+            for r in relaciones:
+                currentClass = self.getClassIndex(self, classes, r.getClassName())
+                try:
+                    #Encontró una relación "es un"
+                    classes[currentClass].subclasses.add(r.getSubclass())
+                except:
+                    #Encontró una relación de composición
+                    #classes[currentClass].atributos.add(r.getPossessed())
+                    pass
+
+            for c in classes:
+                data.append(c.toJSON())
+
+        print("ESTAS SON LAS CLASES QUE IDENTIFICA:")
+        print(data)
+
         request.session["UMLDATA"] = data
         return "OK"
- #diccionario= obj clase
- # data = [
- #       {
-  #          "nombre": "empresa",
-  #          "atributos": ["travesia", "calle", "numero", "codigoPostal", "ciudad", "provincia", "pais"],
-  #          "relaciones": ["cliente", "proveedor", "empleado"],
-  #          "metodos": ["ofrecer", "pedir", "pagar", "pagar_servicio"],
-  #          "subclases": ["empresa_publica", "empresa_privada"],
-  #      },
-  #      {
-  #          "nombre": "empresa_publica",
-  #          "atributos": ["travesia"],
-  #          "relaciones": [],
-   #         "metodos": ["ofrecer"],
-   #         "subclases": [],
-   #     },
-   # ]
-
+ 
 class TransformarAScenariosKeyWords:
     #CONVIERTE UN ESCENARIO NORMAL A UNO CON KEYWORDS
     def desarreglar(arr):
