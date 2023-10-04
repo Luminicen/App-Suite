@@ -179,6 +179,8 @@ def artefactos(request,id):
             similaritySC = request.session["similaridad_scenarios"]
         elif funcionalidad=="lelDT":
             return redirect(reverse('crearUML',kwargs={'idP':id}))
+        elif funcionalidad == "semiotica":
+            print("SEMIOTICA")
             #print("ACAAAAAA, ",similaritySC)
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones,"similaridad":similaritySC})
@@ -579,6 +581,7 @@ def listaBotones():
     botones.append(Boton("Validate knowledge graph","shacl4j"))
     botones.append(Boton("SimilarScenarios","ScSimil"))
     botones.append(Boton("LelDetectoranstractor","lelDT"))
+    botones.append(Boton("To security Scenario","semiotica"))
     return botones
     
 def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
@@ -597,6 +600,9 @@ def funcionalidadesRegitradas(request,entidadesSeleccionadas,idP):
         return 'ScSimil'
     if LelDetector.funcionalidad(entidadesSeleccionadas,request):
         return 'lelDT'
+    semiotica = Semiotica()
+    if semiotica.funcionalidad(entidadesSeleccionadas,request):
+        return 'semiotica'
 
 class SHACL4J:
     def funcionalidad(sel,request):
@@ -2245,8 +2251,120 @@ class LelDetector:
         request.session["LELCOMENTARIOS"] = comentarios
         return "OK"
 
+##########################################################################################################
+#
+# Semiotica - Completa campo extras
+#
+#~#######################################################################################################
+class Semiotica:
+    def preprocesamiento_basico(self,datos):
+        resultado = []
+        for i in datos:
+            if i.pos_ == "VERB" or i.pos_ == "NOUN":
+                resultado.append(i)
+        return resultado
+    def preprocesamientoADJSUS_basico(self,datos):
+        resultado = []
+        matcher = Matcher(nlp.vocab)
+        pattern = [{"POS": "ADJ"},{"POS": "NOUN"}]
+        matcher.add("authorized_person", [pattern])
+        matcheados = matcher(datos)
+        for match_id, start, end in matcheados:
+            resultado.extend(datos[start:end])
+        return resultado
+    def procesarEscenario(self, escenario):
+        nombre = nlp(escenario["nombre"])
+        nom = self.preprocesamiento_basico(nombre)
+        goal = nlp(escenario["Goal"])
+        gol = self.preprocesamiento_basico(goal)
+        contexto = nlp(escenario["Context"])
+        cont = self.preprocesamiento_basico(contexto)
+        actores = nlp(escenario["Actors"])
+        ac = self.preprocesamiento_basico(actores)
+        recursos = nlp(escenario["Resources"])
+        rec =self.preprocesamiento_basico(recursos)
+        episodeos = nlp(escenario["Episodes"])
+        ep = self.preprocesamiento_basico(episodeos)
+        return {
+            "nombre" : self.filtrarSalida(nom),
+            "Goal":self.filtrarSalida(gol),
+            "Context" : self.filtrarSalida(cont),
+            "Actors": self.filtrarSalida(ac),
+            "Resources": self.filtrarSalida(rec),
+            "Episodes" : self.filtrarSalida(ep)
+        }
+    def filtrarNombreAtaques(self,indice,ataques):
+        columnas = []
+        resultados = []
+        columnas.append(ataques.iloc[indice]["Descripcion"])
+        for z in columnas:
+            a = nlp(z)
+            resultados.append(self.preprocesamientoADJSUS_basico(a))
+        return resultados
 
+    def filtrarSalida(self,lista):
+        res = []
+        palabras = self.palabras_importantes()
+        for i in lista:
+            for j in palabras:
+                if i.text.lower() == j.text.lower():
+                    res.append(i.text.lower())
+        return res
+    def palabras_importantes(self):
+        palabras_clave = "QA, Example Attacks, Consequences for Agriculture, Involved Architecture Layer, Layer Definition, Common Problems, Resources, Privacy, Physical Attack, Replay Attack, Masquerade Attack, Perception Layer, Physical Layer, IoT Devices, Theft, Vandalism, Data Sensing, Data Acquisition, Measurement Devices, Information Theft, Production Standards, Infrastructure, Confidentiality, Tracing Attack, Phishing, Brute Force Attack, Known-Key Attack, Interface Layer, Application Layer, Authentication and Authorization, Sensor, Actuator, RFID, Camera, GPS, Devices, Integrity, Forgery Attack, Man-In-The-Middle Attack (MITM), Biometric, Template Attack, Trojan Horse Attack, Edge Layer, Middleware Layer, Service Composition, Security Features, In-Out Interface, Diverse Resources, Gateway, Cloud, Availability, Denial of Service (DoS) Attacks, SYN Flood, Ping of Death, Botnets, Flooding, Network Layer, Internet Layer, Unauthorized Access, Modification of Routing Paths, Authenticity, Attacks against Authentication, Dictionary Attack, Session Hijacking, Spoofing, Non-Repudiation, Malicious Code Attack, Repudiation Attack, Connection Technologies, Cloud."
+        palabras = []
+        for i in nlp(palabras_clave):
+            if i.text != ",":
+                palabras.append(i)
+        return palabras
+    def vincular(self,escenario,ataques,general):
+        detectados = []
+        for i in range(ataques.shape[0]):
+            tem = self.filtrarNombreAtaques(i,ataques)
+            cantidad = self.checkear(self.procesarEscenario(escenario),[elemento for sublist in tem for elemento in sublist])
+            detectados.append((i,cantidad))
+        coincidencia_maxima = max(detectados, key= lambda x:x[1])
+        return coincidencia_maxima
+    def checkear(self, esc, temas):
+        cantidad = 0
+        lista = []
+        lista.extend(esc["nombre"])
+        lista.extend(esc["Goal"])
+        lista.extend(esc["Context"])
+        lista.extend(esc["Actors"])
+        lista.extend(esc["Resources"])
+        lista.extend(esc["Episodes"])
+        for a in temas:
+            if a.text.lower() in lista:
+                cantidad = cantidad + 1
+        return cantidad
+    def extraer_info(self,fila,general,ataques):
+        informacion = ""
+        informacion+="Qa afected: "+ataques.iloc[fila]["QA"]+" \n"
+        informacion+="Threats attacks: "+ataques.iloc[fila]["Threats attacks.1"]+" \n"
+        informacion+="Layer affected: "+general.iloc[fila]["Definicion de capa"]+" \n"
+        informacion+="Mitigation mechanism: "+ataques.iloc[fila]["Mecanismo de mitigacion"]+" \n"
+        informacion+="Impact: "+general.iloc[fila]["Consecuencias para Agricultura"]
+        return informacion
 
+    def funcionalidad(self,sel,request):
+        if "semiotica" not in request.GET:
+            return None
+        esce=[]
+        nlp = spacy.load("en_core_web_trf") 
+        for i in sel:
+            if Artefacto.objects.get(id=i).tipoDeArtefacto.tipo=="Scenario":
+                esce.append(Artefacto.objects.get(id=i))
+        escenario = json.loads(esce[0].texto)
+        from app.settings import BASE_DIR
+        ruta_general= os.path.join(os.path.dirname(BASE_DIR), 'app' ,'suite','QAAspectsGeneral.csv')
+        ruta_ataquesEspecificos = os.path.join(os.path.dirname(BASE_DIR), 'app', 'suite','QAAttacksSpecific.csv')
+        general = pd.read_csv(ruta_general)
+        ataques = pd.read_csv(ruta_ataquesEspecificos)
+        tupla = self.vincular(escenario,ataques,general)
+        print(self.extraer_info(tupla[1],general,ataques))
+        return self.extraer_info(tupla[1],general,ataques)
+        #recabar info
 
 ##########################################################################################################
 #
