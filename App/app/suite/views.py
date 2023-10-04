@@ -180,7 +180,6 @@ def artefactos(request,id):
         elif funcionalidad=="lelDT":
             return redirect(reverse('crearUML',kwargs={'idP':id}))
         elif funcionalidad == "semiotica":
-            print("SEMIOTICA")
             return redirect(reverse('crearSecurityScenario',kwargs={'idP':id}))
             #print("ACAAAAAA, ",similaritySC)
     botones=listaBotones()
@@ -335,7 +334,6 @@ def crearArtefactoKG(request,idP):
 def crearEscenarioDeSeguridad(request,idP):
     #idP = id del Proyecto
     #idT = id del Tipo
-    print("ENTRO A CREAR Escenario de seguridad")
     proyecto=Proyecto.objects.get(id=idP)
     tipo=TipoDeArtefacto.objects.get(tipo='Securityscenario')
     if request.method == "POST":
