@@ -90,9 +90,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql', 
         'NAME': 'req',
         'USER': 'root',
-        'PASSWORD': '', # poner password para produccion
-        'HOST': '127.0.0.1',   # para produccion dejar db
-        'PORT': '3307',
+        'PASSWORD': 'password', # poner password para produccion
+        'HOST': 'db',   # para produccion dejar db
+        'PORT': '3306',
 
     }
 }
