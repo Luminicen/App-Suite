@@ -36,6 +36,7 @@ urlpatterns = [
     path('proyectos/artefactos/eliminar/<str:id>/<str:idP>',destruirArtefacto,name="destruirArtefactos"),
     path('proyectos/artefactos/crearKg/<str:idP>/',crearArtefactoKG,name="crearKG"),
     path('proyectos/artefactos/crearUML/<str:idP>/',crearArtefactoUML,name="crearUML"),
+    path('proyectos/artefactos/crearSecurityScenario/<str:idP>/',crearEscenarioDeSeguridad,name="crearSecurityScenario"),
     path('template',obtenerTemplate,name="obtenerTemplate"),
     path('', include(router.urls)),
     path('pruebaIA/probar/',pantallaDePruebas,name="IA"),

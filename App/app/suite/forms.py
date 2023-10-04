@@ -116,5 +116,5 @@ class SecurityScenario(forms.Form):
     Artifact=forms.CharField(max_length=255,label="Artifact")
     Response=forms.CharField(max_length=255,label="Response",required=False)
     ResponseMeasure=forms.CharField(max_length=255,label="Response Measure",required=False)
-    Threats=forms.CharField(max_length=255,label="Treats",required=False)
+    Threats=forms.CharField(widget=forms.Textarea(attrs={'rows': 20, 'cols': 85}),label="Treats",required=False)
     

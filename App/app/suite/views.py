@@ -181,6 +181,7 @@ def artefactos(request,id):
             return redirect(reverse('crearUML',kwargs={'idP':id}))
         elif funcionalidad == "semiotica":
             print("SEMIOTICA")
+            return redirect(reverse('crearSecurityScenario',kwargs={'idP':id}))
             #print("ACAAAAAA, ",similaritySC)
     botones=listaBotones()
     return render(request,'artefactos-lista.html',{"artifacts":escen,"ok":ok,"form":form,"formB":form2,"idP":id,"botones":botones,"similaridad":similaritySC})
@@ -330,6 +331,32 @@ def crearArtefactoKG(request,idP):
         if i != 'nombre':
             fields.append('id_'+i)
     return render(request, "proyecto-crear_conParticipantes.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+
+def crearEscenarioDeSeguridad(request,idP):
+    #idP = id del Proyecto
+    #idT = id del Tipo
+    print("ENTRO A CREAR Escenario de seguridad")
+    proyecto=Proyecto.objects.get(id=idP)
+    tipo=TipoDeArtefacto.objects.get(tipo='Securityscenario')
+    if request.method == "POST":
+        formulario = SecurityScenario(request.POST)
+        if formulario.is_valid():
+            infForma=formulario.cleaned_data
+            texto=convertidorDeForms(tipo,infForma,request.user)  
+            texto.save()
+            proyecto.artefactos.add(texto)
+            proyecto.save()
+            return redirect(reverse('artefactos',kwargs={'id':idP}))
+    else:
+        data={'Threats': request.session["Semiotica"]}
+        form=SecurityScenario(data)
+    all_fields = form.declared_fields.keys()
+    fields=[]
+    for i in all_fields:
+        if i != 'nombre':
+            fields.append('id_'+i)
+    return render(request, "proyecto-crear_conParticipantes.html", {"form" : form,"campos":fields,"tipo":tipo.tipo})
+
 
 def crearArtefactoUML(request, idP):
     #aTxt=request.session["UMLDATA"]
@@ -2362,8 +2389,9 @@ class Semiotica:
         general = pd.read_csv(ruta_general)
         ataques = pd.read_csv(ruta_ataquesEspecificos)
         tupla = self.vincular(escenario,ataques,general)
-        print(self.extraer_info(tupla[1],general,ataques))
-        return self.extraer_info(tupla[1],general,ataques)
+        datos = self.extraer_info(tupla[1],general,ataques)
+        request.session["Semiotica"] = datos
+        return "OK"
         #recabar info
 
 ##########################################################################################################
