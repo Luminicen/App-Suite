@@ -2367,7 +2367,8 @@ class Semiotica:
         informacion = ""
         informacion+="Qa afected: "+ataques.iloc[fila]["QA"]+" \n"
         informacion+="Threats attacks: "+ataques.iloc[fila]["Threats attacks.1"]+" \n"
-        informacion+="Layer affected: "+general.iloc[fila]["Definicion de capa"]+" \n"
+        informacion+="Layer affected: "+general.iloc[fila]["Capa de arquitectura involucrada"]+" \n"
+        informacion+="Layer details: "+general.iloc[fila]["Definicion de capa"]+" \n"
         informacion+="Mitigation mechanism: "+ataques.iloc[fila]["Mecanismo de mitigacion"]+" \n"
         informacion+="Impact: "+general.iloc[fila]["Consecuencias para Agricultura"]
         return informacion
