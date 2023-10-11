@@ -34,3 +34,4 @@ Services/IA/entorno/*
 Services/IA/aplicacionIA/Modelo_entrenado/*
 Services/IA/aplicacionIA/output/*
 output/*
+.venv
