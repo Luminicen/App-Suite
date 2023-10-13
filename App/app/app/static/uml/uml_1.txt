@@ -1,0 +1,19 @@
+@startuml
+class Exito
+class Transferencia
+Transferencia --> Exito
+Transferencia --> Cuenta
+class Saldo
+class Dinero
+Dinero : transfiriir()
+class Banco
+class Deposito
+Deposito : recibio()
+Deposito : recibir()
+class Cuenta
+Cuenta --> Saldo
+Cuenta --> Dinero
+Cuenta --> Deposito
+Cuenta --> Dueno
+class Dueno
+@enduml

@@ -1,4 +1,4 @@
-FROM python:3.9
+FROM python:3.10
 COPY . /app/
 WORKDIR /app/
 RUN chmod -R 777 data
@@ -12,7 +12,7 @@ RUN mkdir -p /usr/share/man/man1 /usr/share/man/man2
 
 RUN apt-get update && \
 apt-get install -y --no-install-recommends \
-        openjdk-11-jre
+        openjdk-17-jre
 RUN apt install -y graphviz
 RUN python3 pysett.py
 EXPOSE 8000

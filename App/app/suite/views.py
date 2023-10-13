@@ -390,6 +390,48 @@ def crearArtefactoUML(request, idP):
         context["comentarios"] = request.session["LELCOMENTARIOS"]
     return render(request, 'uml-visualizer.html', context=context)
 def detectar_ngramas(lista):
+
+    def armar_estructura(doc, matches):
+        lista_final = [];
+        lista_aux = [];
+        #guardo en la lista todas las palabras encontradas por el matcher
+        #tengo que volver a poner esto con las prop de un token
+        lista_matcheada = set([doc[start:end].text for match_id, start, end in matches])
+        for token in doc:
+            if(token.text in lista_matcheada) and (token.pos_ == 'NOUN') and (not token.text in lista_aux):
+                palabra_base = token.text
+                lista_asociados = list(filter(lambda a : palabra_base in a ,lista_matcheada))
+                lista_aux.append(palabra_base) 
+                lista_final.append((palabra_base, lista_asociados))
+        return lista_final;
+
+    pattern_esp_1 = [
+            {'POS' : {'IN' : ['ADP', 'DET', 'PRON']}, 'OP' : '?'},
+            {'POS' : {'IN' : ['NOUN', 'ADJ']}}, 
+            {'POS' : {'IN' : ['ADP', 'DET', 'PRON']}, 'OP' : '?'},
+            {'POS' : {'IN' : ['ADP', 'DET', 'PRON']}, 'OP' : '?'},
+            {'POS' : {'IN' : ['NOUN', 'ADJ', 'PROPN']}}, 
+            {'POS' : {'IN' : ['ADP', 'DET', 'PRON']}, 'OP' : '?'},
+            {'POS' : {'IN' : ['NOUN', 'ADJ']}, 'OP' : '?'}, 
+            {'POS' : {'IN' : ['ADP', 'DET', 'PRON','PROPN']}, 'OP' : '?'},
+            {'POS' : {'IN' : ['NOUN', 'ADJ']}, 'OP' : '?'}, 
+            {'POS' : {'IN' : ['ADP', 'DET', 'PRON','PROPN']}, 'OP' : '?'},
+            ];
+
+    pattern_esp_2 = [
+            {'POS' : {'IN' : ['NOUN', 'ADJ']}}, 
+            {'POS' : {'IN' : ['NOUN', 'ADJ', 'PROPN']}, 'OP' : '?'}, 
+            ];
+
+    matcher = Matcher(nlp.vocab)
+    matcher.add("bigramas", [pattern_esp_1, pattern_esp_2])
+    
+    lista2= "".join(lista)
+    doc = nlp(lista2)
+    matches = matcher(doc)
+
+    estrucutra_final = armar_estructura(doc, matches);
+
     """
         Detecta ngramas y devuelve un arreglo de ngramas 
         con referencia a alguna clase para poder reemplazar.
@@ -399,8 +441,10 @@ def detectar_ngramas(lista):
          'relaciones': relacion_entre_clases }
          output: los ngramas de la siguiente forma:
          arreglo: ('clase_detectada_de_lista', [lista de ngramas asociados])
-    """
+    
     return [('cuenta',['cuenta bancaria','cuenta en','cuenta la','la cuenta']),('transferencia',['transferencia bancaria','tranferencia en la','transferencia x']),('deposito',['deposito bancario','deposito en'])]
+    """
+    return estrucutra_final;
 def sort_by(e):
     return e[0]
 def preprocesamiento_ngramas(request,idP):
