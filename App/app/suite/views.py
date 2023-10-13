@@ -353,7 +353,7 @@ def crearArtefactoUML(request, idP):
             try:
                 for relacion in clase["relaciones"]:
                     relacion = str(relacion).capitalize()
-                    file.write(f"{nombre_clase} --> {relacion}" + "\n")
+                    file.write(f"{nombre_clase} <-- {relacion}" + "\n")
             except:
                 pass
             try:
