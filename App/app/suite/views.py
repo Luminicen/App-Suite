@@ -576,7 +576,7 @@ def listaBotones():
     botones.append(Boton("To UML","uml"))
     botones.append(Boton("Convert to ScenarioKeyWords","cskw"))
     botones.append(Boton("Export Scenario with keywords to txt file","exportSKW"))
-    botones.append(Boton("Validate knowledge graph","shacl4j"))
+    #botones.append(Boton("Validate knowledge graph","shacl4j"))
     #botones.append(Boton("SimilarScenarios","ScSimil"))
     #botones.append(Boton("LelDetectoranstractor","lelDT"))
     return botones
