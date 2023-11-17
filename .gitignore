@@ -35,3 +35,4 @@ Services/IA/aplicacionIA/Modelo_entrenado/*
 Services/IA/aplicacionIA/output/*
 output/*
 .venv
+db.sqlite3

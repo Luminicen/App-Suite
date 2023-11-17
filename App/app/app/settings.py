@@ -14,14 +14,14 @@ from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-STATIC_ROOT=os.path.join(os.path.dirname(BASE_DIR), 'app','static')
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'app', 'static')
 STATICFILES_DIRS = (os.path.join(
     BASE_DIR, "app", "static"),)
-MEDIA_URL='/herramientas/'
-MEDIA_ROOT=os.path.join(BASE_DIR,'herramientas')
+MEDIA_URL = '/herramientas/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'herramientas')
 FIXTURE_DIRS = (
-   os.path.join(os.path.join(
-    BASE_DIR, "app", "fixtures"),),
+    os.path.join(os.path.join(
+        BASE_DIR, "app", "fixtures"),),
 )
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -32,7 +32,8 @@ SECRET_KEY = 'django-insecure-%+xt5%%3tpy#8y3x*n58&!h59sddil(tj*j)1+^+ga)u@p^hxf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['app-requirements-healer.okd.lifia.info.unlp.edu.ar','localhost','db', '127.0.0.1', "127,0,0,1"]
+ALLOWED_HOSTS = ['app-requirements-healer.okd.lifia.info.unlp.edu.ar',
+                 'localhost', 'db', '127.0.0.1', "127,0,0,1"]
 
 
 # Application definition
@@ -73,7 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                
+
             ],
         },
     },
@@ -87,12 +88,8 @@ WSGI_APPLICATION = 'app.wsgi.application'
 DATABASES = {
     'default': {
 
-        'ENGINE': 'django.db.backends.mysql', 
-        'NAME': 'req',
-        'USER': 'root',
-        'PASSWORD': 'password', # poner password para produccion
-        'HOST': 'db',   # para produccion dejar db
-        'PORT': '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
 
     }
 }
