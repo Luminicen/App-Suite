@@ -42,6 +42,9 @@
           {% if "ProjectFile" != p.tipoDeArtefacto.tipo %}
           <a href="{% url 'modificarArtefactos' p.id idP%}">Modify</a> 
           {% endif %}
+          {% if "Scenario" == p.tipoDeArtefacto.tipo %}
+           | <a href="{% url 'arbolEpisodios' p.id idP%}">Tree</a> 
+          {% endif %}
            | <a href="{% url 'destruirArtefactos' p.id idP%}">Delete</a> 
           {% if "ProjectFile" == p.tipoDeArtefacto.tipo %}
           | <a href="{% url 'verArtefactos' p.id%}">Ver</a>

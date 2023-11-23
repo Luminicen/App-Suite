@@ -33,6 +33,7 @@ urlpatterns = [
     path('proyectos/artefactos/ver/<str:id>',verArtefactos,name="verArtefactos"),
     path('proyectos/artefactos/crear/<str:idP>/<str:idT>',crearArtefactos,name="crearArtefactos"),
     path('proyectos/artefactos/modificar/<str:id>/<str:idP>',modificarArtefacto,name="modificarArtefactos"),
+    path('proyectos/artefactos/arbol/<str:id>/<str:idP>', arbolEpisodios, name="arbolEpisodios"),
     path('proyectos/artefactos/eliminar/<str:id>/<str:idP>',destruirArtefacto,name="destruirArtefactos"),
     path('proyectos/artefactos/crearKg/<str:idP>/',crearArtefactoKG,name="crearKG"),
     path('proyectos/artefactos/crearUML/<str:idP>/',crearArtefactoUML,name="crearUML"),

@@ -279,6 +279,32 @@ def modificarArtefacto(request,id,idP):
             fields.append('id_'+i)
     return render(request, "proyecto-modificar.html", {"form" : form,"campos":fields,"tipo":artefacto.tipoDeArtefacto.tipo,"no_escribir":no_escribir,"id":id,"idP":idP})
 
+def arbolEpisodios(request, id, idP):
+    proyecto = Proyecto.objects.get(id=idP)
+    scenarios = proyecto.artefactos.all().filter(tipoDeArtefacto__tipo="Scenario")
+    artefacto = Artefacto.objects.get(id=id)
+    if not tienePermiso(request.user, proyecto):
+        return render(request,'ERRORES/403.html',{})
+    texto=json.loads(artefacto.texto)
+    print(texto)
+    episodes = texto["Episodes"].split("\r\n")
+    print(episodes)
+    tree = {
+        "name": artefacto.nombre,
+        "children": [{ "name": episode, "children": [] } for episode in episodes]
+    }
+    
+    for episode, i in zip(episodes, range(len(episodes))):
+        for scenario in scenarios:
+            scenario = json.loads(scenario.texto)
+            print(scenario)
+            if scenario["nombre"] == episode:
+                for sub_episode in scenario["Episodes"].split("\r\n"):
+                    tree["children"][i]["children"].append({ "name": sub_episode, "children": [] })
+                    
+    print(tree)
+    return render(request, "proyecto-arbol.html", {"id":id, "idP":idP, "scenario":json.dumps(tree)})
+
 def destruirArtefacto(request,id,idP):
     artefacto= Artefacto.objects.get(id=id)
     proyecto= Proyecto.objects.get(id=idP)
