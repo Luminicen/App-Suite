@@ -1,7 +1,11 @@
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
+// Set html height to 100% to make the svg height 100% of the parent div
+document.documentElement.style.height = "100%";
+
 // Specify the charts’ dimensions. The height is variable, depending on the layout.
-const width = 928;
+const width = 1200;
+const height = 600;
 const marginTop = 10;
 const marginRight = 10;
 const marginBottom = 10;
@@ -12,8 +16,9 @@ const marginLeft = 40;
 // “bottom”, in the data domain. The width of a column is based on the tree’s height.
 
 const data = JSON.parse(scenario.value);
+console.log("data", data);
 const root = d3.hierarchy(data);
-const dx = 20;
+const dx = 70;
 const dy = (width - marginRight - marginLeft) / (1 + root.height);
 
 // Define the tree layout and the shape for links.
@@ -23,16 +28,35 @@ const diagonal = d3
   .x((d) => d.y)
   .y((d) => d.x);
 
-// Create the SVG container, a layer for the links and a layer for the nodes.
-const svg = d3
-  .create("svg")
+const container = d3
+  .select("#grafico") // Assuming 'grafico' is the id of the parent div
+  .style("display", "flex")
+  .style("justify-content", "center")
+  .style("align-items", "center")
+  .style("height", "100vh"); // Set the height to the full viewport height
+
+const svg = container
+  .append("svg")
   .attr("width", width)
-  .attr("height", dx)
-  .attr("viewBox", [-marginLeft, -marginTop, width, dx])
+  .attr("height", height)
+  .attr("viewBox", [-marginLeft, -marginTop, width, height])
   .attr(
     "style",
     "width: auto; height: auto; font: 16px sans-serif; user-select: none;"
   );
+
+// Create the SVG container, a layer for the links and a layer for the nodes.
+//const svg = d3
+//  .create("svg")
+//  .attr("width", width)
+//  .attr("height", height) // Set the height
+//  .attr("viewBox", [-marginLeft, -marginTop, width, height]) // Adjust the viewBox to match the new height
+//  //.attr("height", dx)
+//  //.attr("viewBox", [-marginLeft, -marginTop, width, dx])
+//  .attr(
+//    "style",
+//    "width: auto; height: auto; font: 16px sans-serif; user-select: none;"
+//  );
 
 const gLink = svg
   .append("g")
@@ -61,7 +85,7 @@ function update(event, source) {
     if (node.x > right.x) right = node;
   });
 
-  const height = right.x - left.x + marginTop + marginBottom;
+  //const height = right.x - left.x + marginTop + marginBottom;
 
   const transition = svg
     .transition()
@@ -87,6 +111,44 @@ function update(event, source) {
       d.children = d.children ? null : d._children;
       update(event, d);
     });
+  
+  nodeEnter.each(function (d) {
+    // Check if the node is a middle node
+    if (d.parent && d._children) {
+      d3.select(this)
+        .append("foreignObject")
+        .attr("width", 55)
+        .attr("height", 50)
+        .attr("x", -55)
+        .attr("y", 10)
+        .append("xhtml:body")
+        .html(
+          '<button style="background-color: red; color: white; border: none; text-align: center; font-size: 16px; cursor: pointer; border-radius: 10px;">Borrar</button>'
+        )
+        .on("click", function (event) {
+          event.stopPropagation(); // Prevent click event from propagating to outer elements
+
+          // Get the data bound to the parent g element
+          const nodeData = d3.select(this.parentNode).datum();
+          console.log("nodeData", nodeData);
+
+          // Find the parent of the node
+          const parent = nodeData.parent;
+          console.log("parent", parent);
+
+          // Remove the node from the parent's children array
+          if (parent) {
+            const index = parent.children.indexOf(nodeData);
+            if (index !== -1) {
+              parent.children.splice(index, 1);
+            }
+          }
+
+          // Update the tree
+          update(null, root);
+        });
+    }
+  });
 
   nodeEnter
     .append("circle")
@@ -97,8 +159,17 @@ function update(event, source) {
   nodeEnter
     .append("text")
     .attr("dy", "0.31em")
-    .attr("x", (d) => (d._children ? -6 : 6))
-    .attr("text-anchor", (d) => (d._children ? "end" : "start"))
+    .attr("x", (d) => {
+      if (!d.parent) return 25;
+      else return 5;
+      // return d._children ? -6 : 6;
+    })
+    .attr("y", (d) => {
+      if (!d.parent) return 15;
+      else return 15;
+      // return d._children ? -6 : 6;
+    })
+    .attr("text-anchor", (d) => (!d.parent ? "end" : "start"))
     .text((d) => d.data.name)
     .clone(true)
     .lower()
@@ -162,7 +233,7 @@ root.y0 = 0;
 root.descendants().forEach((d, i) => {
   d.id = i;
   d._children = d.children;
-  if (d.depth && d.data.name.length !== 7) d.children = null;
+  // if (d.depth && d.data.name.length !== 7) d.children = null;
 });
 
 update(null, root);
