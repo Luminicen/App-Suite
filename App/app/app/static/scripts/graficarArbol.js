@@ -107,11 +107,12 @@ function update(event, source) {
     .attr("transform", (d) => `translate(${source.y0},${source.x0})`)
     .attr("fill-opacity", 0)
     .attr("stroke-opacity", 0)
+    .attr("id", (d) => `node-${d.id}`)
     .on("click", (event, d) => {
       d.children = d.children ? null : d._children;
       update(event, d);
     });
-  
+
   nodeEnter.each(function (d) {
     // Check if the node is a middle node
     if (d.parent && d._children) {
@@ -123,44 +124,39 @@ function update(event, source) {
         .attr("y", 10)
         .append("xhtml:body")
         .html(
-          '<button style="background-color: red; color: white; border: none; text-align: center; font-size: 16px; cursor: pointer; border-radius: 10px;">Borrar</button>'
+          `<button style="background-color: red; color: white; border: none; text-align: center; font-size: 16px; cursor: pointer; border-radius: 10px;" id="prune-${d.id}">Podar</button>`
         )
         .on("click", function (event) {
           event.stopPropagation(); // Prevent click event from propagating to outer elements
 
           // Get the data bound to the parent g element
           const nodeData = d3.select(this.parentNode).datum();
-          console.log("nodeData", nodeData);
 
-          // Find the parent of the node
-          const parent = nodeData.parent;
-          console.log("parent", parent);
+          // Toggle the pruned state
+          const newState = !nodeData.data.pruned;
 
-          // Remove the node from the parent's children array
-          if (parent) {
-            const index = parent.children.indexOf(nodeData);
-            if (index !== -1) {
-              parent.children.splice(index, 1);
-            }
-          }
+          // If the new state is false but the parent is pruned, ignore
+          if (!newState && nodeData.parent.data.pruned) return;
+
+          // Mark the node as pruned or not pruned
+          nodeData.data.pruned = newState;
+
+          // Mark all descendants as pruned or not pruned
+          nodeData.each((d) => (d.data.pruned = newState));
 
           // Update the tree
-          update(null, root);
+          update(event, nodeData);
         });
     }
   });
 
-  nodeEnter
-    .append("circle")
-    .attr("r", 2.5)
-    .attr("fill", (d) => (d._children ? "#555" : "#999"))
-    .attr("stroke-width", 10);
+  nodeEnter.append("circle").attr("r", 2.5).attr("stroke-width", 10);
 
   nodeEnter
     .append("text")
     .attr("dy", "0.31em")
     .attr("x", (d) => {
-      if (!d.parent) return 25;
+      if (!d.parent) return -3;
       else return 5;
       // return d._children ? -6 : 6;
     })
@@ -169,7 +165,8 @@ function update(event, source) {
       else return 15;
       // return d._children ? -6 : 6;
     })
-    .attr("text-anchor", (d) => (!d.parent ? "end" : "start"))
+    // .attr("text-anchor", (d) => (!d.parent ? "end" : "start"))
+    .attr("text-anchor", "start")
     .text((d) => d.data.name)
     .clone(true)
     .lower()
@@ -184,6 +181,27 @@ function update(event, source) {
     .attr("transform", (d) => `translate(${d.y},${d.x})`)
     .attr("fill-opacity", 1)
     .attr("stroke-opacity", 1);
+
+  nodeUpdate
+    .select("circle")
+    .attr("fill", (d) =>
+      d.data.pruned ? "red" : d._children ? "#555" : "#999"
+    );
+
+  nodeUpdate
+    .selectAll("text")
+    .style("fill", (d) => (d.data.pruned ? "red" : "black"));
+
+  // Update the prune buttons
+  nodeUpdate.each(function (d) {
+    // Check if the node is a middle node
+    if (d.parent && d._children) {
+      d3.select(this)
+        .select("foreignObject")
+        .select("button")
+        .style("background-color", d.data.pruned ? "grey" : "red");
+    }
+  });
 
   // Transition exiting nodes to the parent's new position.
   const nodeExit = node
@@ -201,13 +219,19 @@ function update(event, source) {
   const linkEnter = link
     .enter()
     .append("path")
+    // .attr("id", (d) => `link-${d.source.data.id}-${d.target.data.id}`)
     .attr("d", (d) => {
       const o = { x: source.x0, y: source.y0 };
       return diagonal({ source: o, target: o });
-    });
+    })
+    .attr("stroke", (d) => (d.target.data.pruned ? "red" : "#555"));
 
   // Transition links to their new position.
-  link.merge(linkEnter).transition(transition).attr("d", diagonal);
+  link
+    .merge(linkEnter)
+    .transition(transition)
+    .attr("d", diagonal)
+    .attr("stroke", (d) => (d.target.data.pruned ? "red" : "#555"));
 
   // Transition exiting nodes to the parent's new position.
   link
