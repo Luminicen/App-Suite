@@ -31,9 +31,9 @@ const diagonal = d3
 const container = d3
   .select("#grafico") // Assuming 'grafico' is the id of the parent div
   .style("display", "flex")
-  .style("justify-content", "center")
-  .style("align-items", "center")
-  .style("height", "100vh"); // Set the height to the full viewport height
+  .style("justify-content", "center");
+// .style("align-items", "center")
+// .style("height", "100vh"); // Set the height to the full viewport height
 
 const svg = container
   .append("svg")
@@ -141,8 +141,16 @@ function update(event, source) {
           // Mark the node as pruned or not pruned
           nodeData.data.pruned = newState;
 
+          // Mark all children as pruned or not pruned
+          const markDescendants = (node) => {
+            node.data.pruned = newState;
+            if (node._children)
+              node._children.forEach((child) => markDescendants(child));
+          };
+          markDescendants(nodeData);
+
           // Mark all descendants as pruned or not pruned
-          nodeData.each((d) => (d.data.pruned = newState));
+          // nodeData.each((d) => (d.data.pruned = newState));
 
           // Update the tree
           update(event, nodeData);
