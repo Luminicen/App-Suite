@@ -1,11 +1,12 @@
-{% extends 'base.html' %} {% load crispy_forms_tags %}
+{% extends 'base.html' %} {% load crispy_forms_tags %} {% load static %}
 {% block title %}Projects{% endblock %}
 {% block content %}
 
 {% if user.is_authenticated %}
+<script type="module" src="{% static 'scripts/graficarArbol.js' %}"></script>
 <input hidden id="scenario" value="{{scenario}}">
 <div class="container text-end" style="padding-top: 50px;">
-  <button class="btn btn-primary" id="exportar">
+  <button class="btn btn-primary" id="exportar" onclick="exportar()">
     Exportar
   </button>
 </div>
@@ -34,7 +35,6 @@
       </div>
     </div>
   </div>
-  {% endif %} {% load static %}
-  <script type="module" src="{% static 'scripts/graficarArbol.js' %}"></script>
+  {% endif %}  
   {% endblock %}
 </div>

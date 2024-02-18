@@ -271,3 +271,23 @@ root.descendants().forEach((d, i) => {
 update(null, root);
 
 grafico.appendChild(svg.node());
+
+function pruneTree(node) {
+  if (node.data.pruned) return null;
+  const newNode = { ...node.data };
+  if (node.children)
+    newNode.children = node.children.map(pruneTree).filter(Boolean);
+  return newNode;
+}
+
+window.exportar = function () {
+  const prunedRoot = pruneTree(root);
+  const data = JSON.stringify(prunedRoot, null, 2);
+  const blob = new Blob([data], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "arbol.json";
+  a.click();
+  URL.revokeObjectURL(url);
+};
