@@ -109,6 +109,7 @@ function update(event, source) {
     .attr("stroke-opacity", 0)
     .attr("id", (d) => `node-${d.id}`)
     .on("click", (event, d) => {
+      return; // Disable collapsing nodes
       d.children = d.children ? null : d._children;
       update(event, d);
     });

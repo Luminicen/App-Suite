@@ -13,6 +13,7 @@ from suite.forms import *
 import json
 from suite.ontoscen.wikilink import Wikilink
 from suite.ontoscen.ontoscen import Ontoscen
+from suite.ontoscen.analyzer import Analyzer
 from suite.ontoscen.requirement import Requirement
 import spacy
 import requests
@@ -279,11 +280,14 @@ def modificarArtefacto(request,id,idP):
             fields.append('id_'+i)
     return render(request, "proyecto-modificar.html", {"form" : form,"campos":fields,"tipo":artefacto.tipoDeArtefacto.tipo,"no_escribir":no_escribir,"id":id,"idP":idP})
 
+def is_semantic_similar(text1, text2):
+    return Analyzer().are_sentences_equivalent(text1, text2)
+
 def process_episode(episode, scenarios):
     tree = { "name": episode, "children": [] }
     for scenario in scenarios:
         scenario = json.loads(scenario.texto)
-        if scenario["nombre"] == episode:
+        if is_semantic_similar(scenario["nombre"], episode):
             for sub_episode in scenario["Episodes"].split("\r\n"):
                 tree["children"].append(process_episode(sub_episode, scenarios))
     return tree

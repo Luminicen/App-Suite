@@ -309,3 +309,21 @@ class Analyzer:
 
         self._remove_rules_for_resources()
         return result + included_resources
+
+    def get_sentence_without_actors(self, sentence):
+        actor = self.analyze_for_actors(sentence)
+        print("sentence", sentence)
+        print("actor", actor)
+        return sentence.text.replace(actor, "").strip()
+    
+    def are_sentences_equivalent(self, sentence1, sentence2):
+        sentence1 = NLP(self.get_sentence_without_actors(sentence1))
+        # print("sentence1", sentence1)
+        sentence1_lemmatized = self.lemmatize(sentence1)
+        # print("sentence1_lemmatized", sentence1_lemmatized)
+        sentence2 = NLP(self.get_sentence_without_actors(sentence2))
+        # print("sentence2", sentence2)
+        sentence2_lemmatized = self.lemmatize(sentence2)
+        # print("sentence2_lemmatized", sentence2_lemmatized)
+        # print("similarity", sentence1.similarity(sentence2))
+        return sentence1.similarity(sentence2) > 0.9
