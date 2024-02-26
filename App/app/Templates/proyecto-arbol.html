@@ -5,12 +5,12 @@
 {% if user.is_authenticated %}
 <script type="module" src="{% static 'scripts/graficarArbol.js' %}"></script>
 <input hidden id="scenario" value="{{scenario}}">
-<div class="container text-end" style="padding-top: 50px;">
+<div class="container text-end" style="padding-top: 50px; margin-bottom: 40px;">
   <button class="btn btn-primary" id="exportar" onclick="exportar()">
     Exportar
   </button>
 </div>
-<div id="grafico" style="justify-content: center; display: flex;"></div>
+<div id="grafico" style="justify-content: center; display: block;"></div>
 {% else %}
 <div style="background-color: #1f1d4f; height: 100vh">
   <div class="container-fluid h-custom">

@@ -4,7 +4,7 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 document.documentElement.style.height = "100%";
 
 // Specify the charts’ dimensions. The height is variable, depending on the layout.
-const width = 1200;
+const spacePerNode = 500;
 const height = 600;
 const marginTop = 10;
 const marginRight = 10;
@@ -18,6 +18,7 @@ const marginLeft = 40;
 const data = JSON.parse(scenario.value);
 console.log("data", data);
 const root = d3.hierarchy(data);
+const width = (1 + root.height) * spacePerNode;
 const dx = 70;
 const dy = (width - marginRight - marginLeft) / (1 + root.height);
 
@@ -30,8 +31,9 @@ const diagonal = d3
 
 const container = d3
   .select("#grafico") // Assuming 'grafico' is the id of the parent div
-  .style("display", "flex")
-  .style("justify-content", "center");
+  // .style("display", "flex")
+  .style("justify-content", "center")
+  .style("overflow", "auto"); // Enable scrolling
 // .style("align-items", "center")
 // .style("height", "100vh"); // Set the height to the full viewport height
 
@@ -125,7 +127,7 @@ function update(event, source) {
         .attr("y", 10)
         .append("xhtml:body")
         .html(
-          `<button style="background-color: red; color: white; border: none; text-align: center; font-size: 16px; cursor: pointer; border-radius: 10px;" id="prune-${d.id}">Podar</button>`
+          `<button style="background-color: red; color: white; border: none; text-align: center; font-size: 16px; cursor: pointer; border-radius: 10px;" id="prune-${d.id}">Prune</button>`
         )
         .on("click", function (event) {
           event.stopPropagation(); // Prevent click event from propagating to outer elements
@@ -267,6 +269,7 @@ root.descendants().forEach((d, i) => {
   d.id = i;
   d._children = d.children;
   // if (d.depth && d.data.name.length !== 7) d.children = null;
+  // if (d.depth && d._children) d.children = null; // collapse middle nodes initially
 });
 
 update(null, root);
